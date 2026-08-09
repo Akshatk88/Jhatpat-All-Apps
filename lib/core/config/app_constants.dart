@@ -24,7 +24,7 @@ class AppConstants {
   ///
   /// Without this Razorpay falls back to the legal entity registered on the
   /// account ("SWITCHEATS PRIVATE LIMITED"), which is not our consumer brand.
-  static const String brandName = 'Suvio';
+  static const String brandName = 'Food+taxi';
 
   /// Public logo URL for the Razorpay sheet. Razorpay fetches this over the
   /// network, so a bundled asset cannot be used — it must be a hosted URL.

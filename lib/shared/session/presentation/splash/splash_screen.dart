@@ -1,8 +1,8 @@
+import 'package:superapp_user/app/routing/app_route_names.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
-import 'package:superapp_user/app/routing/route_names.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -64,7 +64,12 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     _animationController.forward().then((_) {
       Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted) {
-          context.go(RouteNames.home);
+          // The super app opens on the hub so the user picks a service.
+          // (Previously this went straight into food's home, which was correct
+          // when food was the whole app.) Phase 7 moves this decision into
+          // SessionController's redirect, which will also handle onboarding,
+          // forced logout, maintenance and force-update.
+          context.go(AppRoutePaths.hub);
         }
       });
     });
