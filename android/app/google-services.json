@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "592916974677",
+    "firebase_url": "https://flutterfoodapp-e6742-default-rtdb.firebaseio.com",
+    "project_id": "flutterfoodapp-e6742",
+    "storage_bucket": "flutterfoodapp-e6742.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:592916974677:android:3d0944149b8965b01518dc",
+        "android_client_info": {
+          "package_name": "com.fooddelivery.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_twLhO7C21HdRBvoZvedceka0jdLCUjc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:592916974677:android:f60f1fee11a338111518dc",
+        "android_client_info": {
+          "package_name": "com.foodrestaurant.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_twLhO7C21HdRBvoZvedceka0jdLCUjc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:592916974677:android:5366c1825a27cf201518dc",
+        "android_client_info": {
+          "package_name": "com.fooduser.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_twLhO7C21HdRBvoZvedceka0jdLCUjc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
