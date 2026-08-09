@@ -5,17 +5,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:superapp_user/src/presentation/navigation/back_navigation.dart';
-import 'package:superapp_user/src/core/utils/haptics.dart';
-import 'package:superapp_user/src/data/models/food_model.dart';
-import 'package:superapp_user/src/data/models/food_variant.dart';
-import 'package:superapp_user/src/di/catalog_providers.dart';
+import 'package:superapp_user/core/utils/haptics.dart';
+import 'package:superapp_user/modules/food/data/models/food_model.dart';
+import 'package:superapp_user/modules/food/data/models/food_variant.dart';
+import 'package:superapp_user/modules/food/application/providers/catalog_providers.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:superapp_user/src/domain/service/deep_link_service.dart';
+import 'package:superapp_user/modules/food/data/services/deep_link_service.dart';
 import 'package:superapp_user/src/presentation/cart/viewmodels/cart_viewmodel.dart';
 import 'package:superapp_user/src/presentation/cart/utils/cart_restaurant_guard.dart';
 import 'package:superapp_user/src/presentation/cart/animations/add_to_cart_animation.dart';
 import 'package:superapp_user/src/presentation/cart/widgets/floating_view_cart_bar.dart';
-import 'package:superapp_user/src/presentation/common_widgets/smart_image.dart';
+import 'package:superapp_user/design_system/components/media/smart_image.dart';
 import 'package:superapp_user/src/presentation/favorites/viewmodels/favorites_viewmodel.dart';
 import 'package:superapp_user/src/presentation/navigation/route_names.dart';
 

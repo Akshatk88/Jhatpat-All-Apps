@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:superapp_user/src/data/models/cart_item_model.dart';
-import 'package:superapp_user/src/data/models/food_model.dart';
-import 'package:superapp_user/src/data/models/food_variant.dart';
-import 'package:superapp_user/src/data/datasources/order_remote_datasource.dart';
+import 'package:superapp_user/modules/food/data/models/cart_item_model.dart';
+import 'package:superapp_user/modules/food/data/models/food_model.dart';
+import 'package:superapp_user/modules/food/data/models/food_variant.dart';
+import 'package:superapp_user/modules/food/api/datasources/order_remote_datasource.dart';
 
 /// Fixture tests for variants and add-ons.
 ///

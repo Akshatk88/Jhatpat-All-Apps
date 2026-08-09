@@ -4,10 +4,10 @@ import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:superapp_user/src/di/payment_providers.dart';
-import 'package:superapp_user/src/di/wallet_providers.dart';
+import 'package:superapp_user/modules/food/application/providers/payment_providers.dart';
+import 'package:superapp_user/modules/food/application/providers/wallet_providers.dart';
 import 'package:superapp_user/src/presentation/auth/viewmodels/auth_viewmodel.dart';
-import 'package:superapp_user/src/platform/payment/payment_gateway.dart';
+import 'package:superapp_user/core/payment/payment_gateway.dart';
 import 'package:superapp_user/src/presentation/wallet/viewmodels/wallet_state.dart';
 
 final walletViewModelProvider = NotifierProvider<WalletViewModel, WalletState>(

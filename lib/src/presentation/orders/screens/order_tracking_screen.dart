@@ -1,4 +1,4 @@
-import 'package:superapp_user/src/presentation/common_widgets/app_refresh_indicator.dart';
+import 'package:superapp_user/design_system/components/layout/app_refresh_indicator.dart';
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -9,13 +9,13 @@ import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:superapp_user/src/core/utils/haptics.dart';
-import 'package:superapp_user/src/data/models/order_model.dart';
-import 'package:superapp_user/src/presentation/branding/app_colors.dart';
+import 'package:superapp_user/core/utils/haptics.dart';
+import 'package:superapp_user/modules/food/data/models/order_model.dart';
+import 'package:superapp_user/design_system/tokens/app_colors.dart';
 import 'package:superapp_user/src/presentation/chat/screens/chat_screen.dart';
-import 'package:superapp_user/src/presentation/common_widgets/app_snackbar.dart';
-import 'package:superapp_user/src/presentation/common_widgets/skeleton_loading.dart';
-import 'package:superapp_user/src/presentation/common_widgets/smart_image.dart';
+import 'package:superapp_user/design_system/components/feedback/app_snackbar.dart';
+import 'package:superapp_user/design_system/components/skeletons/skeleton_loading.dart';
+import 'package:superapp_user/design_system/components/media/smart_image.dart';
 import 'package:superapp_user/src/presentation/coupons/viewmodels/coupons_viewmodel.dart';
 import 'package:superapp_user/src/presentation/home/viewmodels/banners_viewmodel.dart';
 import 'package:superapp_user/src/presentation/navigation/route_names.dart';

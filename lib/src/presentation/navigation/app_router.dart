@@ -31,15 +31,15 @@ import 'package:superapp_user/src/presentation/referral/screens/referral_ticket_
 import 'package:superapp_user/src/presentation/wallet/screens/wallet_screen.dart';
 import 'package:superapp_user/src/presentation/chat/screens/chat_screen.dart';
 import 'package:superapp_user/src/presentation/home/screens/home_filter_screen.dart';
-import 'package:superapp_user/src/presentation/common/webview_screen.dart';
+import 'package:superapp_user/design_system/components/layout/webview_screen.dart';
 import 'package:superapp_user/src/presentation/about/screens/about_screen.dart';
 import 'package:superapp_user/src/presentation/profile/screens/help_support_screen.dart';
 import 'package:superapp_user/src/presentation/profile/screens/privacy_policy_screen.dart';
 import 'package:superapp_user/src/presentation/profile/screens/terms_conditions_screen.dart';
 import 'package:superapp_user/src/presentation/profile/screens/edit_profile_screen.dart';
-import 'package:superapp_user/src/data/models/restaurant_model.dart';
-import 'package:superapp_user/src/data/models/food_model.dart';
-import 'package:superapp_user/src/data/models/cart_item_model.dart';
+import 'package:superapp_user/modules/food/data/models/restaurant_model.dart';
+import 'package:superapp_user/modules/food/data/models/food_model.dart';
+import 'package:superapp_user/modules/food/data/models/cart_item_model.dart';
 import 'package:superapp_user/src/presentation/cart/viewmodels/cart_viewmodel.dart';
 import 'package:superapp_user/src/presentation/checkout/viewmodels/checkout_viewmodel.dart';
 

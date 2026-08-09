@@ -7,11 +7,11 @@ import 'package:go_router/go_router.dart';
 
 import 'package:superapp_user/src/presentation/navigation/back_navigation.dart';
 
-import 'package:superapp_user/src/core/utils/haptics.dart';
-import 'package:superapp_user/src/core/utils/referral_audio_player.dart';
-import 'package:superapp_user/src/data/models/wallet_model.dart';
-import 'package:superapp_user/src/presentation/branding/app_colors.dart';
-import 'package:superapp_user/src/presentation/common_widgets/skeleton_loading.dart';
+import 'package:superapp_user/core/utils/haptics.dart';
+import 'package:superapp_user/core/audio/referral_audio_player.dart';
+import 'package:superapp_user/modules/food/data/models/wallet_model.dart';
+import 'package:superapp_user/design_system/tokens/app_colors.dart';
+import 'package:superapp_user/design_system/components/skeletons/skeleton_loading.dart';
 import 'package:superapp_user/src/presentation/referral/viewmodels/referral_viewmodel.dart';
 import 'package:superapp_user/src/presentation/referral/widgets/refer_earn_background.dart';
 import 'package:superapp_user/src/presentation/referral/widgets/referral_ticket_card.dart';

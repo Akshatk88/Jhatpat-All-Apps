@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-import 'package:superapp_user/src/core/utils/haptics.dart';
-import 'package:superapp_user/src/data/models/chat_model.dart';
-import 'package:superapp_user/src/presentation/branding/app_colors.dart';
+import 'package:superapp_user/core/utils/haptics.dart';
+import 'package:superapp_user/modules/food/data/models/chat_model.dart';
+import 'package:superapp_user/design_system/tokens/app_colors.dart';
 import 'package:superapp_user/src/presentation/chat/screens/chat_screen.dart';
 import 'package:superapp_user/src/presentation/navigation/route_names.dart';
 import 'package:superapp_user/src/presentation/orders/viewmodels/order_conversations_viewmodel.dart';

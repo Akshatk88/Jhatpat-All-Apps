@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:superapp_user/src/presentation/branding/app_colors.dart';
+import 'package:superapp_user/design_system/tokens/app_colors.dart';
 import 'package:superapp_user/src/presentation/navigation/route_names.dart';
 
 class SplashScreen extends StatefulWidget {

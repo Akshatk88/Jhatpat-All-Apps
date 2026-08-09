@@ -3,11 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:superapp_user/src/presentation/navigation/back_navigation.dart';
-import 'package:superapp_user/src/core/utils/haptics.dart';
-import 'package:superapp_user/src/presentation/branding/app_colors.dart';
+import 'package:superapp_user/core/utils/haptics.dart';
+import 'package:superapp_user/design_system/tokens/app_colors.dart';
 import 'package:superapp_user/src/presentation/cart/widgets/floating_view_cart_bar.dart';
-import 'package:superapp_user/src/presentation/common_widgets/empty_state_widget.dart';
-import 'package:superapp_user/src/presentation/common_widgets/skeleton_loading.dart';
+import 'package:superapp_user/design_system/components/media/empty_state_widget.dart';
+import 'package:superapp_user/design_system/components/skeletons/skeleton_loading.dart';
 import 'package:superapp_user/src/presentation/home/viewmodels/home_viewmodel.dart';
 import 'package:superapp_user/src/presentation/navigation/route_names.dart';
 import 'package:superapp_user/src/presentation/restaurant/widgets/food_item_card.dart';

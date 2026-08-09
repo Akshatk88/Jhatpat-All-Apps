@@ -4,10 +4,10 @@ import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:superapp_user/src/core/error/failures.dart';
-import 'package:superapp_user/src/data/datasources/address_remote_datasource.dart';
-import 'package:superapp_user/src/data/models/address_model.dart';
-import 'package:superapp_user/src/di/address_providers.dart';
+import 'package:superapp_user/core/error/failures.dart';
+import 'package:superapp_user/modules/food/api/datasources/address_remote_datasource.dart';
+import 'package:superapp_user/modules/food/data/models/address_model.dart';
+import 'package:superapp_user/modules/food/application/providers/address_providers.dart';
 import 'package:superapp_user/src/presentation/auth/viewmodels/auth_viewmodel.dart';
 
 /// Saved addresses, backed by `/food/user/addresses`.

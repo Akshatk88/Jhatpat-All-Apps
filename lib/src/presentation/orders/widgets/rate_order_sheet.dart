@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:superapp_user/src/core/utils/haptics.dart';
-import 'package:superapp_user/src/data/models/order_model.dart';
-import 'package:superapp_user/src/presentation/branding/app_colors.dart';
-import 'package:superapp_user/src/presentation/common_widgets/app_snackbar.dart';
+import 'package:superapp_user/core/utils/haptics.dart';
+import 'package:superapp_user/modules/food/data/models/order_model.dart';
+import 'package:superapp_user/design_system/tokens/app_colors.dart';
+import 'package:superapp_user/design_system/components/feedback/app_snackbar.dart';
 import 'package:superapp_user/src/presentation/orders/viewmodels/orders_viewmodel.dart';
 
 /// Bottom sheet for rating a delivered order — food, delivery partner (if

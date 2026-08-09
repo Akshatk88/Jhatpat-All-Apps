@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:superapp_user/src/core/utils/haptics.dart';
-import 'package:superapp_user/src/data/models/food_model.dart';
-import 'package:superapp_user/src/presentation/branding/app_colors.dart';
-import 'package:superapp_user/src/presentation/common_widgets/skeleton_loading.dart';
-import 'package:superapp_user/src/presentation/common_widgets/smart_image.dart';
+import 'package:superapp_user/core/utils/haptics.dart';
+import 'package:superapp_user/modules/food/data/models/food_model.dart';
+import 'package:superapp_user/design_system/tokens/app_colors.dart';
+import 'package:superapp_user/design_system/components/skeletons/skeleton_loading.dart';
+import 'package:superapp_user/design_system/components/media/smart_image.dart';
 import 'package:superapp_user/src/presentation/home/viewmodels/veg_filter_provider.dart';
 import 'package:superapp_user/src/presentation/restaurant/viewmodels/restaurant_detail_viewmodel.dart';
 import 'package:superapp_user/src/presentation/restaurant/widgets/food_detail_sheet.dart';

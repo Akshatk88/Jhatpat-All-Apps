@@ -4,13 +4,13 @@ import 'package:go_router/go_router.dart';
 
 import 'package:superapp_user/src/presentation/navigation/back_navigation.dart';
 
-import 'package:superapp_user/src/core/utils/haptics.dart';
-import 'package:superapp_user/src/data/models/order_model.dart';
-import 'package:superapp_user/src/presentation/branding/app_colors.dart';
+import 'package:superapp_user/core/utils/haptics.dart';
+import 'package:superapp_user/modules/food/data/models/order_model.dart';
+import 'package:superapp_user/design_system/tokens/app_colors.dart';
 import 'package:superapp_user/src/presentation/cart/utils/cart_restaurant_guard.dart';
 import 'package:superapp_user/src/presentation/cart/viewmodels/cart_viewmodel.dart';
-import 'package:superapp_user/src/presentation/common_widgets/app_snackbar.dart';
-import 'package:superapp_user/src/presentation/common_widgets/skeleton_loading.dart';
+import 'package:superapp_user/design_system/components/feedback/app_snackbar.dart';
+import 'package:superapp_user/design_system/components/skeletons/skeleton_loading.dart';
 import 'package:superapp_user/src/presentation/navigation/route_names.dart';
 import 'package:superapp_user/src/presentation/orders/utils/reorder.dart';
 import 'package:superapp_user/src/presentation/orders/viewmodels/orders_viewmodel.dart';

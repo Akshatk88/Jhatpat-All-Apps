@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:superapp_user/src/di/search_providers.dart';
-import 'package:superapp_user/src/domain/service/search_service.dart';
-import 'package:superapp_user/src/platform/speech/speech_service.dart';
+import 'package:superapp_user/modules/food/application/providers/search_providers.dart';
+import 'package:superapp_user/modules/food/data/services/search_service.dart';
+import 'package:superapp_user/core/speech/speech_service.dart';
 import 'package:superapp_user/src/presentation/search/viewmodels/search_state.dart';
 
 final searchViewModelProvider =

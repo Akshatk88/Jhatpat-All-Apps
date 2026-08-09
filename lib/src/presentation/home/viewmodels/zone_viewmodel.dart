@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 
-import 'package:superapp_user/src/data/models/zone_model.dart';
-import 'package:superapp_user/src/di/catalog_providers.dart';
+import 'package:superapp_user/modules/food/data/models/zone_model.dart';
+import 'package:superapp_user/modules/food/application/providers/catalog_providers.dart';
 
 /// Detects the serviceable zone for the user's location.
 ///

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:superapp_user/src/presentation/common_widgets/smart_image.dart';
+import 'package:superapp_user/design_system/components/media/smart_image.dart';
 
 class AddToCartAnimation {
   static void run({

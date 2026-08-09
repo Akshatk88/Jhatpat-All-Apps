@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:superapp_user/src/core/constants/app_constants.dart';
-import 'package:superapp_user/src/data/models/wallet_model.dart';
-import 'package:superapp_user/src/di/account_providers.dart';
+import 'package:superapp_user/core/config/app_constants.dart';
+import 'package:superapp_user/modules/food/data/models/wallet_model.dart';
+import 'package:superapp_user/modules/food/application/providers/account_providers.dart';
 import 'package:superapp_user/src/presentation/auth/viewmodels/auth_viewmodel.dart';
 
 /// Referral stats and invite history from `GET /food/user/referrals/details`.

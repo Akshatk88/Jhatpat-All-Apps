@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:superapp_user/src/data/datasources/catalog_remote_datasource.dart';
-import 'package:superapp_user/src/data/models/restaurant_model.dart';
-import 'package:superapp_user/src/di/catalog_providers.dart';
-import 'package:superapp_user/src/di/location_providers.dart';
-import 'package:superapp_user/src/platform/location/location_service.dart';
+import 'package:superapp_user/modules/food/api/datasources/catalog_remote_datasource.dart';
+import 'package:superapp_user/modules/food/data/models/restaurant_model.dart';
+import 'package:superapp_user/modules/food/application/providers/catalog_providers.dart';
+import 'package:superapp_user/modules/food/application/providers/location_providers.dart';
+import 'package:superapp_user/core/location/location_service.dart';
 
 class NearYouState {
   final AsyncValue<List<RestaurantModel>> restaurants;

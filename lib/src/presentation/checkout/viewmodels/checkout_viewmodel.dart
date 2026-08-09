@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:superapp_user/src/core/error/failures.dart';
-import 'package:superapp_user/src/data/models/order_pricing.dart';
-import 'package:superapp_user/src/di/order_providers.dart';
-import 'package:superapp_user/src/di/payment_providers.dart';
-import 'package:superapp_user/src/platform/payment/payment_gateway.dart';
+import 'package:superapp_user/core/error/failures.dart';
+import 'package:superapp_user/modules/food/data/models/order_pricing.dart';
+import 'package:superapp_user/modules/food/application/providers/order_providers.dart';
+import 'package:superapp_user/modules/food/application/providers/payment_providers.dart';
+import 'package:superapp_user/core/payment/payment_gateway.dart';
 import 'package:superapp_user/src/presentation/auth/viewmodels/auth_viewmodel.dart';
 import 'package:superapp_user/src/presentation/cart/viewmodels/cart_viewmodel.dart';
 import 'package:superapp_user/src/presentation/home/viewmodels/zone_viewmodel.dart';

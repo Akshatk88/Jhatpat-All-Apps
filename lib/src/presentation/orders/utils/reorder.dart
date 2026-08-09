@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:superapp_user/src/data/models/cart_item_model.dart';
-import 'package:superapp_user/src/data/models/food_model.dart';
-import 'package:superapp_user/src/data/models/food_variant.dart';
-import 'package:superapp_user/src/data/models/order_model.dart';
-import 'package:superapp_user/src/di/catalog_providers.dart';
+import 'package:superapp_user/modules/food/data/models/cart_item_model.dart';
+import 'package:superapp_user/modules/food/data/models/food_model.dart';
+import 'package:superapp_user/modules/food/data/models/food_variant.dart';
+import 'package:superapp_user/modules/food/data/models/order_model.dart';
+import 'package:superapp_user/modules/food/application/providers/catalog_providers.dart';
 
 /// Rebuilds an order's items as cart lines, resolved against the
 /// restaurant's CURRENT menu/add-on catalog rather than the order's own

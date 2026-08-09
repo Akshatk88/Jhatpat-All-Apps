@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:superapp_user/src/data/models/order_model.dart';
-import 'package:superapp_user/src/di/order_providers.dart';
-import 'package:superapp_user/src/di/socket_providers.dart';
-import 'package:superapp_user/src/platform/realtime/socket_service.dart';
+import 'package:superapp_user/modules/food/data/models/order_model.dart';
+import 'package:superapp_user/modules/food/application/providers/order_providers.dart';
+import 'package:superapp_user/modules/food/application/providers/socket_providers.dart';
+import 'package:superapp_user/core/realtime/socket_service.dart';
 import 'package:superapp_user/src/presentation/auth/viewmodels/auth_viewmodel.dart';
 
 class ActiveOrderState {

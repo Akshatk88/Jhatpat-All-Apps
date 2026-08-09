@@ -6,10 +6,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:superapp_user/src/presentation/navigation/back_navigation.dart';
 import 'package:share_plus/share_plus.dart';
 
-import 'package:superapp_user/src/core/utils/haptics.dart';
+import 'package:superapp_user/core/utils/haptics.dart';
 import 'package:superapp_user/src/presentation/auth/viewmodels/auth_viewmodel.dart';
-import 'package:superapp_user/src/presentation/common_widgets/app_snackbar.dart';
-import 'package:superapp_user/src/presentation/common_widgets/skeleton_loading.dart';
+import 'package:superapp_user/design_system/components/feedback/app_snackbar.dart';
+import 'package:superapp_user/design_system/components/skeletons/skeleton_loading.dart';
 import 'package:superapp_user/src/presentation/referral/viewmodels/referral_viewmodel.dart';
 import 'package:superapp_user/src/presentation/referral/widgets/fire_particle_share_button.dart';
 import 'package:superapp_user/src/presentation/referral/widgets/refer_earn_background.dart';

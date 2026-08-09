@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:superapp_user/src/core/network/api_client.dart';
-import 'package:superapp_user/src/core/storage/token_storage.dart';
-import 'package:superapp_user/src/data/datasources/order_remote_datasource.dart';
-import 'package:superapp_user/src/data/models/cart_item_model.dart';
-import 'package:superapp_user/src/data/models/food_model.dart';
+import 'package:superapp_user/core/network/api_client.dart';
+import 'package:superapp_user/core/storage/token_storage.dart';
+import 'package:superapp_user/modules/food/api/datasources/order_remote_datasource.dart';
+import 'package:superapp_user/modules/food/data/models/cart_item_model.dart';
+import 'package:superapp_user/modules/food/data/models/food_model.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

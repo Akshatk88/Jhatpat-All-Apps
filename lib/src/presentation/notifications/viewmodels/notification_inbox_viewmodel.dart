@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:superapp_user/src/core/error/failures.dart';
-import 'package:superapp_user/src/data/models/wallet_model.dart';
-import 'package:superapp_user/src/di/account_providers.dart';
+import 'package:superapp_user/core/error/failures.dart';
+import 'package:superapp_user/modules/food/data/models/wallet_model.dart';
+import 'package:superapp_user/modules/food/application/providers/account_providers.dart';
 import 'package:superapp_user/src/presentation/auth/viewmodels/auth_viewmodel.dart';
 
 /// Paginated notification inbox from `GET /food/notifications/inbox`.

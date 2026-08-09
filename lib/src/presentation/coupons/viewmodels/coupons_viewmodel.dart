@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:superapp_user/src/di/catalog_providers.dart';
+import 'package:superapp_user/modules/food/application/providers/catalog_providers.dart';
 
 /// A coupon from `GET /food/restaurant/offers`.
 ///

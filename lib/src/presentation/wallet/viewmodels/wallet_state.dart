@@ -1,4 +1,4 @@
-import 'package:superapp_user/src/data/models/wallet_model.dart';
+import 'package:superapp_user/modules/food/data/models/wallet_model.dart';
 
 enum WalletStatus { initial, loading, success, error }
 

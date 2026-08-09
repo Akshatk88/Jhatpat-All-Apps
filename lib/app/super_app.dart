@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:superapp_user/src/presentation/branding/app_theme.dart';
-import 'package:superapp_user/src/presentation/branding/theme_color_provider.dart';
-import 'package:superapp_user/src/presentation/branding/theme_provider.dart';
+import 'package:superapp_user/design_system/theme/app_theme.dart';
+import 'package:superapp_user/design_system/theme/theme_color_provider.dart';
+import 'package:superapp_user/design_system/theme/theme_provider.dart';
 import 'package:superapp_user/src/presentation/navigation/app_router.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import 'package:superapp_user/src/di/push_providers.dart';
-import 'package:superapp_user/src/platform/notifications/push_service.dart';
+import 'package:superapp_user/modules/food/application/providers/push_providers.dart';
+import 'package:superapp_user/core/push/push_service.dart';
 import 'package:superapp_user/src/presentation/auth/viewmodels/auth_viewmodel.dart';
 
 class SuperApp extends ConsumerStatefulWidget {

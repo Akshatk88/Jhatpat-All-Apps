@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:superapp_user/src/data/models/order_model.dart';
-import 'package:superapp_user/src/presentation/branding/app_colors.dart';
+import 'package:superapp_user/modules/food/data/models/order_model.dart';
+import 'package:superapp_user/design_system/tokens/app_colors.dart';
 
 class PaymentDetailsCard extends StatelessWidget {
   final OrderModel order;

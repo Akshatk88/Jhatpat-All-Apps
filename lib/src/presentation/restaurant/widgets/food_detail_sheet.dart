@@ -3,19 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:superapp_user/src/core/utils/haptics.dart';
-import 'package:superapp_user/src/data/models/cart_item_model.dart';
-import 'package:superapp_user/src/data/models/food_model.dart';
-import 'package:superapp_user/src/data/models/food_variant.dart';
-import 'package:superapp_user/src/di/catalog_providers.dart';
-import 'package:superapp_user/src/presentation/branding/app_colors.dart';
+import 'package:superapp_user/core/utils/haptics.dart';
+import 'package:superapp_user/modules/food/data/models/cart_item_model.dart';
+import 'package:superapp_user/modules/food/data/models/food_model.dart';
+import 'package:superapp_user/modules/food/data/models/food_variant.dart';
+import 'package:superapp_user/modules/food/application/providers/catalog_providers.dart';
+import 'package:superapp_user/design_system/tokens/app_colors.dart';
 import 'package:superapp_user/src/presentation/cart/utils/cart_restaurant_guard.dart';
 import 'package:superapp_user/src/presentation/cart/viewmodels/cart_viewmodel.dart';
-import 'package:superapp_user/src/presentation/common_widgets/smart_image.dart';
+import 'package:superapp_user/design_system/components/media/smart_image.dart';
 import 'package:superapp_user/src/presentation/favorites/viewmodels/favorites_viewmodel.dart';
 import 'package:superapp_user/src/presentation/home/viewmodels/veg_filter_provider.dart';
 
-import 'package:superapp_user/src/domain/service/deep_link_service.dart';
+import 'package:superapp_user/modules/food/data/services/deep_link_service.dart';
 
 /// Selection-indicator style for a customization option row.
 enum _SelectionIndicator { radio, checkbox }

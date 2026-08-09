@@ -3,19 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:superapp_user/src/core/utils/haptics.dart';
+import 'package:superapp_user/core/utils/haptics.dart';
 import 'package:superapp_user/src/presentation/navigation/route_names.dart';
-import 'package:superapp_user/src/presentation/branding/app_colors.dart';
-import 'package:superapp_user/src/presentation/common_widgets/app_snackbar.dart';
-import 'package:superapp_user/src/data/models/user_model.dart';
+import 'package:superapp_user/design_system/tokens/app_colors.dart';
+import 'package:superapp_user/design_system/components/feedback/app_snackbar.dart';
+import 'package:superapp_user/modules/food/data/models/user_model.dart';
 import 'package:superapp_user/src/presentation/auth/viewmodels/auth_viewmodel.dart';
 import 'package:superapp_user/src/presentation/address/viewmodels/address_viewmodel.dart';
 import 'package:superapp_user/src/presentation/coupons/viewmodels/coupons_viewmodel.dart';
 import 'package:superapp_user/src/presentation/profile/viewmodels/notifications_viewmodel.dart';
 import 'package:superapp_user/src/presentation/orders/viewmodels/orders_viewmodel.dart';
 import 'package:superapp_user/src/presentation/wallet/viewmodels/wallet_viewmodel.dart';
-import 'package:superapp_user/src/presentation/branding/theme_color_provider.dart';
-import 'package:superapp_user/src/presentation/branding/theme_provider.dart';
+import 'package:superapp_user/design_system/theme/theme_color_provider.dart';
+import 'package:superapp_user/design_system/theme/theme_provider.dart';
 import 'package:superapp_user/src/presentation/home/viewmodels/veg_filter_provider.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {

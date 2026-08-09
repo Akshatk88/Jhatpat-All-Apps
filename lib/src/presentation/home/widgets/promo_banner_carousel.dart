@@ -5,10 +5,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:superapp_user/src/core/utils/haptics.dart';
-import 'package:superapp_user/src/data/models/promo_banner_model.dart';
-import 'package:superapp_user/src/presentation/branding/app_colors.dart';
-import 'package:superapp_user/src/presentation/common_widgets/smart_image.dart';
+import 'package:superapp_user/core/utils/haptics.dart';
+import 'package:superapp_user/modules/food/data/models/promo_banner_model.dart';
+import 'package:superapp_user/design_system/tokens/app_colors.dart';
+import 'package:superapp_user/design_system/components/media/smart_image.dart';
 
 /// Auto-rotating carousel of admin-uploaded promo banners.
 class PromoBannerCarousel extends StatefulWidget {

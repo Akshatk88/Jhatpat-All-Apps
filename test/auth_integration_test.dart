@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:superapp_user/src/core/network/api_client.dart';
-import 'package:superapp_user/src/core/storage/token_storage.dart';
-import 'package:superapp_user/src/data/datasources/auth_remote_datasource.dart';
-import 'package:superapp_user/src/data/repository/auth_repository_impl.dart';
+import 'package:superapp_user/core/network/api_client.dart';
+import 'package:superapp_user/core/storage/token_storage.dart';
+import 'package:superapp_user/modules/food/api/datasources/auth_remote_datasource.dart';
+import 'package:superapp_user/modules/food/data/repositories/auth_repository_impl.dart';
 
 /// Exercises the real network stack against the live backend.
 ///

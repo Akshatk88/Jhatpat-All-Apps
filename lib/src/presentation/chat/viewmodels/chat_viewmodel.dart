@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:superapp_user/src/data/models/chat_model.dart';
-import 'package:superapp_user/src/di/chat_providers.dart';
-import 'package:superapp_user/src/di/network_providers.dart';
-import 'package:superapp_user/src/di/push_providers.dart';
-import 'package:superapp_user/src/di/socket_providers.dart';
+import 'package:superapp_user/modules/food/data/models/chat_model.dart';
+import 'package:superapp_user/modules/food/application/providers/chat_providers.dart';
+import 'package:superapp_user/modules/food/application/providers/network_providers.dart';
+import 'package:superapp_user/modules/food/application/providers/push_providers.dart';
+import 'package:superapp_user/modules/food/application/providers/socket_providers.dart';
 import 'package:superapp_user/src/presentation/auth/viewmodels/auth_viewmodel.dart';
 
 /// Identifies one chat thread. For the delivery-partner chat, [orderId]

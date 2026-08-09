@@ -1,4 +1,4 @@
-import 'package:superapp_user/src/domain/model/search_result.dart';
+import 'package:superapp_user/modules/food/data/models/search_result.dart';
 
 enum SearchMode {
   home,

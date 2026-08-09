@@ -4,19 +4,19 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:superapp_user/src/presentation/navigation/back_navigation.dart';
-import 'package:superapp_user/src/core/utils/haptics.dart';
-import 'package:superapp_user/src/data/models/address_model.dart';
+import 'package:superapp_user/core/utils/haptics.dart';
+import 'package:superapp_user/modules/food/data/models/address_model.dart';
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:superapp_user/src/core/utils/map_styles.dart';
+import 'package:superapp_user/core/maps/map_styles.dart';
 
-import 'package:superapp_user/src/di/location_providers.dart';
-import 'package:superapp_user/src/platform/location/location_service.dart';
-import 'package:superapp_user/src/presentation/branding/app_colors.dart';
-import 'package:superapp_user/src/presentation/common_widgets/app_snackbar.dart';
+import 'package:superapp_user/modules/food/application/providers/location_providers.dart';
+import 'package:superapp_user/core/location/location_service.dart';
+import 'package:superapp_user/design_system/tokens/app_colors.dart';
+import 'package:superapp_user/design_system/components/feedback/app_snackbar.dart';
 import 'package:superapp_user/src/presentation/auth/viewmodels/auth_viewmodel.dart';
 import 'package:superapp_user/src/presentation/navigation/route_names.dart';
 import 'package:superapp_user/src/presentation/address/viewmodels/address_viewmodel.dart';

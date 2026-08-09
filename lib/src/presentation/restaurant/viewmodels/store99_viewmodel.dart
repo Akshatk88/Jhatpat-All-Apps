@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:superapp_user/src/data/models/restaurant_model.dart';
-import 'package:superapp_user/src/di/store99_providers.dart';
-import 'package:superapp_user/src/domain/service/store99_service.dart';
+import 'package:superapp_user/modules/food/data/models/restaurant_model.dart';
+import 'package:superapp_user/modules/food/application/providers/store99_providers.dart';
+import 'package:superapp_user/modules/food/data/services/store99_service.dart';
 import 'package:superapp_user/src/presentation/restaurant/viewmodels/store99_state.dart';
 
 final store99ViewModelProvider =

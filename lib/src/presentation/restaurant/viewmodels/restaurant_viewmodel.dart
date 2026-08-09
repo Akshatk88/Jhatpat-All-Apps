@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:superapp_user/src/data/models/food_model.dart';
-import 'package:superapp_user/src/data/models/restaurant_model.dart';
-import 'package:superapp_user/src/di/restaurant_providers.dart';
-import 'package:superapp_user/src/domain/service/restaurant_service.dart';
+import 'package:superapp_user/modules/food/data/models/food_model.dart';
+import 'package:superapp_user/modules/food/data/models/restaurant_model.dart';
+import 'package:superapp_user/modules/food/application/providers/restaurant_providers.dart';
+import 'package:superapp_user/modules/food/data/services/restaurant_service.dart';
 import 'package:superapp_user/src/presentation/home/viewmodels/veg_filter_provider.dart';
 import 'package:superapp_user/src/presentation/restaurant/viewmodels/restaurant_state.dart';
 

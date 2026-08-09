@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:superapp_user/src/di/restaurant_providers.dart';
-import 'package:superapp_user/src/data/models/category_model.dart';
-import 'package:superapp_user/src/data/models/restaurant_model.dart';
-import 'package:superapp_user/src/data/models/food_model.dart';
-import 'package:superapp_user/src/domain/repository/restaurant_repository.dart';
+import 'package:superapp_user/modules/food/application/providers/restaurant_providers.dart';
+import 'package:superapp_user/modules/food/data/models/category_model.dart';
+import 'package:superapp_user/modules/food/data/models/restaurant_model.dart';
+import 'package:superapp_user/modules/food/data/models/food_model.dart';
+import 'package:superapp_user/modules/food/data/contracts/restaurant_repository.dart';
 
 class HomeState {
   final AsyncValue<List<CategoryModel>> categories;

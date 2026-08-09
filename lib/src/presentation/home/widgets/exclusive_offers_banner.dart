@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
-import 'package:superapp_user/src/presentation/branding/app_colors.dart';
+import 'package:superapp_user/design_system/tokens/app_colors.dart';
 
 /// Promo card between "Popular Brands" and "Restaurants". Background is the
 /// looping, muted promo video from assets/videos/banner.mp4 — the same
