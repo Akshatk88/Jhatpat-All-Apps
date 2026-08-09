@@ -20,7 +20,7 @@ class DeepLinkService {
   static const String webHost = AppConstants.hostUrl;
 
   static const String playStoreUrl =
-      'https://play.google.com/store/apps/details?id=com.fooduser.app';
+      'https://play.google.com/store/apps/details?id=com.k9bharat.user';
   static const String appStoreUrl =
       'https://apps.apple.com/app/suvio-food/id123456789';
 

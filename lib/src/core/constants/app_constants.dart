@@ -35,7 +35,7 @@ class AppConstants {
   /// Backend REST API host domain.
   static const String hostUrl = String.fromEnvironment(
     'API_HOST',
-    defaultValue: 'https://suvio.appzeto.com',
+    defaultValue: 'https://k9.appzeto.com',
   );
 
   /// Backend REST API base URL (all endpoints mounted under `/api/v1`).
@@ -50,27 +50,41 @@ class AppConstants {
     defaultValue: hostUrl,
   );
 
-  /// Firebase project configuration for User App (com.fooduser.app).
+  /// Firebase project configuration for the super app (com.k9bharat.user).
+  ///
+  /// Project `k9rides-529a8` — the same project the k9 backend authenticates
+  /// as (`firebase-adminsdk-fbsvc@k9rides-529a8.iam.gserviceaccount.com`).
+  /// These values must stay in sync with `android/app/google-services.json`;
+  /// they are only used as a fallback when the default `Firebase.initializeApp()`
+  /// fails to read the platform config (see `ensureFirebaseInitialized`).
+  ///
+  /// iOS is not configured yet — there is no GoogleService-Info.plist for this
+  /// project, so iOS builds will fall through to the failure branch.
   static String firebaseApiKey = (kIsWeb || Platform.isAndroid)
-      ? "AIzaSyC_twLhO7C21HdRBvoZvedceka0jdLCUjc"
+      ? "AIzaSyDt1UEqn5kYbrbQoRJnQ5klKZbLNVrGvuQ"
       : "ios firebase api key";
 
   static String get firbaseApiKey => firebaseApiKey;
 
   static String firebaseAppId = (kIsWeb || Platform.isAndroid)
-      ? "1:592916974677:android:5366c1825a27cf201518dc"
+      ? "1:857854567102:android:0472547c3baf400bfc34ef"
       : "ios firebase app id";
 
   static String firebaseMessagingSenderId =
-      (kIsWeb || Platform.isAndroid) ? "592916974677" : "ios firebase sender id";
+      (kIsWeb || Platform.isAndroid) ? "857854567102" : "ios firebase sender id";
 
   static String get firebasemessagingSenderId => firebaseMessagingSenderId;
 
   static String firebaseProjectId =
-      (kIsWeb || Platform.isAndroid) ? "flutterfoodapp-e6742" : "ios firebase project id";
+      (kIsWeb || Platform.isAndroid) ? "k9rides-529a8" : "ios firebase project id";
 
+  /// Regional RTDB instance — note this is NOT the default `.firebaseio.com`
+  /// domain, so it must always be passed explicitly to
+  /// `FirebaseDatabase.instanceFor(app:, databaseURL:)`.
   static String firebaseDatabaseUrl =
-      "https://flutterfoodapp-e6742-default-rtdb.firebaseio.com";
+      "https://k9rides-529a8-default-rtdb.asia-southeast1.firebasedatabase.app";
+
+  static const String firebaseStorageBucket = "k9rides-529a8.firebasestorage.app";
 
   /// Google Maps API key (Maps SDK + Geocoding API).
   static String mapKey = 'AIzaSyCLHQKJg5shpKs0uNiDHiZJTtBUMKl21ak';
@@ -85,6 +99,6 @@ class AppConstants {
     LocaleLanguageList(name: 'English', lang: 'en'),
   ];
 
-  static String packageName = 'com.fooduser.app';
+  static String packageName = 'com.k9bharat.user';
   static String signKey = '';
 }

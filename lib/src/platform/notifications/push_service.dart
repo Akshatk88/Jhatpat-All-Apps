@@ -165,7 +165,7 @@ Notification Type: ${link.type}''');
 
       // STEP: INITIALIZE LOCAL NOTIFICATIONS FOR SYSTEM HEADS-UP NOTIFICATIONS
       const androidChannel = AndroidNotificationChannel(
-        'high_importance_channel',
+        'default',
         'High Importance Notifications',
         description: 'This channel is used for order status push notifications.',
         importance: Importance.max,
@@ -256,7 +256,7 @@ Notification Type: ${link.type}''');
         _log('Displaying local notification.');
         try {
           const androidDetails = AndroidNotificationDetails(
-            'high_importance_channel',
+            'default',
             'High Importance Notifications',
             channelDescription: 'This channel is used for order status push notifications.',
             importance: Importance.max,

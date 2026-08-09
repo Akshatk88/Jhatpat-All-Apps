@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.fooduser.app"
+    namespace = "com.k9bharat.user"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -22,7 +22,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.fooduser.app"
+        applicationId = "com.k9bharat.user"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
