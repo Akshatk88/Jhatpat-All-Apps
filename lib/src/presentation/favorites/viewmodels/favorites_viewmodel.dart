@@ -1,9 +1,9 @@
 import 'dart:developer' as developer;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../data/models/food_model.dart';
-import '../../../data/models/restaurant_model.dart';
-import '../../../di/favorites_providers.dart';
-import '../../../domain/repository/favorites_repository.dart';
+import 'package:superapp_user/src/data/models/food_model.dart';
+import 'package:superapp_user/src/data/models/restaurant_model.dart';
+import 'package:superapp_user/src/di/favorites_providers.dart';
+import 'package:superapp_user/src/domain/repository/favorites_repository.dart';
 
 class FavoritesState {
   final Set<String> restaurantIds;

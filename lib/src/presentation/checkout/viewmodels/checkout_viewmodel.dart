@@ -2,16 +2,16 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/error/failures.dart';
-import '../../../data/models/order_pricing.dart';
-import '../../../di/order_providers.dart';
-import '../../../di/payment_providers.dart';
-import '../../../platform/payment/payment_gateway.dart';
-import '../../auth/viewmodels/auth_viewmodel.dart';
-import '../../cart/viewmodels/cart_viewmodel.dart';
-import '../../home/viewmodels/zone_viewmodel.dart';
+import 'package:superapp_user/src/core/error/failures.dart';
+import 'package:superapp_user/src/data/models/order_pricing.dart';
+import 'package:superapp_user/src/di/order_providers.dart';
+import 'package:superapp_user/src/di/payment_providers.dart';
+import 'package:superapp_user/src/platform/payment/payment_gateway.dart';
+import 'package:superapp_user/src/presentation/auth/viewmodels/auth_viewmodel.dart';
+import 'package:superapp_user/src/presentation/cart/viewmodels/cart_viewmodel.dart';
+import 'package:superapp_user/src/presentation/home/viewmodels/zone_viewmodel.dart';
 
-import '../../orders/viewmodels/active_order_viewmodel.dart';
+import 'package:superapp_user/src/presentation/orders/viewmodels/active_order_viewmodel.dart';
 
 class CheckoutState {
   final OrderCalculation? calculation;

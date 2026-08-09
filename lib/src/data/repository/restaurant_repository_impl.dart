@@ -1,10 +1,10 @@
-import '../../core/error/failures.dart';
-import '../../core/network/api_response.dart';
-import '../../domain/repository/restaurant_repository.dart';
-import '../datasources/catalog_remote_datasource.dart';
-import '../models/category_model.dart';
-import '../models/food_model.dart';
-import '../models/restaurant_model.dart';
+import 'package:superapp_user/src/core/error/failures.dart';
+import 'package:superapp_user/src/core/network/api_response.dart';
+import 'package:superapp_user/src/domain/repository/restaurant_repository.dart';
+import 'package:superapp_user/src/data/datasources/catalog_remote_datasource.dart';
+import 'package:superapp_user/src/data/models/category_model.dart';
+import 'package:superapp_user/src/data/models/food_model.dart';
+import 'package:superapp_user/src/data/models/restaurant_model.dart';
 
 /// Backend-backed catalog repository.
 ///

@@ -1,4 +1,4 @@
-import 'user_model.dart';
+import 'package:superapp_user/src/data/models/user_model.dart';
 
 /// Result of `POST /food/auth/user/verify-otp`.
 ///

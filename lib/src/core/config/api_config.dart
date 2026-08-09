@@ -1,4 +1,4 @@
-import '../constants/app_constants.dart';
+import 'package:superapp_user/src/core/constants/app_constants.dart';
 
 /// Central API configuration.
 ///

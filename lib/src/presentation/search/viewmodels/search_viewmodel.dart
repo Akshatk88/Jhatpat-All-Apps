@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../di/search_providers.dart';
-import '../../../domain/service/search_service.dart';
-import '../../../platform/speech/speech_service.dart';
-import 'search_state.dart';
+import 'package:superapp_user/src/di/search_providers.dart';
+import 'package:superapp_user/src/domain/service/search_service.dart';
+import 'package:superapp_user/src/platform/speech/speech_service.dart';
+import 'package:superapp_user/src/presentation/search/viewmodels/search_state.dart';
 
 final searchViewModelProvider =
     NotifierProvider<SearchViewModel, SearchState>(() {

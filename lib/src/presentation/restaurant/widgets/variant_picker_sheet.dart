@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/utils/haptics.dart';
-import '../../../data/models/food_model.dart';
-import '../../../data/models/food_variant.dart';
-import '../../../di/catalog_providers.dart';
-import '../../branding/app_colors.dart';
+import 'package:superapp_user/src/core/utils/haptics.dart';
+import 'package:superapp_user/src/data/models/food_model.dart';
+import 'package:superapp_user/src/data/models/food_variant.dart';
+import 'package:superapp_user/src/di/catalog_providers.dart';
+import 'package:superapp_user/src/presentation/branding/app_colors.dart';
 
 /// What the user chose in the sheet.
 class VariantSelection {

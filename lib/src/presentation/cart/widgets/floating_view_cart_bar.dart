@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../data/models/cart_item_model.dart';
-import '../../common_widgets/smart_image.dart';
-import '../viewmodels/cart_viewmodel.dart';
+import 'package:superapp_user/src/data/models/cart_item_model.dart';
+import 'package:superapp_user/src/presentation/common_widgets/smart_image.dart';
+import 'package:superapp_user/src/presentation/cart/viewmodels/cart_viewmodel.dart';
 
 class FloatingViewCartBar extends ConsumerStatefulWidget {
   final VoidCallback onTap;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../branding/app_colors.dart';
-import 'top_toast.dart';
+import 'package:superapp_user/src/presentation/branding/app_colors.dart';
+import 'package:superapp_user/src/presentation/common_widgets/top_toast.dart';
 
 enum AppSnackbarType { success, error, warning, info }
 

@@ -1,4 +1,4 @@
-import '../../core/config/api_config.dart';
+import 'package:superapp_user/src/core/config/api_config.dart';
 
 /// One line item on a placed order.
 class OrderItem {

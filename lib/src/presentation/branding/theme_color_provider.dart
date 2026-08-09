@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'app_colors.dart';
+import 'package:superapp_user/src/presentation/branding/app_colors.dart';
 
 /// A preset brand color the user can pick from Profile → App Theme.
 ///

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/utils/haptics.dart';
-import '../../branding/app_colors.dart';
-import '../../navigation/route_names.dart';
+import 'package:superapp_user/src/core/utils/haptics.dart';
+import 'package:superapp_user/src/presentation/branding/app_colors.dart';
+import 'package:superapp_user/src/presentation/navigation/route_names.dart';
 
 class EmptyCartView extends ConsumerWidget {
   const EmptyCartView({super.key});

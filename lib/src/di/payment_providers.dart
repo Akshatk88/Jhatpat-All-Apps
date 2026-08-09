@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../platform/payment/payment_gateway.dart';
-import 'account_providers.dart';
-import 'order_providers.dart';
+import 'package:superapp_user/src/platform/payment/payment_gateway.dart';
+import 'package:superapp_user/src/di/account_providers.dart';
+import 'package:superapp_user/src/di/order_providers.dart';
 
 /// Razorpay checkout wrapper. Disposed with the container so native listeners
 /// are always cleared.

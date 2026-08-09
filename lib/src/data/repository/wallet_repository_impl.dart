@@ -1,6 +1,6 @@
-import '../../domain/repository/wallet_repository.dart';
-import '../datasources/account_remote_datasource.dart';
-import '../models/wallet_model.dart';
+import 'package:superapp_user/src/domain/repository/wallet_repository.dart';
+import 'package:superapp_user/src/data/datasources/account_remote_datasource.dart';
+import 'package:superapp_user/src/data/models/wallet_model.dart';
 
 class WalletRepositoryImpl implements WalletRepository {
   final AccountRemoteDataSource _remoteDataSource;

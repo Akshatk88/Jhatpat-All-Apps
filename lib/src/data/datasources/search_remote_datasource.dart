@@ -1,5 +1,5 @@
-import '../../domain/model/search_result.dart';
-import 'catalog_remote_datasource.dart';
+import 'package:superapp_user/src/domain/model/search_result.dart';
+import 'package:superapp_user/src/data/datasources/catalog_remote_datasource.dart';
 
 abstract class SearchRemoteDataSource {
   Future<List<SearchResult>> searchHome(String query);

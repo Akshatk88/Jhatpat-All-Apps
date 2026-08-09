@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../branding/app_colors.dart';
-import '../../../di/catalog_providers.dart';
-import '../../common_widgets/skeleton_loading.dart';
-import '../../navigation/route_names.dart';
-import 'restaurant_screen.dart';
+import 'package:superapp_user/src/presentation/branding/app_colors.dart';
+import 'package:superapp_user/src/di/catalog_providers.dart';
+import 'package:superapp_user/src/presentation/common_widgets/skeleton_loading.dart';
+import 'package:superapp_user/src/presentation/navigation/route_names.dart';
+import 'package:superapp_user/src/presentation/restaurant/screens/restaurant_screen.dart';
 
 /// Resolves a restaurant from an id and shows its page.
 ///

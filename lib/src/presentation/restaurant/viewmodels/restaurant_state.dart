@@ -1,6 +1,6 @@
-import '../../../data/models/food_model.dart';
-import '../../../data/models/restaurant_model.dart';
-import '../../../domain/model/restaurant_menu_category.dart';
+import 'package:superapp_user/src/data/models/food_model.dart';
+import 'package:superapp_user/src/data/models/restaurant_model.dart';
+import 'package:superapp_user/src/domain/model/restaurant_menu_category.dart';
 
 /// Immutable presentation state for the Restaurant Details screen.
 class RestaurantState {

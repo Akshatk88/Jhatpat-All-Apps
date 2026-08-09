@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/utils/haptics.dart';
-import '../../../data/models/food_model.dart';
-import '../../branding/app_colors.dart';
-import '../../common_widgets/skeleton_loading.dart';
-import '../../common_widgets/smart_image.dart';
-import '../../home/viewmodels/veg_filter_provider.dart';
-import '../../restaurant/viewmodels/restaurant_detail_viewmodel.dart';
-import '../../restaurant/widgets/food_detail_sheet.dart';
-import '../animations/add_to_cart_animation.dart';
-import '../viewmodels/cart_viewmodel.dart';
+import 'package:superapp_user/src/core/utils/haptics.dart';
+import 'package:superapp_user/src/data/models/food_model.dart';
+import 'package:superapp_user/src/presentation/branding/app_colors.dart';
+import 'package:superapp_user/src/presentation/common_widgets/skeleton_loading.dart';
+import 'package:superapp_user/src/presentation/common_widgets/smart_image.dart';
+import 'package:superapp_user/src/presentation/home/viewmodels/veg_filter_provider.dart';
+import 'package:superapp_user/src/presentation/restaurant/viewmodels/restaurant_detail_viewmodel.dart';
+import 'package:superapp_user/src/presentation/restaurant/widgets/food_detail_sheet.dart';
+import 'package:superapp_user/src/presentation/cart/animations/add_to_cart_animation.dart';
+import 'package:superapp_user/src/presentation/cart/viewmodels/cart_viewmodel.dart';
 
 class CartRecommendationsSection extends ConsumerStatefulWidget {
   final String restaurantId;

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../../core/utils/haptics.dart';
-import '../../branding/app_colors.dart';
-import '../../common_widgets/app_snackbar.dart';
-import '../../navigation/route_names.dart';
+import 'package:superapp_user/src/core/utils/haptics.dart';
+import 'package:superapp_user/src/presentation/branding/app_colors.dart';
+import 'package:superapp_user/src/presentation/common_widgets/app_snackbar.dart';
+import 'package:superapp_user/src/presentation/navigation/route_names.dart';
 
 class HelpSupportScreen extends StatelessWidget {
   const HelpSupportScreen({super.key});

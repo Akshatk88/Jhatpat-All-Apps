@@ -3,18 +3,18 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../navigation/back_navigation.dart';
+import 'package:superapp_user/src/presentation/navigation/back_navigation.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../../../core/utils/haptics.dart';
-import '../../auth/viewmodels/auth_viewmodel.dart';
-import '../../common_widgets/app_snackbar.dart';
-import '../../common_widgets/skeleton_loading.dart';
-import '../viewmodels/referral_viewmodel.dart';
-import '../widgets/fire_particle_share_button.dart';
-import '../widgets/refer_earn_background.dart';
-import '../widgets/referral_ticket_card.dart';
-import '../widgets/rotating_ticket_border.dart';
+import 'package:superapp_user/src/core/utils/haptics.dart';
+import 'package:superapp_user/src/presentation/auth/viewmodels/auth_viewmodel.dart';
+import 'package:superapp_user/src/presentation/common_widgets/app_snackbar.dart';
+import 'package:superapp_user/src/presentation/common_widgets/skeleton_loading.dart';
+import 'package:superapp_user/src/presentation/referral/viewmodels/referral_viewmodel.dart';
+import 'package:superapp_user/src/presentation/referral/widgets/fire_particle_share_button.dart';
+import 'package:superapp_user/src/presentation/referral/widgets/refer_earn_background.dart';
+import 'package:superapp_user/src/presentation/referral/widgets/referral_ticket_card.dart';
+import 'package:superapp_user/src/presentation/referral/widgets/rotating_ticket_border.dart';
 
 /// The dedicated "here's your ticket" page shown right after the referral
 /// ticket finishes printing — just the ticket and the share button.

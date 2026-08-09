@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import '../../core/config/api_config.dart';
+import 'package:superapp_user/src/core/config/api_config.dart';
 
 class RestaurantModel {
   final String id;

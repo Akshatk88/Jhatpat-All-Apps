@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
 
-import '../../core/config/api_config.dart';
+import 'package:superapp_user/src/core/config/api_config.dart';
 
 /// Events the user app cares about. `new_order`, `order_claimed` and friends
 /// are restaurant/rider/admin events and are deliberately ignored.

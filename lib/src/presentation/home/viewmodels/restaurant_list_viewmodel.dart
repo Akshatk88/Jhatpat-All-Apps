@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/error/failures.dart';
-import '../../../data/models/restaurant_model.dart';
-import '../../../di/catalog_providers.dart';
-import 'zone_viewmodel.dart';
+import 'package:superapp_user/src/core/error/failures.dart';
+import 'package:superapp_user/src/data/models/restaurant_model.dart';
+import 'package:superapp_user/src/di/catalog_providers.dart';
+import 'package:superapp_user/src/presentation/home/viewmodels/zone_viewmodel.dart';
 
 /// Paginated restaurant feed for infinite-scroll listings.
 ///

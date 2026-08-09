@@ -1,8 +1,8 @@
-import '../../core/network/api_response.dart';
-import '../../domain/model/search_result.dart';
-import '../../domain/repository/search_repository.dart';
-import '../datasources/search_local_datasource.dart';
-import '../datasources/search_remote_datasource.dart';
+import 'package:superapp_user/src/core/network/api_response.dart';
+import 'package:superapp_user/src/domain/model/search_result.dart';
+import 'package:superapp_user/src/domain/repository/search_repository.dart';
+import 'package:superapp_user/src/data/datasources/search_local_datasource.dart';
+import 'package:superapp_user/src/data/datasources/search_remote_datasource.dart';
 
 class SearchRepositoryImpl implements SearchRepository {
   final SearchRemoteDataSource _remoteDataSource;

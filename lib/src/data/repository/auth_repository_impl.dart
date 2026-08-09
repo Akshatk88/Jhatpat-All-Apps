@@ -1,10 +1,10 @@
-import '../../core/error/failures.dart';
-import '../../core/network/api_response.dart';
-import '../../core/storage/token_storage.dart';
-import '../../domain/repository/auth_repository.dart';
-import '../datasources/auth_remote_datasource.dart';
-import '../models/auth_session.dart';
-import '../models/user_model.dart';
+import 'package:superapp_user/src/core/error/failures.dart';
+import 'package:superapp_user/src/core/network/api_response.dart';
+import 'package:superapp_user/src/core/storage/token_storage.dart';
+import 'package:superapp_user/src/domain/repository/auth_repository.dart';
+import 'package:superapp_user/src/data/datasources/auth_remote_datasource.dart';
+import 'package:superapp_user/src/data/models/auth_session.dart';
+import 'package:superapp_user/src/data/models/user_model.dart';
 
 /// Backend-backed [AuthRepository].
 ///

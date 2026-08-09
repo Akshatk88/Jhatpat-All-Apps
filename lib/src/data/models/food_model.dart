@@ -1,5 +1,5 @@
-import '../../core/config/api_config.dart';
-import 'food_variant.dart';
+import 'package:superapp_user/src/core/config/api_config.dart';
+import 'package:superapp_user/src/data/models/food_variant.dart';
 
 class FoodModel {
   final String id;

@@ -2,9 +2,9 @@ import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../core/utils/haptics.dart';
-import '../../branding/app_colors.dart';
-import '../viewmodels/search_viewmodel.dart';
+import 'package:superapp_user/src/core/utils/haptics.dart';
+import 'package:superapp_user/src/presentation/branding/app_colors.dart';
+import 'package:superapp_user/src/presentation/search/viewmodels/search_viewmodel.dart';
 
 /// Animated modal dialog displayed during Voice Search (Mic).
 /// Returns [Future<String?>] containing the recognized query, or null if canceled.

@@ -1,12 +1,12 @@
-import '../../core/error/failures.dart';
-import '../../core/network/api_response.dart';
-import '../../domain/model/store99_brand.dart';
-import '../../domain/model/store99_cuisine.dart';
-import '../../domain/model/store99_product.dart';
-import '../../domain/repository/store99_repository.dart';
-import '../datasources/catalog_remote_datasource.dart';
-import '../models/food_model.dart';
-import '../models/restaurant_model.dart';
+import 'package:superapp_user/src/core/error/failures.dart';
+import 'package:superapp_user/src/core/network/api_response.dart';
+import 'package:superapp_user/src/domain/model/store99_brand.dart';
+import 'package:superapp_user/src/domain/model/store99_cuisine.dart';
+import 'package:superapp_user/src/domain/model/store99_product.dart';
+import 'package:superapp_user/src/domain/repository/store99_repository.dart';
+import 'package:superapp_user/src/data/datasources/catalog_remote_datasource.dart';
+import 'package:superapp_user/src/data/models/food_model.dart';
+import 'package:superapp_user/src/data/models/restaurant_model.dart';
 
 /// Backend-backed 99 Store.
 ///

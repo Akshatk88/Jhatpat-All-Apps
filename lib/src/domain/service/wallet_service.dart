@@ -1,5 +1,5 @@
-import '../repository/wallet_repository.dart';
-import '../../data/models/wallet_model.dart';
+import 'package:superapp_user/src/domain/repository/wallet_repository.dart';
+import 'package:superapp_user/src/data/models/wallet_model.dart';
 
 class WalletService {
   final WalletRepository _repository;

@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../di/order_providers.dart';
-import '../../auth/viewmodels/auth_viewmodel.dart';
-import '../../../data/models/cart_item_model.dart';
-import '../../../data/models/food_model.dart';
+import 'package:superapp_user/src/di/order_providers.dart';
+import 'package:superapp_user/src/presentation/auth/viewmodels/auth_viewmodel.dart';
+import 'package:superapp_user/src/data/models/cart_item_model.dart';
+import 'package:superapp_user/src/data/models/food_model.dart';
 import 'package:uuid/uuid.dart';
 
 class CartState {

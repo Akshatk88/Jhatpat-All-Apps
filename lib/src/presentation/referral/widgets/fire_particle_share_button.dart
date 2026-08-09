@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../core/utils/haptics.dart';
+import 'package:superapp_user/src/core/utils/haptics.dart';
 
 class FireParticleShareButton extends StatefulWidget {
   final VoidCallback onPressed;

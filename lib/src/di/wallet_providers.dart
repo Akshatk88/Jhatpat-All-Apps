@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../data/repository/wallet_repository_impl.dart';
-import '../domain/repository/wallet_repository.dart';
-import '../domain/service/wallet_service.dart';
-import 'account_providers.dart';
+import 'package:superapp_user/src/data/repository/wallet_repository_impl.dart';
+import 'package:superapp_user/src/domain/repository/wallet_repository.dart';
+import 'package:superapp_user/src/domain/service/wallet_service.dart';
+import 'package:superapp_user/src/di/account_providers.dart';
 
 final walletRepositoryProvider = Provider<WalletRepository>((ref) {
   final remote = ref.watch(accountRemoteDataSourceProvider);

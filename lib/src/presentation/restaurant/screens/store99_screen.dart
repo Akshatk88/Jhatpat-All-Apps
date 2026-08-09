@@ -1,24 +1,24 @@
-import '../../common_widgets/app_refresh_indicator.dart';
+import 'package:superapp_user/src/presentation/common_widgets/app_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/utils/haptics.dart';
-import '../../../data/models/food_model.dart';
-import '../../../domain/model/store99_product.dart';
-import '../../branding/app_colors.dart';
-import '../../cart/utils/cart_restaurant_guard.dart';
-import '../../cart/viewmodels/cart_viewmodel.dart';
-import '../../cart/widgets/floating_view_cart_bar.dart';
-import '../../common_widgets/collapsing_header_delegate.dart';
-import '../../common_widgets/skeleton_loading.dart';
-import '../../common_widgets/smart_image.dart';
-import '../../home/viewmodels/veg_filter_provider.dart';
-import '../../navigation/route_names.dart';
-import '../viewmodels/store99_state.dart';
-import '../viewmodels/store99_viewmodel.dart';
-import '../widgets/food_detail_sheet.dart';
+import 'package:superapp_user/src/core/utils/haptics.dart';
+import 'package:superapp_user/src/data/models/food_model.dart';
+import 'package:superapp_user/src/domain/model/store99_product.dart';
+import 'package:superapp_user/src/presentation/branding/app_colors.dart';
+import 'package:superapp_user/src/presentation/cart/utils/cart_restaurant_guard.dart';
+import 'package:superapp_user/src/presentation/cart/viewmodels/cart_viewmodel.dart';
+import 'package:superapp_user/src/presentation/cart/widgets/floating_view_cart_bar.dart';
+import 'package:superapp_user/src/presentation/common_widgets/collapsing_header_delegate.dart';
+import 'package:superapp_user/src/presentation/common_widgets/skeleton_loading.dart';
+import 'package:superapp_user/src/presentation/common_widgets/smart_image.dart';
+import 'package:superapp_user/src/presentation/home/viewmodels/veg_filter_provider.dart';
+import 'package:superapp_user/src/presentation/navigation/route_names.dart';
+import 'package:superapp_user/src/presentation/restaurant/viewmodels/store99_state.dart';
+import 'package:superapp_user/src/presentation/restaurant/viewmodels/store99_viewmodel.dart';
+import 'package:superapp_user/src/presentation/restaurant/widgets/food_detail_sheet.dart';
 
 /// The 99 Store promo landing screen.
 ///

@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/constants/app_constants.dart';
-import '../../../data/models/wallet_model.dart';
-import '../../../di/account_providers.dart';
-import '../../auth/viewmodels/auth_viewmodel.dart';
+import 'package:superapp_user/src/core/constants/app_constants.dart';
+import 'package:superapp_user/src/data/models/wallet_model.dart';
+import 'package:superapp_user/src/di/account_providers.dart';
+import 'package:superapp_user/src/presentation/auth/viewmodels/auth_viewmodel.dart';
 
 /// Referral stats and invite history from `GET /food/user/referrals/details`.
 final referralDetailsProvider = FutureProvider.autoDispose<ReferralDetails>((ref) async {

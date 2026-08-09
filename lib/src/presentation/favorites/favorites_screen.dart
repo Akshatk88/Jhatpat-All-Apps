@@ -3,18 +3,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/utils/haptics.dart';
-import '../../data/models/food_model.dart';
-import '../../data/models/restaurant_model.dart';
-import '../branding/app_colors.dart';
-import '../common_widgets/empty_state_widget.dart';
-import '../common_widgets/skeleton_loading.dart';
-import '../common_widgets/smart_image.dart';
-import '../home/viewmodels/home_viewmodel.dart';
-import '../home/viewmodels/veg_filter_provider.dart';
-import '../navigation/route_names.dart';
-import '../restaurant/widgets/food_detail_sheet.dart';
-import 'viewmodels/favorites_viewmodel.dart';
+import 'package:superapp_user/src/core/utils/haptics.dart';
+import 'package:superapp_user/src/data/models/food_model.dart';
+import 'package:superapp_user/src/data/models/restaurant_model.dart';
+import 'package:superapp_user/src/presentation/branding/app_colors.dart';
+import 'package:superapp_user/src/presentation/common_widgets/empty_state_widget.dart';
+import 'package:superapp_user/src/presentation/common_widgets/skeleton_loading.dart';
+import 'package:superapp_user/src/presentation/common_widgets/smart_image.dart';
+import 'package:superapp_user/src/presentation/home/viewmodels/home_viewmodel.dart';
+import 'package:superapp_user/src/presentation/home/viewmodels/veg_filter_provider.dart';
+import 'package:superapp_user/src/presentation/navigation/route_names.dart';
+import 'package:superapp_user/src/presentation/restaurant/widgets/food_detail_sheet.dart';
+import 'package:superapp_user/src/presentation/favorites/viewmodels/favorites_viewmodel.dart';
 
 /// Favorites Screen with tabs for Restaurants & Dishes.
 class FavoritesScreen extends ConsumerStatefulWidget {

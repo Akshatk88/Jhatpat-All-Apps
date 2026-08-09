@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../data/models/food_model.dart';
-import '../../../data/models/food_variant.dart';
-import '../../../di/catalog_providers.dart';
-import '../../branding/app_colors.dart';
-import '../../restaurant/widgets/food_detail_sheet.dart';
-import '../viewmodels/cart_viewmodel.dart';
+import 'package:superapp_user/src/data/models/food_model.dart';
+import 'package:superapp_user/src/data/models/food_variant.dart';
+import 'package:superapp_user/src/di/catalog_providers.dart';
+import 'package:superapp_user/src/presentation/branding/app_colors.dart';
+import 'package:superapp_user/src/presentation/restaurant/widgets/food_detail_sheet.dart';
+import 'package:superapp_user/src/presentation/cart/viewmodels/cart_viewmodel.dart';
 
 /// Confirms with the user before wiping their cart for a different
 /// restaurant's item — the single-restaurant-per-cart rule every "Add to

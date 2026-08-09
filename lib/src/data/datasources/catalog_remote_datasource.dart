@@ -1,11 +1,11 @@
-import '../../core/config/api_config.dart';
-import '../../core/network/api_client.dart';
-import '../models/category_model.dart';
-import '../models/food_model.dart';
-import '../models/food_variant.dart';
-import '../models/promo_banner_model.dart';
-import '../models/restaurant_model.dart';
-import '../models/zone_model.dart';
+import 'package:superapp_user/src/core/config/api_config.dart';
+import 'package:superapp_user/src/core/network/api_client.dart';
+import 'package:superapp_user/src/data/models/category_model.dart';
+import 'package:superapp_user/src/data/models/food_model.dart';
+import 'package:superapp_user/src/data/models/food_variant.dart';
+import 'package:superapp_user/src/data/models/promo_banner_model.dart';
+import 'package:superapp_user/src/data/models/restaurant_model.dart';
+import 'package:superapp_user/src/data/models/zone_model.dart';
 
 /// Transport for every public discovery endpoint: zones, banners, categories,
 /// restaurants, menus, the cross-restaurant food feed, offers and search.

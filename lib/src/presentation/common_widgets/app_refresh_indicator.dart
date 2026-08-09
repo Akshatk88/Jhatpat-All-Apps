@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../core/utils/refresh_audio_player.dart';
-import '../branding/app_colors.dart';
+import 'package:superapp_user/src/core/utils/refresh_audio_player.dart';
+import 'package:superapp_user/src/presentation/branding/app_colors.dart';
 
 /// A unified pull-to-refresh wrapper for the entire application.
 /// Ensures:

@@ -1,4 +1,4 @@
-import '../../core/config/api_config.dart';
+import 'package:superapp_user/src/core/config/api_config.dart';
 
 /// The authenticated user, mapped from `GET /food/user/profile` and the
 /// `verify-otp` response (both return the same document).

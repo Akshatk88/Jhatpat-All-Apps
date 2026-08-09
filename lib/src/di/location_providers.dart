@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../platform/location/location_service.dart';
+import 'package:superapp_user/src/platform/location/location_service.dart';
 
 final locationServiceProvider = Provider<LocationService>((ref) {
   return LocationService();

@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
-import 'ticket_clipper.dart';
+import 'package:superapp_user/src/presentation/referral/widgets/ticket_clipper.dart';
 
 class RotatingTicketBorder extends StatefulWidget {
   final double width;

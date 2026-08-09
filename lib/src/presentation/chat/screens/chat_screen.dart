@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/utils/haptics.dart';
-import '../../branding/app_colors.dart';
-import '../../common_widgets/app_snackbar.dart';
-import '../../common_widgets/skeleton_loading.dart';
-import '../viewmodels/chat_viewmodel.dart';
+import 'package:superapp_user/src/core/utils/haptics.dart';
+import 'package:superapp_user/src/presentation/branding/app_colors.dart';
+import 'package:superapp_user/src/presentation/common_widgets/app_snackbar.dart';
+import 'package:superapp_user/src/presentation/common_widgets/skeleton_loading.dart';
+import 'package:superapp_user/src/presentation/chat/viewmodels/chat_viewmodel.dart';
 
 /// Everything the chat screen needs to identify the thread and label the
 /// app bar — passed via `go_router`'s `extra` (no path params needed).

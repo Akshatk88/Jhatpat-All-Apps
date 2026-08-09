@@ -3,14 +3,14 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../data/models/auth_session.dart';
-import '../../../data/models/user_model.dart';
-import '../../../di/auth_providers.dart';
-import '../../../di/favorites_providers.dart';
-import '../../../di/network_providers.dart';
-import '../../../di/push_providers.dart';
-import '../../../domain/repository/auth_repository.dart';
-import '../../favorites/viewmodels/favorites_viewmodel.dart';
+import 'package:superapp_user/src/data/models/auth_session.dart';
+import 'package:superapp_user/src/data/models/user_model.dart';
+import 'package:superapp_user/src/di/auth_providers.dart';
+import 'package:superapp_user/src/di/favorites_providers.dart';
+import 'package:superapp_user/src/di/network_providers.dart';
+import 'package:superapp_user/src/di/push_providers.dart';
+import 'package:superapp_user/src/domain/repository/auth_repository.dart';
+import 'package:superapp_user/src/presentation/favorites/viewmodels/favorites_viewmodel.dart';
 
 void _authLog(String message) {
   if (kDebugMode) debugPrint('[AUTH] $message');

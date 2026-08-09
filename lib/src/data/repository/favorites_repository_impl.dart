@@ -1,7 +1,7 @@
 import 'dart:developer' as developer;
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../domain/repository/favorites_repository.dart';
-import '../datasources/favorites_remote_datasource.dart';
+import 'package:superapp_user/src/domain/repository/favorites_repository.dart';
+import 'package:superapp_user/src/data/datasources/favorites_remote_datasource.dart';
 
 /// Favorites store with backend sync and SharedPreferences fallback.
 class FavoritesRepositoryImpl implements FavoritesRepository {

@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../data/datasources/address_remote_datasource.dart';
-import 'network_providers.dart';
+import 'package:superapp_user/src/data/datasources/address_remote_datasource.dart';
+import 'package:superapp_user/src/di/network_providers.dart';
 
 final addressRemoteDataSourceProvider = Provider<AddressRemoteDataSource>((ref) {
   return AddressRemoteDataSource(ref.watch(apiClientProvider));

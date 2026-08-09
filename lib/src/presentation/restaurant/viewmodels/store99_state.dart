@@ -1,6 +1,6 @@
-import '../../../domain/model/store99_brand.dart';
-import '../../../domain/model/store99_cuisine.dart';
-import '../../../domain/model/store99_product.dart';
+import 'package:superapp_user/src/domain/model/store99_brand.dart';
+import 'package:superapp_user/src/domain/model/store99_cuisine.dart';
+import 'package:superapp_user/src/domain/model/store99_product.dart';
 
 /// Immutable presentation state for the 99 Store screen.
 class Store99State {

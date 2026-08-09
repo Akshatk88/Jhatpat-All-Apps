@@ -2,22 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../navigation/back_navigation.dart';
+import 'package:superapp_user/src/presentation/navigation/back_navigation.dart';
 
-import '../../../core/utils/haptics.dart';
-import '../../../data/models/order_model.dart';
-import '../../branding/app_colors.dart';
-import '../../cart/utils/cart_restaurant_guard.dart';
-import '../../cart/viewmodels/cart_viewmodel.dart';
-import '../../common_widgets/app_snackbar.dart';
-import '../../common_widgets/skeleton_loading.dart';
-import '../../navigation/route_names.dart';
-import '../utils/reorder.dart';
-import '../viewmodels/orders_viewmodel.dart';
-import '../widgets/order_details_header.dart';
-import '../widgets/order_timeline_card.dart';
-import '../widgets/price_details_card.dart';
-import '../widgets/previous_conversations_card.dart';
+import 'package:superapp_user/src/core/utils/haptics.dart';
+import 'package:superapp_user/src/data/models/order_model.dart';
+import 'package:superapp_user/src/presentation/branding/app_colors.dart';
+import 'package:superapp_user/src/presentation/cart/utils/cart_restaurant_guard.dart';
+import 'package:superapp_user/src/presentation/cart/viewmodels/cart_viewmodel.dart';
+import 'package:superapp_user/src/presentation/common_widgets/app_snackbar.dart';
+import 'package:superapp_user/src/presentation/common_widgets/skeleton_loading.dart';
+import 'package:superapp_user/src/presentation/navigation/route_names.dart';
+import 'package:superapp_user/src/presentation/orders/utils/reorder.dart';
+import 'package:superapp_user/src/presentation/orders/viewmodels/orders_viewmodel.dart';
+import 'package:superapp_user/src/presentation/orders/widgets/order_details_header.dart';
+import 'package:superapp_user/src/presentation/orders/widgets/order_timeline_card.dart';
+import 'package:superapp_user/src/presentation/orders/widgets/price_details_card.dart';
+import 'package:superapp_user/src/presentation/orders/widgets/previous_conversations_card.dart';
 
 class OrderDetailsScreen extends ConsumerWidget {
   final String orderId;

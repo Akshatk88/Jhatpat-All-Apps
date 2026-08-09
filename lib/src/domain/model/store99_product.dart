@@ -1,5 +1,5 @@
-import '../../data/models/food_model.dart';
-import '../../data/models/restaurant_model.dart';
+import 'package:superapp_user/src/data/models/food_model.dart';
+import 'package:superapp_user/src/data/models/restaurant_model.dart';
 
 /// Domain entity representing a 99 Store product item.
 /// 

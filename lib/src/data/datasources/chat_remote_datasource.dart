@@ -1,6 +1,6 @@
-import '../../core/config/api_config.dart';
-import '../../core/network/api_client.dart';
-import '../models/chat_model.dart';
+import 'package:superapp_user/src/core/config/api_config.dart';
+import 'package:superapp_user/src/core/network/api_client.dart';
+import 'package:superapp_user/src/data/models/chat_model.dart';
 
 /// `/food/chat` — conversations with the delivery partner (or admin support)
 /// on an active order. Real-time delivery is the shared [SocketService];

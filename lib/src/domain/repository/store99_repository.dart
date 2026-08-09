@@ -1,8 +1,8 @@
-import '../../core/network/api_response.dart';
-import '../../data/models/restaurant_model.dart';
-import '../model/store99_brand.dart';
-import '../model/store99_cuisine.dart';
-import '../model/store99_product.dart';
+import 'package:superapp_user/src/core/network/api_response.dart';
+import 'package:superapp_user/src/data/models/restaurant_model.dart';
+import 'package:superapp_user/src/domain/model/store99_brand.dart';
+import 'package:superapp_user/src/domain/model/store99_cuisine.dart';
+import 'package:superapp_user/src/domain/model/store99_product.dart';
 
 /// Repository interface for 99 Store operations following Clean Architecture.
 abstract class Store99Repository {

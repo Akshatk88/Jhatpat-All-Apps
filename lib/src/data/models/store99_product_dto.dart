@@ -1,4 +1,4 @@
-import '../../domain/model/store99_product.dart';
+import 'package:superapp_user/src/domain/model/store99_product.dart';
 
 /// Data Transfer Object for 99 Store product items.
 class Store99ProductDto {

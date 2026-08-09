@@ -3,17 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../navigation/back_navigation.dart';
+import 'package:superapp_user/src/presentation/navigation/back_navigation.dart';
 
-import '../../../core/utils/haptics.dart';
-import '../../../data/models/restaurant_model.dart';
-import '../../branding/app_colors.dart';
-import '../../common_widgets/app_refresh_indicator.dart';
-import '../../common_widgets/skeleton_loading.dart';
-import '../../navigation/route_names.dart';
-import '../viewmodels/home_viewmodel.dart';
-import '../viewmodels/near_you_viewmodel.dart';
-import '../widgets/restaurant_card.dart';
+import 'package:superapp_user/src/core/utils/haptics.dart';
+import 'package:superapp_user/src/data/models/restaurant_model.dart';
+import 'package:superapp_user/src/presentation/branding/app_colors.dart';
+import 'package:superapp_user/src/presentation/common_widgets/app_refresh_indicator.dart';
+import 'package:superapp_user/src/presentation/common_widgets/skeleton_loading.dart';
+import 'package:superapp_user/src/presentation/navigation/route_names.dart';
+import 'package:superapp_user/src/presentation/home/viewmodels/home_viewmodel.dart';
+import 'package:superapp_user/src/presentation/home/viewmodels/near_you_viewmodel.dart';
+import 'package:superapp_user/src/presentation/home/widgets/restaurant_card.dart';
 
 /// Filter screen arguments passed when opening from quick filter pills.
 class HomeFilterArgs {

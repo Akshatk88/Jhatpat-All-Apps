@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
-import '../../core/constants/app_constants.dart';
-import '../../core/error/failures.dart';
-import '../../data/datasources/account_remote_datasource.dart';
-import '../../data/datasources/order_remote_datasource.dart';
+import 'package:superapp_user/src/core/constants/app_constants.dart';
+import 'package:superapp_user/src/core/error/failures.dart';
+import 'package:superapp_user/src/data/datasources/account_remote_datasource.dart';
+import 'package:superapp_user/src/data/datasources/order_remote_datasource.dart';
 
 /// Outcome of a gateway attempt.
 enum PaymentOutcome { success, failed, cancelled, pending }

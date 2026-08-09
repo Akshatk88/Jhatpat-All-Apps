@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../platform/realtime/socket_service.dart';
-import '../presentation/auth/viewmodels/auth_viewmodel.dart';
-import 'network_providers.dart';
+import 'package:superapp_user/src/platform/realtime/socket_service.dart';
+import 'package:superapp_user/src/presentation/auth/viewmodels/auth_viewmodel.dart';
+import 'package:superapp_user/src/di/network_providers.dart';
 
 /// The app's one Socket.IO connection — order tracking and chat both read
 /// this instead of opening their own.

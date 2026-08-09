@@ -1,7 +1,7 @@
-import '../../core/network/api_response.dart';
-import '../../data/models/restaurant_model.dart';
-import '../../data/models/category_model.dart';
-import '../../data/models/food_model.dart';
+import 'package:superapp_user/src/core/network/api_response.dart';
+import 'package:superapp_user/src/data/models/restaurant_model.dart';
+import 'package:superapp_user/src/data/models/category_model.dart';
+import 'package:superapp_user/src/data/models/food_model.dart';
 
 abstract class RestaurantRepository {
   /// [onCache], where supported, fires synchronously with a cached copy (if

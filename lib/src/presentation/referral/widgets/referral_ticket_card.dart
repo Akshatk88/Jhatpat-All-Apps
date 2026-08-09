@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../data/models/wallet_model.dart';
-import '../../auth/viewmodels/auth_viewmodel.dart';
-import '../viewmodels/referral_viewmodel.dart';
-import 'ticket_clipper.dart';
+import 'package:superapp_user/src/data/models/wallet_model.dart';
+import 'package:superapp_user/src/presentation/auth/viewmodels/auth_viewmodel.dart';
+import 'package:superapp_user/src/presentation/referral/viewmodels/referral_viewmodel.dart';
+import 'package:superapp_user/src/presentation/referral/widgets/ticket_clipper.dart';
 
 class ReferralTicketCard extends ConsumerWidget {
   final double? width;

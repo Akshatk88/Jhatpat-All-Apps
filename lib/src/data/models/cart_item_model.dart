@@ -1,4 +1,4 @@
-import 'food_model.dart';
+import 'package:superapp_user/src/data/models/food_model.dart';
 
 class CartItemModel {
   final String id;

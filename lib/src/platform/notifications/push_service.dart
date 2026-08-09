@@ -8,9 +8,9 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../../core/constants/app_constants.dart';
-import '../../data/datasources/account_remote_datasource.dart';
-import '../../data/models/user_model.dart';
+import 'package:superapp_user/src/core/constants/app_constants.dart';
+import 'package:superapp_user/src/data/datasources/account_remote_datasource.dart';
+import 'package:superapp_user/src/data/models/user_model.dart';
 
 /// Fired when a push should navigate somewhere. The router listens to this
 /// rather than the service reaching into navigation itself.

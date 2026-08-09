@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../data/datasources/account_remote_datasource.dart';
-import 'network_providers.dart';
+import 'package:superapp_user/src/data/datasources/account_remote_datasource.dart';
+import 'package:superapp_user/src/di/network_providers.dart';
 
 final accountRemoteDataSourceProvider = Provider<AccountRemoteDataSource>((ref) {
   return AccountRemoteDataSource(

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../branding/app_colors.dart';
-import '../common_widgets/app_snackbar.dart';
+import 'package:superapp_user/src/presentation/branding/app_colors.dart';
+import 'package:superapp_user/src/presentation/common_widgets/app_snackbar.dart';
 
 /// Reusable WebView Screen to display web pages (e.g. Privacy Policy, Terms & Conditions)
 class WebViewScreen extends StatefulWidget {

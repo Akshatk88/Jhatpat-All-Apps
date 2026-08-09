@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../core/utils/haptics.dart';
-import '../../../data/models/order_model.dart';
-import '../../branding/app_colors.dart';
-import '../../common_widgets/app_snackbar.dart';
-import '../viewmodels/orders_viewmodel.dart';
+import 'package:superapp_user/src/core/utils/haptics.dart';
+import 'package:superapp_user/src/data/models/order_model.dart';
+import 'package:superapp_user/src/presentation/branding/app_colors.dart';
+import 'package:superapp_user/src/presentation/common_widgets/app_snackbar.dart';
+import 'package:superapp_user/src/presentation/orders/viewmodels/orders_viewmodel.dart';
 
 /// Bottom sheet for rating a delivered order — food, delivery partner (if
 /// any), and individual items, submitted together in one PATCH call.

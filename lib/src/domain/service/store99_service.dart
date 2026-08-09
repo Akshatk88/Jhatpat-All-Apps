@@ -1,9 +1,9 @@
-import '../../core/network/api_response.dart';
-import '../../data/models/restaurant_model.dart';
-import '../model/store99_brand.dart';
-import '../model/store99_cuisine.dart';
-import '../model/store99_product.dart';
-import '../repository/store99_repository.dart';
+import 'package:superapp_user/src/core/network/api_response.dart';
+import 'package:superapp_user/src/data/models/restaurant_model.dart';
+import 'package:superapp_user/src/domain/model/store99_brand.dart';
+import 'package:superapp_user/src/domain/model/store99_cuisine.dart';
+import 'package:superapp_user/src/domain/model/store99_product.dart';
+import 'package:superapp_user/src/domain/repository/store99_repository.dart';
 
 /// Business domain service for 99 Store rules, filtering, and data orchestration.
 class Store99Service {

@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../data/repository/restaurant_repository_impl.dart';
-import '../domain/repository/restaurant_repository.dart';
-import '../domain/service/restaurant_service.dart';
-import '../presentation/home/viewmodels/zone_viewmodel.dart';
-import 'catalog_providers.dart';
+import 'package:superapp_user/src/data/repository/restaurant_repository_impl.dart';
+import 'package:superapp_user/src/domain/repository/restaurant_repository.dart';
+import 'package:superapp_user/src/domain/service/restaurant_service.dart';
+import 'package:superapp_user/src/presentation/home/viewmodels/zone_viewmodel.dart';
+import 'package:superapp_user/src/di/catalog_providers.dart';
 
 final restaurantRepositoryProvider = Provider<RestaurantRepository>((ref) {
   return RestaurantRepositoryImpl(

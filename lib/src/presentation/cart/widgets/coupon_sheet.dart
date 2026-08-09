@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/utils/haptics.dart';
-import '../../branding/app_colors.dart';
-import '../../checkout/viewmodels/checkout_viewmodel.dart';
-import '../../common_widgets/app_snackbar.dart';
-import '../../coupons/viewmodels/coupons_viewmodel.dart';
-import '../viewmodels/cart_viewmodel.dart';
+import 'package:superapp_user/src/core/utils/haptics.dart';
+import 'package:superapp_user/src/presentation/branding/app_colors.dart';
+import 'package:superapp_user/src/presentation/checkout/viewmodels/checkout_viewmodel.dart';
+import 'package:superapp_user/src/presentation/common_widgets/app_snackbar.dart';
+import 'package:superapp_user/src/presentation/coupons/viewmodels/coupons_viewmodel.dart';
+import 'package:superapp_user/src/presentation/cart/viewmodels/cart_viewmodel.dart';
 
 /// Apply/remove a coupon against the server bill.
 ///

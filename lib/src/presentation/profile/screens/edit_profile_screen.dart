@@ -4,13 +4,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../../core/utils/haptics.dart';
-import '../../../di/auth_providers.dart';
-import '../../auth/viewmodels/auth_viewmodel.dart';
-import '../../branding/app_colors.dart';
-import '../../common_widgets/app_snackbar.dart';
-import '../../address/viewmodels/address_viewmodel.dart';
-import '../../navigation/route_names.dart';
+import 'package:superapp_user/src/core/utils/haptics.dart';
+import 'package:superapp_user/src/di/auth_providers.dart';
+import 'package:superapp_user/src/presentation/auth/viewmodels/auth_viewmodel.dart';
+import 'package:superapp_user/src/presentation/branding/app_colors.dart';
+import 'package:superapp_user/src/presentation/common_widgets/app_snackbar.dart';
+import 'package:superapp_user/src/presentation/address/viewmodels/address_viewmodel.dart';
+import 'package:superapp_user/src/presentation/navigation/route_names.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
   const EditProfileScreen({super.key});

@@ -1,4 +1,4 @@
-import '../../core/config/api_config.dart';
+import 'package:superapp_user/src/core/config/api_config.dart';
 
 /// A size/portion choice on a menu item.
 ///

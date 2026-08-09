@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../data/datasources/favorites_remote_datasource.dart';
-import '../data/repository/favorites_repository_impl.dart';
-import '../domain/repository/favorites_repository.dart';
-import 'network_providers.dart';
+import 'package:superapp_user/src/data/datasources/favorites_remote_datasource.dart';
+import 'package:superapp_user/src/data/repository/favorites_repository_impl.dart';
+import 'package:superapp_user/src/domain/repository/favorites_repository.dart';
+import 'package:superapp_user/src/di/network_providers.dart';
 
 final favoritesRemoteDataSourceProvider = Provider<FavoritesRemoteDataSource>((ref) {
   return FavoritesRemoteDataSource(ref.watch(apiClientProvider));

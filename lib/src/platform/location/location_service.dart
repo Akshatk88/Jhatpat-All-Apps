@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:geolocator/geolocator.dart';
-import '../../core/constants/app_constants.dart';
+import 'package:superapp_user/src/core/constants/app_constants.dart';
 
 /// Result wrapper for GPS location detection and reverse geocoding.
 /// One search hit in the address picker.

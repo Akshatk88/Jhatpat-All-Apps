@@ -1,8 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
-import '../../core/constants/app_constants.dart';
-import '../models/active_order_rtdb_model.dart';
+import 'package:superapp_user/src/core/constants/app_constants.dart';
+import 'package:superapp_user/src/data/models/active_order_rtdb_model.dart';
 
 void _rtdbLog(String message) {
   if (kDebugMode) debugPrint('[RTDB] $message');

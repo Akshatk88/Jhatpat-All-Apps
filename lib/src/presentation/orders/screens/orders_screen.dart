@@ -4,16 +4,16 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-import '../../../core/utils/haptics.dart';
-import '../../../data/models/order_model.dart';
-import '../../branding/app_colors.dart';
-import '../../common_widgets/app_refresh_indicator.dart';
-import '../../common_widgets/app_snackbar.dart';
-import '../../common_widgets/smart_image.dart';
-import '../../navigation/route_names.dart';
-import '../utils/reorder.dart';
-import '../viewmodels/orders_viewmodel.dart';
-import '../widgets/rate_order_sheet.dart';
+import 'package:superapp_user/src/core/utils/haptics.dart';
+import 'package:superapp_user/src/data/models/order_model.dart';
+import 'package:superapp_user/src/presentation/branding/app_colors.dart';
+import 'package:superapp_user/src/presentation/common_widgets/app_refresh_indicator.dart';
+import 'package:superapp_user/src/presentation/common_widgets/app_snackbar.dart';
+import 'package:superapp_user/src/presentation/common_widgets/smart_image.dart';
+import 'package:superapp_user/src/presentation/navigation/route_names.dart';
+import 'package:superapp_user/src/presentation/orders/utils/reorder.dart';
+import 'package:superapp_user/src/presentation/orders/viewmodels/orders_viewmodel.dart';
+import 'package:superapp_user/src/presentation/orders/widgets/rate_order_sheet.dart';
 
 class OrdersScreen extends ConsumerStatefulWidget {
   const OrdersScreen({super.key});

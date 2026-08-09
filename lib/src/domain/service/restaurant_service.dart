@@ -1,7 +1,7 @@
-import '../../core/network/api_response.dart';
-import '../../data/models/food_model.dart';
-import '../model/restaurant_menu_category.dart';
-import '../repository/restaurant_repository.dart';
+import 'package:superapp_user/src/core/network/api_response.dart';
+import 'package:superapp_user/src/data/models/food_model.dart';
+import 'package:superapp_user/src/domain/model/restaurant_menu_category.dart';
+import 'package:superapp_user/src/domain/repository/restaurant_repository.dart';
 
 /// Business domain service for restaurant menu processing, category extraction, and filtering.
 class RestaurantService {

@@ -3,18 +3,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../navigation/back_navigation.dart';
+import 'package:superapp_user/src/presentation/navigation/back_navigation.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../core/utils/haptics.dart';
-import '../../../data/models/order_model.dart';
-import '../../branding/app_colors.dart';
-import '../../common_widgets/app_refresh_indicator.dart';
-import '../../common_widgets/app_snackbar.dart';
-import '../../navigation/route_names.dart';
-import '../viewmodels/orders_viewmodel.dart';
-import '../widgets/previous_conversations_card.dart';
+import 'package:superapp_user/src/core/utils/haptics.dart';
+import 'package:superapp_user/src/data/models/order_model.dart';
+import 'package:superapp_user/src/presentation/branding/app_colors.dart';
+import 'package:superapp_user/src/presentation/common_widgets/app_refresh_indicator.dart';
+import 'package:superapp_user/src/presentation/common_widgets/app_snackbar.dart';
+import 'package:superapp_user/src/presentation/navigation/route_names.dart';
+import 'package:superapp_user/src/presentation/orders/viewmodels/orders_viewmodel.dart';
+import 'package:superapp_user/src/presentation/orders/widgets/previous_conversations_card.dart';
 
 class OrderDeliveredScreen extends ConsumerStatefulWidget {
   final String orderId;

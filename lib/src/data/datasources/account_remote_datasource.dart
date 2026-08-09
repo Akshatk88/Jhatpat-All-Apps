@@ -4,11 +4,11 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
-import '../../core/config/api_config.dart';
-import '../../core/network/api_client.dart';
-import '../../core/storage/token_storage.dart';
-import '../models/user_model.dart';
-import '../models/wallet_model.dart';
+import 'package:superapp_user/src/core/config/api_config.dart';
+import 'package:superapp_user/src/core/network/api_client.dart';
+import 'package:superapp_user/src/core/storage/token_storage.dart';
+import 'package:superapp_user/src/data/models/user_model.dart';
+import 'package:superapp_user/src/data/models/wallet_model.dart';
 
 /// Wallet, referrals, notification inbox and FCM registration — the
 /// account-scoped endpoints under `/food/user`, `/food/notifications` and

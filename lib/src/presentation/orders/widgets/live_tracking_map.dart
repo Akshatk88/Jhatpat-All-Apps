@@ -6,7 +6,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../../../core/utils/map_styles.dart';
+import 'package:superapp_user/src/core/utils/map_styles.dart';
 
 /// Compass bearing from [a] to [b], in degrees clockwise from north.
 ///

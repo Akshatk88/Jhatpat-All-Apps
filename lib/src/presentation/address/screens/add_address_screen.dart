@@ -3,23 +3,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../navigation/back_navigation.dart';
-import '../../../core/utils/haptics.dart';
-import '../../../data/models/address_model.dart';
+import 'package:superapp_user/src/presentation/navigation/back_navigation.dart';
+import 'package:superapp_user/src/core/utils/haptics.dart';
+import 'package:superapp_user/src/data/models/address_model.dart';
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../../../core/utils/map_styles.dart';
+import 'package:superapp_user/src/core/utils/map_styles.dart';
 
-import '../../../di/location_providers.dart';
-import '../../../platform/location/location_service.dart';
-import '../../branding/app_colors.dart';
-import '../../common_widgets/app_snackbar.dart';
-import '../../auth/viewmodels/auth_viewmodel.dart';
-import '../../navigation/route_names.dart';
-import '../viewmodels/address_viewmodel.dart';
+import 'package:superapp_user/src/di/location_providers.dart';
+import 'package:superapp_user/src/platform/location/location_service.dart';
+import 'package:superapp_user/src/presentation/branding/app_colors.dart';
+import 'package:superapp_user/src/presentation/common_widgets/app_snackbar.dart';
+import 'package:superapp_user/src/presentation/auth/viewmodels/auth_viewmodel.dart';
+import 'package:superapp_user/src/presentation/navigation/route_names.dart';
+import 'package:superapp_user/src/presentation/address/viewmodels/address_viewmodel.dart';
 
 class AddAddressScreen extends ConsumerStatefulWidget {
   const AddAddressScreen({super.key});

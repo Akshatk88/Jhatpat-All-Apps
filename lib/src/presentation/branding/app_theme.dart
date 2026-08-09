@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'app_colors.dart';
-import 'app_text_styles.dart';
+import 'package:superapp_user/src/presentation/branding/app_colors.dart';
+import 'package:superapp_user/src/presentation/branding/app_text_styles.dart';
 
 const double _borderRadius = 22.0; // Modern Rounded Corners
 const double _buttonBorderRadius = 24.0;

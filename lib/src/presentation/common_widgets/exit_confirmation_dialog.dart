@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../core/utils/haptics.dart';
-import '../branding/app_colors.dart';
+import 'package:superapp_user/src/core/utils/haptics.dart';
+import 'package:superapp_user/src/presentation/branding/app_colors.dart';
 
 /// Shows a premium Material 3 Exit Confirmation Dialog for Suvio.
 Future<bool?> showExitConfirmationDialog(BuildContext context) {

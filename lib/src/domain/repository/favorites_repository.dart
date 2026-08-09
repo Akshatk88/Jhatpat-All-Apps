@@ -1,4 +1,4 @@
-import '../../data/datasources/favorites_remote_datasource.dart';
+import 'package:superapp_user/src/data/datasources/favorites_remote_datasource.dart';
 
 /// Contract for favorited restaurant and food IDs, synchronized with backend.
 abstract class FavoritesRepository {

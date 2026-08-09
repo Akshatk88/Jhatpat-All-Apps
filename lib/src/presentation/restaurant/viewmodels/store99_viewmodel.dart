@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../data/models/restaurant_model.dart';
-import '../../../di/store99_providers.dart';
-import '../../../domain/service/store99_service.dart';
-import 'store99_state.dart';
+import 'package:superapp_user/src/data/models/restaurant_model.dart';
+import 'package:superapp_user/src/di/store99_providers.dart';
+import 'package:superapp_user/src/domain/service/store99_service.dart';
+import 'package:superapp_user/src/presentation/restaurant/viewmodels/store99_state.dart';
 
 final store99ViewModelProvider =
     NotifierProvider<Store99ViewModel, Store99State>(() {

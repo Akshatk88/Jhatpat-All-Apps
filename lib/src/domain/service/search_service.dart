@@ -1,7 +1,7 @@
 import 'dart:developer' as developer;
-import '../../core/network/api_response.dart';
-import '../model/search_result.dart';
-import '../repository/search_repository.dart';
+import 'package:superapp_user/src/core/network/api_response.dart';
+import 'package:superapp_user/src/domain/model/search_result.dart';
+import 'package:superapp_user/src/domain/repository/search_repository.dart';
 
 /// Business domain service for normalization, search processing, and suggestions.
 class SearchService {

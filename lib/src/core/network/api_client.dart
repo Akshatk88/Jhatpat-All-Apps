@@ -5,9 +5,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../config/api_config.dart';
-import '../error/failures.dart';
-import '../storage/token_storage.dart';
+import 'package:superapp_user/src/core/config/api_config.dart';
+import 'package:superapp_user/src/core/error/failures.dart';
+import 'package:superapp_user/src/core/storage/token_storage.dart';
 
 /// The single Dio instance for the whole app.
 ///

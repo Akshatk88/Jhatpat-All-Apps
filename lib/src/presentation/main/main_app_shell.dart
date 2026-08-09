@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../di/socket_providers.dart';
-import '../branding/theme_color_provider.dart';
-import '../common_widgets/offline_banner.dart';
-import '../orders/viewmodels/active_order_viewmodel.dart';
-import '../orders/widgets/floating_active_order_card.dart';
-import 'widgets/custom_bottom_nav.dart';
-import '../cart/viewmodels/cart_viewmodel.dart';
-import '../navigation/route_names.dart';
+import 'package:superapp_user/src/di/socket_providers.dart';
+import 'package:superapp_user/src/presentation/branding/theme_color_provider.dart';
+import 'package:superapp_user/src/presentation/common_widgets/offline_banner.dart';
+import 'package:superapp_user/src/presentation/orders/viewmodels/active_order_viewmodel.dart';
+import 'package:superapp_user/src/presentation/orders/widgets/floating_active_order_card.dart';
+import 'package:superapp_user/src/presentation/main/widgets/custom_bottom_nav.dart';
+import 'package:superapp_user/src/presentation/cart/viewmodels/cart_viewmodel.dart';
+import 'package:superapp_user/src/presentation/navigation/route_names.dart';
 
 import 'package:flutter/services.dart';
-import '../common_widgets/exit_confirmation_dialog.dart';
+import 'package:superapp_user/src/presentation/common_widgets/exit_confirmation_dialog.dart';
 
 class MainAppShell extends ConsumerWidget {
   final StatefulNavigationShell navigationShell;

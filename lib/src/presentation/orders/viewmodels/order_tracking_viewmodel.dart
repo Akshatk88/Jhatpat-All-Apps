@@ -1,16 +1,16 @@
-import 'active_order_viewmodel.dart';
+import 'package:superapp_user/src/presentation/orders/viewmodels/active_order_viewmodel.dart';
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/error/failures.dart';
-import '../../../data/models/active_order_rtdb_model.dart';
-import '../../../data/models/order_model.dart';
-import '../../../di/order_providers.dart';
-import '../../../di/socket_providers.dart';
-import '../../../platform/realtime/socket_service.dart';
+import 'package:superapp_user/src/core/error/failures.dart';
+import 'package:superapp_user/src/data/models/active_order_rtdb_model.dart';
+import 'package:superapp_user/src/data/models/order_model.dart';
+import 'package:superapp_user/src/di/order_providers.dart';
+import 'package:superapp_user/src/di/socket_providers.dart';
+import 'package:superapp_user/src/platform/realtime/socket_service.dart';
 
 void _trackingLog(String message) {
   if (kDebugMode) debugPrint('[TRACKING] $message');

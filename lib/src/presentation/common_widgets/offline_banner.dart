@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../platform/network/network_status_provider.dart';
+import 'package:superapp_user/src/platform/network/network_status_provider.dart';
 
 /// A persistent strip shown above the bottom nav while there's no internet —
 /// replaces the old blocking dialog so the user can keep browsing cached

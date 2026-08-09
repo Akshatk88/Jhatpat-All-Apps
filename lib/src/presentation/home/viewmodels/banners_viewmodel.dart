@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../data/models/promo_banner_model.dart';
-import '../../../di/catalog_providers.dart';
+import 'package:superapp_user/src/data/models/promo_banner_model.dart';
+import 'package:superapp_user/src/di/catalog_providers.dart';
 
 /// Hero banner image URLs from `GET /food/hero-banners/public`.
 ///

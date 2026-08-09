@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../core/network/api_client.dart';
-import '../core/storage/token_storage.dart';
+import 'package:superapp_user/src/core/network/api_client.dart';
+import 'package:superapp_user/src/core/storage/token_storage.dart';
 
 /// Encrypted token store — single instance, it caches the pair in memory.
 final tokenStorageProvider = Provider<TokenStorage>((ref) => TokenStorage());

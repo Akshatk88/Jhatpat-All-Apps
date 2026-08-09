@@ -1,8 +1,8 @@
 import 'dart:developer' as developer;
-import '../../core/config/api_config.dart';
-import '../../core/network/api_client.dart';
-import '../models/food_model.dart';
-import '../models/restaurant_model.dart';
+import 'package:superapp_user/src/core/config/api_config.dart';
+import 'package:superapp_user/src/core/network/api_client.dart';
+import 'package:superapp_user/src/data/models/food_model.dart';
+import 'package:superapp_user/src/data/models/restaurant_model.dart';
 
 class FavoritesResponse {
   final Set<String> restaurantIds;

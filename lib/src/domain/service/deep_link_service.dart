@@ -1,4 +1,4 @@
-import '../../core/constants/app_constants.dart';
+import 'package:superapp_user/src/core/constants/app_constants.dart';
 
 /// Business logic and utility for product deep linking and sharing.
 ///

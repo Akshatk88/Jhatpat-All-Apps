@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../data/models/food_model.dart';
-import '../../../data/models/restaurant_model.dart';
-import '../../../di/restaurant_providers.dart';
-import '../../../domain/service/restaurant_service.dart';
-import '../../home/viewmodels/veg_filter_provider.dart';
-import 'restaurant_state.dart';
+import 'package:superapp_user/src/data/models/food_model.dart';
+import 'package:superapp_user/src/data/models/restaurant_model.dart';
+import 'package:superapp_user/src/di/restaurant_providers.dart';
+import 'package:superapp_user/src/domain/service/restaurant_service.dart';
+import 'package:superapp_user/src/presentation/home/viewmodels/veg_filter_provider.dart';
+import 'package:superapp_user/src/presentation/restaurant/viewmodels/restaurant_state.dart';
 
 final restaurantViewModelProvider =
     NotifierProvider<RestaurantViewModel, RestaurantState>(

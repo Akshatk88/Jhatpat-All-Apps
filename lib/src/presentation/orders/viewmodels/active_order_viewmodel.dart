@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../data/models/order_model.dart';
-import '../../../di/order_providers.dart';
-import '../../../di/socket_providers.dart';
-import '../../../platform/realtime/socket_service.dart';
-import '../../auth/viewmodels/auth_viewmodel.dart';
+import 'package:superapp_user/src/data/models/order_model.dart';
+import 'package:superapp_user/src/di/order_providers.dart';
+import 'package:superapp_user/src/di/socket_providers.dart';
+import 'package:superapp_user/src/platform/realtime/socket_service.dart';
+import 'package:superapp_user/src/presentation/auth/viewmodels/auth_viewmodel.dart';
 
 class ActiveOrderState {
   final OrderModel? activeOrder;

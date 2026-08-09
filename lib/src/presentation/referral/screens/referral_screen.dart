@@ -5,16 +5,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../navigation/back_navigation.dart';
+import 'package:superapp_user/src/presentation/navigation/back_navigation.dart';
 
-import '../../../core/utils/haptics.dart';
-import '../../../core/utils/referral_audio_player.dart';
-import '../../../data/models/wallet_model.dart';
-import '../../branding/app_colors.dart';
-import '../../common_widgets/skeleton_loading.dart';
-import '../viewmodels/referral_viewmodel.dart';
-import '../widgets/refer_earn_background.dart';
-import '../widgets/referral_ticket_card.dart';
+import 'package:superapp_user/src/core/utils/haptics.dart';
+import 'package:superapp_user/src/core/utils/referral_audio_player.dart';
+import 'package:superapp_user/src/data/models/wallet_model.dart';
+import 'package:superapp_user/src/presentation/branding/app_colors.dart';
+import 'package:superapp_user/src/presentation/common_widgets/skeleton_loading.dart';
+import 'package:superapp_user/src/presentation/referral/viewmodels/referral_viewmodel.dart';
+import 'package:superapp_user/src/presentation/referral/widgets/refer_earn_background.dart';
+import 'package:superapp_user/src/presentation/referral/widgets/referral_ticket_card.dart';
 
 class ReferralScreen extends ConsumerStatefulWidget {
   const ReferralScreen({super.key});
