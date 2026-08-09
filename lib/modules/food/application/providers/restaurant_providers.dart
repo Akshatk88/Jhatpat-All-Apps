@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:superapp_user/modules/food/data/repositories/restaurant_repository_impl.dart';
 import 'package:superapp_user/modules/food/data/contracts/restaurant_repository.dart';
 import 'package:superapp_user/modules/food/data/services/restaurant_service.dart';
-import 'package:superapp_user/src/presentation/home/viewmodels/zone_viewmodel.dart';
+import 'package:superapp_user/modules/food/presentation/home/viewmodels/zone_viewmodel.dart';
 import 'package:superapp_user/modules/food/application/providers/catalog_providers.dart';
 
 final restaurantRepositoryProvider = Provider<RestaurantRepository>((ref) {

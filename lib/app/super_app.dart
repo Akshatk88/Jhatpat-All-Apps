@@ -4,12 +4,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:superapp_user/design_system/theme/app_theme.dart';
 import 'package:superapp_user/design_system/theme/theme_color_provider.dart';
 import 'package:superapp_user/design_system/theme/theme_provider.dart';
-import 'package:superapp_user/src/presentation/navigation/app_router.dart';
+import 'package:superapp_user/app/routing/app_router.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'package:superapp_user/modules/food/application/providers/push_providers.dart';
 import 'package:superapp_user/core/push/push_service.dart';
-import 'package:superapp_user/src/presentation/auth/viewmodels/auth_viewmodel.dart';
+import 'package:superapp_user/shared/auth/presentation/viewmodels/auth_viewmodel.dart';
 
 class SuperApp extends ConsumerStatefulWidget {
   const SuperApp({super.key});

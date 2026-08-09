@@ -1,0 +1,364 @@
+// App Router Configuration
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:superapp_user/app/routing/route_names.dart';
+import 'package:superapp_user/shared/session/presentation/splash/splash_screen.dart';
+import 'package:superapp_user/shared/auth/presentation/screens/login_screen.dart';
+import 'package:superapp_user/shared/auth/presentation/screens/otp_screen.dart';
+import 'package:superapp_user/app/shell/main_app_shell.dart';
+import 'package:superapp_user/modules/food/presentation/home/home_screen.dart';
+import 'package:superapp_user/modules/food/presentation/cart/cart_screen.dart';
+import 'package:superapp_user/shared/notifications/presentation/notifications_screen.dart';
+import 'package:superapp_user/shared/profile/presentation/profile_screen.dart';
+import 'package:superapp_user/modules/food/presentation/restaurant/screens/food_detail_loader_screen.dart';
+import 'package:superapp_user/modules/food/presentation/restaurant/screens/food_detail_screen.dart';
+import 'package:superapp_user/modules/food/presentation/restaurant/screens/restaurant_detail_loader_screen.dart';
+import 'package:superapp_user/modules/food/presentation/restaurant/screens/restaurant_screen.dart';
+import 'package:superapp_user/modules/food/presentation/restaurant/screens/store99_screen.dart';
+import 'package:superapp_user/shared/search/presentation/screens/search_screen.dart';
+import 'package:superapp_user/shared/address/presentation/screens/add_address_screen.dart';
+import 'package:superapp_user/modules/food/presentation/offers/screens/all_offers_screen.dart';
+import 'package:superapp_user/modules/food/presentation/favorites/favorites_screen.dart';
+import 'package:superapp_user/modules/food/presentation/orders/screens/orders_screen.dart';
+import 'package:superapp_user/modules/food/presentation/orders/screens/order_details_screen.dart';
+import 'package:superapp_user/modules/food/presentation/orders/screens/order_tracking_screen.dart';
+import 'package:superapp_user/modules/food/presentation/orders/screens/order_success_screen.dart';
+import 'package:superapp_user/modules/food/presentation/orders/screens/order_delivered_screen.dart';
+import 'package:superapp_user/shared/referral/presentation/screens/referral_screen.dart';
+import 'package:superapp_user/shared/referral/presentation/screens/referral_ticket_result_screen.dart';
+import 'package:superapp_user/shared/wallet/presentation/screens/wallet_screen.dart';
+import 'package:superapp_user/shared/support/presentation/chat/screens/chat_screen.dart';
+import 'package:superapp_user/modules/food/presentation/home/screens/home_filter_screen.dart';
+import 'package:superapp_user/design_system/components/layout/webview_screen.dart';
+import 'package:superapp_user/shared/settings/presentation/about/screens/about_screen.dart';
+import 'package:superapp_user/shared/profile/presentation/screens/help_support_screen.dart';
+import 'package:superapp_user/shared/profile/presentation/screens/privacy_policy_screen.dart';
+import 'package:superapp_user/shared/profile/presentation/screens/terms_conditions_screen.dart';
+import 'package:superapp_user/shared/profile/presentation/screens/edit_profile_screen.dart';
+import 'package:superapp_user/modules/food/data/models/restaurant_model.dart';
+import 'package:superapp_user/modules/food/data/models/food_model.dart';
+import 'package:superapp_user/modules/food/data/models/cart_item_model.dart';
+import 'package:superapp_user/modules/food/presentation/cart/viewmodels/cart_viewmodel.dart';
+import 'package:superapp_user/modules/food/presentation/checkout/viewmodels/checkout_viewmodel.dart';
+
+final rootNavigatorKey = GlobalKey<NavigatorState>();
+final shellNavigatorKeyHome = GlobalKey<NavigatorState>(
+  debugLabel: 'shellHome',
+);
+final shellNavigatorKeyCart = GlobalKey<NavigatorState>(
+  debugLabel: 'shellCart',
+);
+final shellNavigatorKeyStore99 = GlobalKey<NavigatorState>(
+  debugLabel: 'shellStore99',
+);
+final shellNavigatorKeyProfile = GlobalKey<NavigatorState>(
+  debugLabel: 'shellProfile',
+);
+
+final routerProvider = Provider<GoRouter>((ref) {
+  return GoRouter(
+    navigatorKey: rootNavigatorKey,
+    initialLocation: RouteNames.splash,
+    routes: [
+      GoRoute(
+        path: RouteNames.splash,
+        builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.login,
+        builder: (context, state) {
+          final fromPath =
+              state.uri.queryParameters['from'] ??
+              (state.extra is String ? state.extra as String : null);
+          return LoginScreen(fromPath: fromPath);
+        },
+      ),
+      GoRoute(
+        path: RouteNames.otp,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final phone =
+              extra?['phone']?.toString() ??
+              state.uri.queryParameters['phone'] ??
+              '';
+          final fromPath =
+              extra?['from']?.toString() ?? state.uri.queryParameters['from'];
+          return OtpScreen(
+            phoneNumber: phone,
+            devOtp: extra?['devOtp']?.toString(),
+            fromPath: fromPath,
+          );
+        },
+      ),
+      GoRoute(
+        path: RouteNames.restaurantDetail,
+        builder: (context, state) {
+          // `extra` is not guaranteed. A shared link carries only the id, and an
+          // unconditional cast threw on arrival; the favourites screen also
+          // already pushes '/restaurant-detail/<id>', which never matched this
+          // route at all. Both now resolve through the loader.
+          final restaurant =
+              state.extra is RestaurantModel ? state.extra as RestaurantModel : null;
+          if (restaurant != null) {
+            return RestaurantScreen(restaurant: restaurant);
+          }
+          return RestaurantDetailLoaderScreen(
+            restaurantId: state.uri.queryParameters['id'] ??
+                state.uri.queryParameters['restaurantId'] ??
+                '',
+          );
+        },
+        routes: [
+          GoRoute(
+            path: ':id',
+            builder: (context, state) {
+              final restaurant = state.extra is RestaurantModel
+                  ? state.extra as RestaurantModel
+                  : null;
+              if (restaurant != null) {
+                return RestaurantScreen(restaurant: restaurant);
+              }
+              return RestaurantDetailLoaderScreen(
+                restaurantId: state.pathParameters['id'] ?? '',
+              );
+            },
+          ),
+        ],
+      ),
+      GoRoute(
+        path: RouteNames.foodDetail,
+        builder: (context, state) {
+          final extraFood = state.extra is FoodModel ? state.extra as FoodModel : null;
+          final foodId = state.uri.queryParameters['id'] ?? state.uri.queryParameters['productId'] ?? '';
+          final restaurantId = state.uri.queryParameters['restaurantId'] ?? state.uri.queryParameters['rId'] ?? '';
+
+          if (extraFood != null) {
+            return FoodDetailScreen(food: extraFood);
+          }
+          return FoodDetailLoaderScreen(
+            foodId: foodId,
+            restaurantId: restaurantId,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/food',
+        builder: (context, state) {
+          final extraFood = state.extra is FoodModel ? state.extra as FoodModel : null;
+          final foodId = state.uri.queryParameters['id'] ?? state.uri.queryParameters['productId'] ?? '';
+          final restaurantId = state.uri.queryParameters['restaurantId'] ?? state.uri.queryParameters['rId'] ?? '';
+
+          if (extraFood != null) {
+            return FoodDetailScreen(food: extraFood);
+          }
+          return FoodDetailLoaderScreen(
+            foodId: foodId,
+            restaurantId: restaurantId,
+          );
+        },
+      ),
+      GoRoute(
+        path: RouteNames.search,
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) {
+          final query = state.extra is String
+              ? state.extra as String
+              : state.uri.queryParameters['q'];
+          return SearchScreen(initialQuery: query);
+        },
+      ),
+      GoRoute(
+        path: RouteNames.orders,
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const OrdersScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.notifications,
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const NotificationsScreen(),
+      ),
+      GoRoute(
+        path: '/orders/details/:id',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return OrderDetailsScreen(orderId: id);
+        },
+      ),
+      GoRoute(
+        path: '/orders/track/:id',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return OrderTrackingScreen(orderId: id);
+        },
+      ),
+      GoRoute(
+        path: '/orders/delivered/:id',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return OrderDeliveredScreen(orderId: id);
+        },
+      ),
+      GoRoute(
+        path: RouteNames.chat,
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) {
+          final args = state.extra as ChatArgs? ?? const ChatArgs(
+            orderId: '',
+            peerName: 'Support',
+            peerRole: 'ADMIN',
+          );
+          return ChatScreen(args: args);
+        },
+      ),
+      GoRoute(
+        path: RouteNames.homeFilter,
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) =>
+            HomeFilterScreen(args: state.extra as HomeFilterArgs),
+      ),
+      GoRoute(
+        path: '/orders/success/:id',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return OrderSuccessScreen(orderId: id);
+        },
+      ),
+      GoRoute(
+        path: RouteNames.referral,
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const ReferralScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.referralTicket,
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const ReferralTicketResultScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.favorites,
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const FavoritesScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.addAddress,
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const AddAddressScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.allOffers,
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const AllOffersScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.wallet,
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const WalletScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.webView,
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) {
+          final extraMap = state.extra as Map<String, dynamic>?;
+          final title =
+              extraMap?['title']?.toString() ??
+              state.uri.queryParameters['title'] ??
+              'Web View';
+          final url =
+              extraMap?['url']?.toString() ??
+              state.uri.queryParameters['url'] ??
+              '';
+          return WebViewScreen(title: title, url: url);
+        },
+      ),
+      GoRoute(
+        path: RouteNames.about,
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const AboutScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.helpSupport,
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const HelpSupportScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.privacyPolicy,
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const PrivacyPolicyScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.termsConditions,
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const TermsConditionsScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.editProfile,
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const EditProfileScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.buyAgain,
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) {
+          final items = state.extra as List<CartItemModel>;
+          return ProviderScope(
+            overrides: [
+              cartViewModelProvider.overrideWith(
+                () => CartViewModel(initialItems: items, syncEnabled: false),
+              ),
+              checkoutViewModelProvider.overrideWith(CheckoutViewModel.new),
+            ],
+            child: const CartScreen(),
+          );
+        },
+      ),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return MainAppShell(navigationShell: navigationShell);
+        },
+        branches: [
+          StatefulShellBranch(
+            navigatorKey: shellNavigatorKeyHome,
+            routes: [
+              GoRoute(
+                path: RouteNames.home,
+                builder: (context, state) => const HomeScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: shellNavigatorKeyCart,
+            routes: [
+              GoRoute(
+                path: RouteNames.cart,
+                builder: (context, state) => const CartScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: shellNavigatorKeyStore99,
+            routes: [
+              GoRoute(
+                path: RouteNames.store99,
+                builder: (context, state) => const Store99Screen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: shellNavigatorKeyProfile,
+            routes: [
+              GoRoute(
+                path: RouteNames.profile,
+                builder: (context, state) => const ProfileScreen(),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ],
+  );
+});

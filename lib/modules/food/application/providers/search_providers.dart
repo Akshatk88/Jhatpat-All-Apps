@@ -6,7 +6,7 @@ import 'package:superapp_user/modules/food/data/contracts/search_repository.dart
 import 'package:superapp_user/modules/food/data/services/search_service.dart';
 import 'package:superapp_user/core/speech/speech_service.dart';
 import 'package:superapp_user/modules/food/application/providers/catalog_providers.dart';
-import 'package:superapp_user/src/presentation/home/viewmodels/zone_viewmodel.dart';
+import 'package:superapp_user/modules/food/presentation/home/viewmodels/zone_viewmodel.dart';
 
 final speechServiceProvider = Provider<SpeechService>((ref) {
   return SpeechService();

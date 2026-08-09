@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-import 'package:superapp_user/src/presentation/orders/widgets/live_tracking_map.dart';
+import 'package:superapp_user/modules/food/presentation/orders/widgets/live_tracking_map.dart';
 
 void main() {
   group('nearestRouteIndexAhead', () {
