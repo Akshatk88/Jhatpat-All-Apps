@@ -50,6 +50,20 @@ class RentalModule extends AppModule {
   @override
   int get order => 3;
 
+  /// Off until k9 serves the rental routes.
+  ///
+  /// Every one of them is commented out in
+  /// `modules/taxi/user/routes/userRoutes.js` — catalogue, quote requests,
+  /// bookings, active booking, end-ride, location updates and all three
+  /// advance-payment paths. Verified live: `/taxi/users/rental-vehicles`,
+  /// `/rental-bookings` and `/rental-quote-requests` all return 404.
+  ///
+  /// The screens are ported and ready, so this is a one-line flip once the
+  /// backend uncomments them. Shipping the tile now would advertise a service
+  /// whose every screen can only render an error.
+  @override
+  bool get isEnabled => false;
+
   @override
   List<RouteBase> routes(GlobalKey<NavigatorState> rootNavigatorKey) => [
         GoRoute(
