@@ -19,6 +19,9 @@ class FoodModule extends AppModule {
   String get label => 'Food';
 
   @override
+  String get tagline => 'Delicious meals';
+
+  @override
   IconData get icon => Icons.restaurant_rounded;
 
   @override

@@ -65,8 +65,11 @@ abstract class AppModule {
 
   ModuleId get id;
 
-  /// Hub tile label.
+  /// Short name shown on the service switcher.
   String get label;
+
+  /// One-line description under the label ("Delicious meals", "Book a ride").
+  String get tagline;
 
   /// Brand colour applied to this module's route subtree.
   ModuleAccent get accent;

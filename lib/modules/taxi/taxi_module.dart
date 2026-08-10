@@ -20,6 +20,9 @@ class TaxiModule extends AppModule {
   String get label => 'Rides';
 
   @override
+  String get tagline => 'Book a ride';
+
+  @override
   IconData get icon => Icons.local_taxi_rounded;
 
   @override

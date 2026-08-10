@@ -1,3 +1,4 @@
+import 'package:superapp_user/shared/location/application/current_location_provider.dart';
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,29 +34,34 @@ class ZoneViewModel extends AsyncNotifier<ZoneModel> {
     }
   }
 
+  /// Coordinates for zone detection, taken from the one app-wide location
+  /// fix rather than a third independent GPS acquisition.
+  ///
+  /// Returns null on any failure — zone detection must never hard-fail the
+  /// app, and unscoped listings are a usable fallback.
   Future<Position?> _currentPosition() async {
     try {
-      if (!await Geolocator.isLocationServiceEnabled()) return null;
-
-      var permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-      }
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
-        return null;
-      }
-
-      return await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.medium,
-          timeLimit: Duration(seconds: 10),
-        ),
+      final location = await ref.read(currentLocationProvider.future);
+      final lat = location.latitude;
+      final lng = location.longitude;
+      if (lat == null || lng == null) return null;
+      return Position(
+        latitude: lat,
+        longitude: lng,
+        timestamp: DateTime.now(),
+        accuracy: 0,
+        altitude: 0,
+        altitudeAccuracy: 0,
+        heading: 0,
+        headingAccuracy: 0,
+        speed: 0,
+        speedAccuracy: 0,
       );
     } catch (_) {
       return null;
     }
   }
+
 
   Future<void> refresh() async {
     state = const AsyncValue.loading();

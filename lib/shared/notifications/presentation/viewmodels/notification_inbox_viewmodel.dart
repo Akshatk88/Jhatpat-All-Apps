@@ -163,3 +163,11 @@ class NotificationInboxViewModel extends Notifier<NotificationInboxState> {
     }
   }
 }
+
+/// Unread badge count for the header.
+///
+/// A derived selector rather than a second fetch — the header rebuilds only
+/// when the count itself changes, not on every inbox mutation.
+final unreadNotificationCountProvider = Provider<int>((ref) {
+  return ref.watch(notificationInboxProvider.select((s) => s.unreadCount));
+});

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:superapp_user/app/shell/widgets/super_app_header.dart';
 import 'package:superapp_user/design_system/components/nav/module_top_nav.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
 import 'package:superapp_user/modules/module_id.dart';
@@ -36,7 +37,13 @@ class ModuleHomeShell extends ConsumerWidget {
         children: [
           SafeArea(
             bottom: false,
-            child: ModuleTopNav(activeModule: moduleId),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SuperAppHeader(),
+                ModuleTopNav(activeModule: moduleId),
+              ],
+            ),
           ),
           // The module keeps its own Scaffold, app bar, refresh indicator and
           // bottom nav — this only donates the strip above it.

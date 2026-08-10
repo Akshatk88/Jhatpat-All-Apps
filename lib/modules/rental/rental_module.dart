@@ -36,6 +36,9 @@ class RentalModule extends AppModule {
   String get label => 'Rentals';
 
   @override
+  String get tagline => 'Rent a vehicle';
+
+  @override
   IconData get icon => Icons.car_rental_rounded;
 
   @override

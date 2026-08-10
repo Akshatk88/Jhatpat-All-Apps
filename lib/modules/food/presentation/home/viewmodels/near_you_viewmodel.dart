@@ -1,8 +1,8 @@
+import 'package:superapp_user/shared/location/application/current_location_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:superapp_user/modules/food/api/datasources/catalog_remote_datasource.dart';
 import 'package:superapp_user/modules/food/data/models/restaurant_model.dart';
 import 'package:superapp_user/modules/food/application/providers/catalog_providers.dart';
-import 'package:superapp_user/modules/food/application/providers/location_providers.dart';
 import 'package:superapp_user/core/location/location_service.dart';
 
 class NearYouState {
@@ -30,12 +30,10 @@ final nearYouViewModelProvider = NotifierProvider<NearYouViewModel, NearYouState
 });
 
 class NearYouViewModel extends Notifier<NearYouState> {
-  late final LocationService _locationService;
   late final CatalogRemoteDataSource _catalogDataSource;
 
   @override
   NearYouState build() {
-    _locationService = ref.watch(locationServiceProvider);
     _catalogDataSource = ref.watch(catalogRemoteDataSourceProvider);
     Future.microtask(() => loadNearbyRestaurants());
     return const NearYouState(restaurants: AsyncValue.loading());
@@ -47,8 +45,10 @@ class NearYouViewModel extends Notifier<NearYouState> {
     }
 
     try {
-      // 1. Fetch current GPS location
-      final locResult = await _locationService.getCurrentLocationAndAddress();
+      // Reads the one app-wide fix rather than acquiring its own. Four call
+      // sites used to each run a GPS fix + reverse geocode, so every module
+      // switch re-located the device and billed another Geocoding call.
+      final locResult = await ref.read(currentLocationProvider.future);
       final double? lat = locResult.latitude;
       final double? lng = locResult.longitude;
 

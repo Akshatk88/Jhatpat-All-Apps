@@ -85,9 +85,9 @@ class _HomeScreenState extends ConsumerState<TaxiHomeScreen> {
     }
     // Default promotional banner list for infinite loop sliding
     return const [
-      {'image': 'assets/banner.png', 'link': ''},
-      {'image': 'assets/promo_car_banner.png', 'link': ''},
-      {'image': 'assets/delivery_rider_banner.png', 'link': ''},
+      {'image': 'assets/images/banner.png', 'link': ''},
+      {'image': 'assets/images/Ridenow.png', 'link': ''},
+      {'image': 'assets/images/Delivery.png', 'link': ''},
     ];
   }
 

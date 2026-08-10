@@ -51,6 +51,9 @@ class ParcelModule extends AppModule {
   String get label => 'Parcel';
 
   @override
+  String get tagline => 'Send anything';
+
+  @override
   IconData get icon => Icons.inventory_2_rounded;
 
   @override

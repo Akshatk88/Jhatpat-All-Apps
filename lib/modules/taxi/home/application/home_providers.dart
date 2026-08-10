@@ -1,3 +1,4 @@
+import 'package:superapp_user/shared/location/application/current_location_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -47,15 +48,30 @@ final bootstrapProvider = FutureProvider<Map<String, dynamic>>((ref) {
   return ref.watch(homeRepositoryProvider).getBootstrap();
 });
 
+/// The rider's position, derived from the one app-wide location fix.
+///
+/// Previously acquired its own GPS lock, which meant switching Food -> Rides
+/// re-located the device every time. Falls back to the last known position so
+/// the map still centres somewhere sensible if the shared fix failed.
 final currentPositionProvider = FutureProvider<Position?>((ref) async {
-  final service = ref.watch(taxiLocationServiceProvider);
-  final permission = await service.ensurePermission();
-  if (!permission.granted) return null;
-  try {
-    return await service.getCurrentPosition();
-  } catch (_) {
-    return await Geolocator.getLastKnownPosition();
+  final location = await ref.watch(currentLocationProvider.future);
+  final lat = location.latitude;
+  final lng = location.longitude;
+  if (lat != null && lng != null) {
+    return Position(
+      latitude: lat,
+      longitude: lng,
+      timestamp: DateTime.now(),
+      accuracy: 0,
+      altitude: 0,
+      altitudeAccuracy: 0,
+      heading: 0,
+      headingAccuracy: 0,
+      speed: 0,
+      speedAccuracy: 0,
+    );
   }
+  return Geolocator.getLastKnownPosition();
 });
 
 /// One online driver near the rider, reduced to what the map needs.
