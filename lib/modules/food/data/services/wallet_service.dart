@@ -1,5 +1,5 @@
 import 'package:superapp_user/modules/food/data/contracts/wallet_repository.dart';
-import 'package:superapp_user/modules/food/data/models/wallet_model.dart';
+import 'package:superapp_user/shared/wallet/data/wallet_model.dart';
 
 class WalletService {
   final WalletRepository _repository;

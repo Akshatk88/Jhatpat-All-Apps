@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:superapp_user/app/routing/back_navigation.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
-import 'package:superapp_user/modules/food/data/models/address_model.dart';
+import 'package:superapp_user/shared/address/data/address_model.dart';
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';

@@ -5,8 +5,8 @@ import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 import 'package:superapp_user/core/config/app_constants.dart';
 import 'package:superapp_user/core/error/failures.dart';
-import 'package:superapp_user/modules/food/api/datasources/account_remote_datasource.dart';
-import 'package:superapp_user/modules/food/api/datasources/order_remote_datasource.dart';
+import 'package:superapp_user/shared/profile/data/account_remote_datasource.dart';
+import 'package:superapp_user/core/payment/payment_verifier.dart';
 
 /// Outcome of a gateway attempt.
 enum PaymentOutcome { success, failed, cancelled, pending }
@@ -34,10 +34,10 @@ class PaymentResult {
 /// fails but the webhook lands, the order still succeeds. So a verify failure
 /// re-reads the order and reports `pending` rather than a hard failure.
 class PaymentGateway {
-  final OrderRemoteDataSource _orders;
+  final PaymentVerifier _verifier;
   final AccountRemoteDataSource _account;
 
-  PaymentGateway(this._orders, this._account);
+  PaymentGateway(this._verifier, this._account);
 
   /// Completes when the gateway sheet closes and verification settles.
   Completer<PaymentResult>? _pending;
@@ -196,11 +196,11 @@ class PaymentGateway {
         return;
       }
 
-      final verified = await _orders.verifyPayment(
-        orderId: orderId,
-        razorpayOrderId: response.orderId ?? '',
-        razorpayPaymentId: response.paymentId ?? '',
-        razorpaySignature: response.signature ?? '',
+      final verified = await _verifier.verify(
+        jobId: orderId,
+        gatewayOrderId: response.orderId ?? '',
+        gatewayPaymentId: response.paymentId ?? '',
+        gatewaySignature: response.signature ?? '',
       );
       _settle(PaymentResult(
         PaymentOutcome.success,
@@ -212,9 +212,8 @@ class PaymentGateway {
       // failure on a client-side verification hiccup.
       if (orderId != null) {
         try {
-          final order = await _orders.getOrder(orderId);
-          final status = ((order['order'] as Map?)?['payment'] as Map?)?['status'];
-          if (status == 'paid') {
+          final order = await _verifier.fetchJob(orderId);
+          if (_verifier.isPaid(order)) {
             _settle(PaymentResult(PaymentOutcome.success, 'Payment successful.', order: order));
             return;
           }

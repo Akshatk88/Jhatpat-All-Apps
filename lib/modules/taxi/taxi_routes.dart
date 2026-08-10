@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:superapp_user/_taxi_staging/features/home/presentation/all_services_screen.dart';
-import 'package:superapp_user/_taxi_staging/features/home/presentation/confirm_booking_screen.dart';
-import 'package:superapp_user/_taxi_staging/features/home/presentation/finding_driver_screen.dart';
-import 'package:superapp_user/_taxi_staging/features/home/presentation/home_screen.dart';
-import 'package:superapp_user/_taxi_staging/features/home/presentation/map_picker_screen.dart';
-import 'package:superapp_user/_taxi_staging/features/home/presentation/no_driver_screen.dart';
-import 'package:superapp_user/_taxi_staging/features/home/presentation/promo_screen.dart';
-import 'package:superapp_user/_taxi_staging/features/home/presentation/ride_type_screen.dart';
-import 'package:superapp_user/_taxi_staging/features/home/presentation/saved_places_screen.dart';
-import 'package:superapp_user/_taxi_staging/features/home/presentation/search_destination_screen.dart';
-import 'package:superapp_user/_taxi_staging/features/ride/presentation/rating_review_screen.dart';
-import 'package:superapp_user/_taxi_staging/features/ride/presentation/ride_chat_screen.dart';
-import 'package:superapp_user/_taxi_staging/features/ride/presentation/ride_detail_screen.dart';
-import 'package:superapp_user/_taxi_staging/features/ride/presentation/ride_history_screen.dart';
-import 'package:superapp_user/_taxi_staging/features/ride/presentation/ride_tracking_screen.dart';
+import 'package:superapp_user/modules/taxi/home/presentation/all_services_screen.dart';
+import 'package:superapp_user/modules/taxi/home/presentation/confirm_booking_screen.dart';
+import 'package:superapp_user/modules/taxi/home/presentation/finding_driver_screen.dart';
+import 'package:superapp_user/modules/taxi/home/presentation/home_screen.dart';
+import 'package:superapp_user/modules/taxi/home/presentation/map_picker_screen.dart';
+import 'package:superapp_user/modules/taxi/home/presentation/no_driver_screen.dart';
+import 'package:superapp_user/modules/taxi/home/presentation/promo_screen.dart';
+import 'package:superapp_user/modules/taxi/home/presentation/ride_type_screen.dart';
+import 'package:superapp_user/modules/taxi/home/presentation/saved_places_screen.dart';
+import 'package:superapp_user/modules/taxi/home/presentation/search_destination_screen.dart';
+import 'package:superapp_user/modules/taxi/ride/presentation/rating_review_screen.dart';
+import 'package:superapp_user/modules/taxi/ride/presentation/ride_chat_screen.dart';
+import 'package:superapp_user/modules/taxi/ride/presentation/ride_detail_screen.dart';
+import 'package:superapp_user/modules/taxi/ride/presentation/ride_history_screen.dart';
+import 'package:superapp_user/modules/taxi/ride/presentation/ride_tracking_screen.dart';
 import 'package:superapp_user/modules/taxi/taxi_route_names.dart';
 
 /// The taxi module's route subtree.

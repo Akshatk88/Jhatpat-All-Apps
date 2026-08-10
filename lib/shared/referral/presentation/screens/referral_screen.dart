@@ -9,7 +9,7 @@ import 'package:superapp_user/app/routing/back_navigation.dart';
 
 import 'package:superapp_user/core/utils/haptics.dart';
 import 'package:superapp_user/core/audio/referral_audio_player.dart';
-import 'package:superapp_user/modules/food/data/models/wallet_model.dart';
+import 'package:superapp_user/shared/wallet/data/wallet_model.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
 import 'package:superapp_user/design_system/components/skeletons/skeleton_loading.dart';
 import 'package:superapp_user/shared/referral/presentation/viewmodels/referral_viewmodel.dart';

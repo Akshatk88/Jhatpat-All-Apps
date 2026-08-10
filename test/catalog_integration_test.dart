@@ -9,7 +9,7 @@ import 'package:superapp_user/modules/food/api/datasources/address_remote_dataso
 import 'package:superapp_user/modules/food/api/datasources/auth_remote_datasource.dart';
 import 'package:superapp_user/modules/food/api/datasources/catalog_remote_datasource.dart';
 import 'package:superapp_user/modules/food/api/datasources/order_remote_datasource.dart';
-import 'package:superapp_user/modules/food/data/models/address_model.dart';
+import 'package:superapp_user/shared/address/data/address_model.dart';
 import 'package:superapp_user/modules/food/data/models/cart_item_model.dart';
 import 'package:superapp_user/modules/food/data/models/food_model.dart';
 

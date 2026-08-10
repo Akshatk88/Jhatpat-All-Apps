@@ -7,7 +7,7 @@ import 'package:superapp_user/design_system/theme/theme_provider.dart';
 import 'package:superapp_user/app/routing/app_router.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import 'package:superapp_user/modules/food/application/providers/push_providers.dart';
+import 'package:superapp_user/core/push/push_providers.dart';
 import 'package:superapp_user/core/push/push_service.dart';
 import 'package:superapp_user/shared/auth/presentation/viewmodels/auth_viewmodel.dart';
 

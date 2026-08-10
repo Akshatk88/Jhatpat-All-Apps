@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:superapp_user/modules/food/data/models/chat_model.dart';
-import 'package:superapp_user/modules/food/application/providers/chat_providers.dart';
+import 'package:superapp_user/shared/support/application/chat_providers.dart';
 
 /// Previous support threads for one order.
 ///

@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:superapp_user/modules/food/data/models/chat_model.dart';
-import 'package:superapp_user/modules/food/application/providers/chat_providers.dart';
-import 'package:superapp_user/modules/food/application/providers/network_providers.dart';
-import 'package:superapp_user/modules/food/application/providers/push_providers.dart';
+import 'package:superapp_user/shared/support/application/chat_providers.dart';
+import 'package:superapp_user/core/network/network_providers.dart';
+import 'package:superapp_user/core/push/push_providers.dart';
 import 'package:superapp_user/modules/food/application/providers/socket_providers.dart';
 import 'package:superapp_user/shared/auth/presentation/viewmodels/auth_viewmodel.dart';
 

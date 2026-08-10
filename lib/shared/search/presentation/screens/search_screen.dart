@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
 import 'package:superapp_user/modules/food/data/models/food_model.dart';
 import 'package:superapp_user/modules/food/data/models/restaurant_model.dart';
-import 'package:superapp_user/modules/food/data/models/search_result.dart';
+import 'package:superapp_user/shared/search/data/search_result.dart';
 import 'package:superapp_user/modules/food/data/models/store99_product.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
 import 'package:superapp_user/modules/food/presentation/cart/utils/cart_restaurant_guard.dart';

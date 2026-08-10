@@ -9,8 +9,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'package:superapp_user/core/config/app_constants.dart';
-import 'package:superapp_user/modules/food/api/datasources/account_remote_datasource.dart';
-import 'package:superapp_user/modules/food/data/models/user_model.dart';
+import 'package:superapp_user/shared/profile/data/account_remote_datasource.dart';
+import 'package:superapp_user/shared/profile/data/user_model.dart';
 
 /// Fired when a push should navigate somewhere. The router listens to this
 /// rather than the service reaching into navigation itself.

@@ -1,4 +1,4 @@
-import 'package:superapp_user/modules/food/data/models/wallet_model.dart';
+import 'package:superapp_user/shared/wallet/data/wallet_model.dart';
 
 /// Domain repository abstraction for user wallet operations.
 abstract class WalletRepository {

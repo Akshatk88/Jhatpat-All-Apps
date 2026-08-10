@@ -13,7 +13,7 @@ import 'package:superapp_user/modules/food/data/models/order_pricing.dart';
 import 'package:superapp_user/modules/food/data/models/restaurant_model.dart';
 import 'package:superapp_user/shared/auth/presentation/viewmodels/auth_viewmodel.dart';
 import 'package:superapp_user/shared/address/presentation/viewmodels/address_viewmodel.dart';
-import 'package:superapp_user/modules/food/data/models/address_model.dart';
+import 'package:superapp_user/shared/address/data/address_model.dart';
 import 'package:superapp_user/modules/food/application/providers/catalog_providers.dart';
 import 'package:superapp_user/modules/food/presentation/cart/viewmodels/cart_viewmodel.dart';
 import 'package:superapp_user/modules/food/presentation/checkout/viewmodels/checkout_viewmodel.dart';

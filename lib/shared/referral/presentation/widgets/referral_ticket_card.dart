@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:superapp_user/modules/food/data/models/wallet_model.dart';
+import 'package:superapp_user/shared/wallet/data/wallet_model.dart';
 import 'package:superapp_user/shared/auth/presentation/viewmodels/auth_viewmodel.dart';
 import 'package:superapp_user/shared/referral/presentation/viewmodels/referral_viewmodel.dart';
 import 'package:superapp_user/shared/referral/presentation/widgets/ticket_clipper.dart';

@@ -1,6 +1,6 @@
 import 'package:superapp_user/core/network/api_response.dart';
-import 'package:superapp_user/modules/food/data/models/auth_session.dart';
-import 'package:superapp_user/modules/food/data/models/user_model.dart';
+import 'package:superapp_user/shared/auth/data/auth_session.dart';
+import 'package:superapp_user/shared/profile/data/user_model.dart';
 
 /// Phone-first authentication, matching what the backend actually exposes.
 ///

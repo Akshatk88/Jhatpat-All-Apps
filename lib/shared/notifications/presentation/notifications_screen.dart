@@ -5,8 +5,8 @@ import 'package:go_router/go_router.dart';
 
 import 'package:superapp_user/app/routing/back_navigation.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
-import 'package:superapp_user/modules/food/data/models/wallet_model.dart';
-import 'package:superapp_user/modules/food/application/providers/account_providers.dart';
+import 'package:superapp_user/shared/wallet/data/wallet_model.dart';
+import 'package:superapp_user/shared/profile/application/account_providers.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
 import 'package:superapp_user/app/routing/route_names.dart';
 import 'package:superapp_user/shared/auth/presentation/viewmodels/auth_viewmodel.dart';

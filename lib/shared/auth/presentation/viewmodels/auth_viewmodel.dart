@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:superapp_user/modules/food/data/models/auth_session.dart';
-import 'package:superapp_user/modules/food/data/models/user_model.dart';
-import 'package:superapp_user/modules/food/application/providers/auth_providers.dart';
+import 'package:superapp_user/shared/auth/data/auth_session.dart';
+import 'package:superapp_user/shared/profile/data/user_model.dart';
+import 'package:superapp_user/shared/auth/application/auth_providers.dart';
 import 'package:superapp_user/modules/food/application/providers/favorites_providers.dart';
-import 'package:superapp_user/modules/food/application/providers/network_providers.dart';
-import 'package:superapp_user/modules/food/application/providers/push_providers.dart';
+import 'package:superapp_user/core/network/network_providers.dart';
+import 'package:superapp_user/core/push/push_providers.dart';
 import 'package:superapp_user/modules/food/data/contracts/auth_repository.dart';
 import 'package:superapp_user/modules/food/presentation/favorites/viewmodels/favorites_viewmodel.dart';
 

@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:superapp_user/modules/food/application/providers/payment_providers.dart';
-import 'package:superapp_user/modules/food/application/providers/wallet_providers.dart';
+import 'package:superapp_user/shared/wallet/application/wallet_providers.dart';
 import 'package:superapp_user/shared/auth/presentation/viewmodels/auth_viewmodel.dart';
 import 'package:superapp_user/core/payment/payment_gateway.dart';
 import 'package:superapp_user/shared/wallet/presentation/viewmodels/wallet_state.dart';

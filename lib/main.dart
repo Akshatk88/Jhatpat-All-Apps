@@ -1,9 +1,9 @@
+import 'package:superapp_user/core/storage/storage_providers.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:superapp_user/_taxi_staging/core/providers/core_providers.dart';
-import 'package:superapp_user/_taxi_staging/core/storage/local_storage_service.dart';
+import 'package:superapp_user/core/storage/local_storage_service.dart';
 import 'package:superapp_user/app/super_app.dart';
 import 'package:superapp_user/core/push/push_service.dart';
 

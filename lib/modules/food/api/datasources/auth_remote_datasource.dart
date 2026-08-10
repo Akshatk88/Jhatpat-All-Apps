@@ -2,8 +2,8 @@ import 'package:dio/dio.dart';
 
 import 'package:superapp_user/core/config/api_config.dart';
 import 'package:superapp_user/core/network/api_client.dart';
-import 'package:superapp_user/modules/food/data/models/auth_session.dart';
-import 'package:superapp_user/modules/food/data/models/user_model.dart';
+import 'package:superapp_user/shared/auth/data/auth_session.dart';
+import 'package:superapp_user/shared/profile/data/user_model.dart';
 
 /// Thin transport layer for `/food/auth` and the profile half of `/food/user`.
 ///

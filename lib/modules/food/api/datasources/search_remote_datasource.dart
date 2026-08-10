@@ -1,4 +1,4 @@
-import 'package:superapp_user/modules/food/data/models/search_result.dart';
+import 'package:superapp_user/shared/search/data/search_result.dart';
 import 'package:superapp_user/modules/food/api/datasources/catalog_remote_datasource.dart';
 
 abstract class SearchRemoteDataSource {

@@ -7,7 +7,7 @@ import 'package:superapp_user/core/utils/haptics.dart';
 import 'package:superapp_user/app/routing/route_names.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
 import 'package:superapp_user/design_system/components/feedback/app_snackbar.dart';
-import 'package:superapp_user/modules/food/data/models/user_model.dart';
+import 'package:superapp_user/shared/profile/data/user_model.dart';
 import 'package:superapp_user/shared/auth/presentation/viewmodels/auth_viewmodel.dart';
 import 'package:superapp_user/shared/address/presentation/viewmodels/address_viewmodel.dart';
 import 'package:superapp_user/modules/food/presentation/coupons/viewmodels/coupons_viewmodel.dart';

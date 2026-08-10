@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:superapp_user/modules/food/application/providers/search_providers.dart';
-import 'package:superapp_user/modules/food/data/services/search_service.dart';
+import 'package:superapp_user/shared/search/application/search_providers.dart';
+import 'package:superapp_user/shared/search/data/search_service.dart';
 import 'package:superapp_user/core/speech/speech_service.dart';
 import 'package:superapp_user/shared/search/presentation/viewmodels/search_state.dart';
 

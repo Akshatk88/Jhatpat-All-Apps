@@ -1,5 +1,5 @@
 import 'package:superapp_user/core/network/api_response.dart';
-import 'package:superapp_user/modules/food/data/models/search_result.dart';
+import 'package:superapp_user/shared/search/data/search_result.dart';
 
 /// Contract for search data access and persistence operations.
 abstract class SearchRepository {

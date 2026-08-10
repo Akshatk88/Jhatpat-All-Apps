@@ -3,8 +3,8 @@ import 'package:superapp_user/core/network/api_response.dart';
 import 'package:superapp_user/core/storage/token_storage.dart';
 import 'package:superapp_user/modules/food/data/contracts/auth_repository.dart';
 import 'package:superapp_user/modules/food/api/datasources/auth_remote_datasource.dart';
-import 'package:superapp_user/modules/food/data/models/auth_session.dart';
-import 'package:superapp_user/modules/food/data/models/user_model.dart';
+import 'package:superapp_user/shared/auth/data/auth_session.dart';
+import 'package:superapp_user/shared/profile/data/user_model.dart';
 
 /// Backend-backed [AuthRepository].
 ///

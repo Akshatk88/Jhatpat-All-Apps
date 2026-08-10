@@ -1,6 +1,6 @@
 import 'package:superapp_user/core/config/api_config.dart';
 import 'package:superapp_user/core/network/api_client.dart';
-import 'package:superapp_user/modules/food/data/models/address_model.dart';
+import 'package:superapp_user/shared/address/data/address_model.dart';
 
 /// `/food/user/addresses` (Bearer).
 class AddressRemoteDataSource {

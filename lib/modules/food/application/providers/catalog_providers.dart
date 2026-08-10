@@ -4,7 +4,7 @@ import 'package:superapp_user/modules/food/api/datasources/catalog_remote_dataso
 import 'package:superapp_user/modules/food/data/models/food_model.dart';
 import 'package:superapp_user/modules/food/data/models/food_variant.dart';
 import 'package:superapp_user/modules/food/data/models/restaurant_model.dart';
-import 'package:superapp_user/modules/food/application/providers/network_providers.dart';
+import 'package:superapp_user/core/network/network_providers.dart';
 
 /// Discovery transport — shared by the catalog repository, zone detection and
 /// search, so they all go through the one Dio instance.

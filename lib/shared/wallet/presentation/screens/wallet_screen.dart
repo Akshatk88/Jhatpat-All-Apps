@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:superapp_user/core/utils/haptics.dart';
-import 'package:superapp_user/modules/food/data/models/wallet_model.dart';
+import 'package:superapp_user/shared/wallet/data/wallet_model.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
 import 'package:superapp_user/design_system/components/feedback/app_snackbar.dart';
 import 'package:superapp_user/shared/wallet/presentation/viewmodels/wallet_state.dart';
