@@ -1,12 +1,10 @@
+import 'package:superapp_user/core/error/failures.dart';
 import 'dart:async';
-import 'dart:convert';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:superapp_user/core/config/api_config.dart';
 import 'package:superapp_user/core/network/api_client.dart';
-import 'package:superapp_user/core/storage/token_storage.dart';
 import 'package:superapp_user/shared/profile/data/user_model.dart';
 import 'package:superapp_user/shared/wallet/data/wallet_model.dart';
 
@@ -15,9 +13,8 @@ import 'package:superapp_user/shared/wallet/data/wallet_model.dart';
 /// `/fcm-tokens`. All Bearer-only.
 class AccountRemoteDataSource {
   final ApiClient _client;
-  final TokenStorage _tokens;
 
-  const AccountRemoteDataSource(this._client, this._tokens);
+  const AccountRemoteDataSource(this._client);
 
   // --------------------------------------------------------------- wallet
 
@@ -130,101 +127,41 @@ class AccountRemoteDataSource {
   // ------------------------------------------------------------ fcm token
 
   /// Mobile variant — POST /api/v1/fcm-tokens/mobile/save
+  /// Registers this device against the signed-in account.
+  ///
+  /// Contract (k9): `POST /api/v1/fcm-tokens/mobile/save` with `{ token }`
+  /// and a bearer. **`platform` must be omitted on mobile** — sending it is
+  /// rejected with 400; only the web endpoint (`/fcm-tokens/save`) takes
+  /// `platform: "web"`.
+  ///
+  /// The owner (ownerType/ownerId) is derived from the token, so no user id is
+  /// passed, and the call is an upsert — repeating it with the same token is
+  /// safe and is what makes the app-start reconciliation cheap.
   Future<bool> saveFcmToken(String token, {UserModel? user}) async {
-    final url = '${ApiConfig.baseUrl}${ApiPaths.fcmSaveMobile}';
-    final jwt = await _tokens.accessToken;
-    final bodyMap = {'token': token};
-    final headersStr = 'Authorization: Bearer ${jwt ?? "NULL"}, Content-Type: application/json';
-    final authHeaderStr = 'Bearer ${jwt ?? "NULL"}';
-
-    // Step 4: Login details
-    if (user != null) {
-      debugPrint('''
-[FCM] Logged In User Details:
-User ID: ${user.id}
-JWT Token: ${jwt ?? "NULL"}
-Phone Number: ${user.phone}''');
-    }
-
-    // Step 5: Backend Request details
-    debugPrint('''
-[FCM] Sending token to backend...
-Request URL: POST $url
-Headers: $headersStr
-Authorization Header: $authHeaderStr
-Body: ${jsonEncode(bodyMap)}
-Token: $token''');
-
-    if (jwt == null || jwt.isEmpty) {
-      debugPrint('''
-[FCM] Authorization Failed
-JWT Token: NULL
-Expiry: N/A
-Current User: ${user?.id ?? "Guest"}''');
-    }
-
     try {
-      final res = await _client.raw.post<dynamic>(
-        ApiPaths.fcmSaveMobile,
-        data: bodyMap,
-        options: Options(
-          headers: {
-            if (jwt != null && jwt.isNotEmpty) 'Authorization': 'Bearer $jwt',
-            'Content-Type': 'application/json',
-          },
-        ),
-      );
-
-      final statusCode = res.statusCode ?? 0;
-      final responseBody = jsonEncode(res.data);
-      final responseHeaders = res.headers.map;
-
-      // Step 6: Backend Response
-      debugPrint('''
-[FCM] Backend Response:
-Status Code: $statusCode
-Response Body: $responseBody
-Headers: $responseHeaders''');
-
-      if (statusCode >= 200 && statusCode < 300) {
-        // Step 9: Success log
-        debugPrint('[FCM] FCM Token Saved Successfully');
-        return true;
-      } else {
-        // Step 8: Authorization check
-        if (statusCode == 401 || statusCode == 403) {
-          debugPrint('''
-[FCM] Authorization Failed
-JWT Token: ${jwt ?? "NULL"}
-Expiry: N/A
-Current User: ${user?.id ?? "Guest"}''');
-        }
-
-        // Step 7: Request Failure log
-        debugPrint('''
-[FCM] ERROR Saving Token
-Exception: HTTP $statusCode
-StackTrace: N/A
-Response Body: $responseBody
-Status Code: $statusCode''');
-        return false;
-      }
-    } catch (e, st) {
-      // Step 7: Exception log
-      debugPrint('''
-[FCM] ERROR Saving Token
-Exception: $e
-StackTrace: $st
-Response Body: N/A
-Status Code: 500''');
+      // Plain client call: the auth interceptor attaches the bearer, so the
+      // previous hand-built Authorization header was both redundant and the
+      // reason the raw JWT was being written to the log on every launch.
+      await _client.post<dynamic>(ApiPaths.fcmSaveMobile, body: {'token': token});
+      if (kDebugMode) debugPrint('[FCM] token registered');
+      return true;
+    } on Failure catch (failure) {
+      if (kDebugMode) debugPrint('[FCM] token registration failed: ${failure.message}');
+      return false;
+    } catch (e) {
+      if (kDebugMode) debugPrint('[FCM] token registration failed: $e');
       return false;
     }
   }
 
+  /// Unregisters this device so the next account on the handset is not
+  /// targeted with the previous user's notifications.
+  ///
+  /// Uses the path form (`/fcm-tokens/remove/:token`) rather than a body:
+  /// DELETE-with-body is inconsistently supported across proxies, and the
+  /// previous call also sent `platform: 'mobile'`, which the mobile
+  /// endpoints reject.
   Future<void> removeFcmToken(String token) async {
-    await _client.delete<dynamic>(
-      ApiPaths.fcmRemove,
-      body: {'token': token, 'platform': 'mobile'},
-    );
+    await _client.delete<dynamic>('${ApiPaths.fcmRemove}/$token');
   }
 }

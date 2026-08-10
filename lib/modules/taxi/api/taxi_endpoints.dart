@@ -16,7 +16,6 @@ class ApiConstants {
   static const String register = '/taxi/users/register';
   static const String signup = '/taxi/users/signup';
   static const String login = '/taxi/users/login';
-  static const String fcmToken = '/taxi/users/fcm-token';
 
   // Profile
   static const String me = '/taxi/users/me';

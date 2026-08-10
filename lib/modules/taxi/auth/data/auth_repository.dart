@@ -13,6 +13,11 @@ import 'package:superapp_user/modules/taxi/auth/data/models/user_model.dart';
 /// races the shared one for the same storage slot. The endpoints still exist on
 /// k9 (`/api/v1/taxi/users/auth/*`); nothing in this app should call them.
 ///
+/// Device push registration is not here either: it goes through the one
+/// shared /api/v1/fcm-tokens/mobile/save call. The ride-side endpoint this
+/// class used to POST to (/taxi/users/fcm-token) returns 404 on k9, and it
+/// sent a `platform` field that the mobile endpoints reject with 400.
+///
 /// What remains is profile mutation, which is legitimately ride-scoped because
 /// it writes through the taxi route tree — the same `users` document either way,
 /// since `TaxiUser` and `FoodUser` are two Mongoose models over one collection.
@@ -29,10 +34,6 @@ class TaxiAuthRepository {
   Future<String> uploadProfileImage(String dataUrl) async {
     final data = await api.post(ApiConstants.profileImage, data: {'dataUrl': dataUrl});
     return (data['secureUrl'] ?? '').toString();
-  }
-
-  Future<void> saveFcmToken(String token, {required String platform}) {
-    return api.post(ApiConstants.fcmToken, data: {'token': token, 'platform': platform});
   }
 
   Future<void> requestAccountDeletion(String reason) {
