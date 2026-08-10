@@ -1,9 +1,10 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:superapp_user/modules/taxi/application/taxi_core_providers.dart';
 import 'package:superapp_user/modules/taxi/ride/application/ride_providers.dart';
-import 'package:superapp_user/modules/taxi/home/data/models/set_price_model.dart';
 import 'package:superapp_user/modules/taxi/home/data/models/vehicle_type_model.dart';
 import 'package:superapp_user/modules/taxi/home/application/booking_state.dart';
 import 'package:superapp_user/modules/taxi/home/application/fare_calculator.dart';
@@ -19,23 +20,46 @@ class BookingController extends Notifier<BookingState> {
   BookingState build() => const BookingState();
 
   Future<void> loadCatalog() async {
-    try {
-      final repo = ref.read(homeRepositoryProvider);
-      final results = await Future.wait([
-        repo.getVehicleTypes(),
-        repo.getSetPrices(),
-      ]);
-      final vehicleTypes = results[0] as List<VehicleTypeModel>;
-      final setPrices = results[1] as List<SetPriceModel>;
+    final repo = ref.read(homeRepositoryProvider);
+    state = state.copyWith(clearError: true);
+
+    // Fetched independently, NOT with Future.wait. A single Future.wait rejects
+    // as soon as either call throws, so a missing fare table took the vehicle
+    // list down with it — and because the screen shows a spinner whenever the
+    // list is empty, that surfaced as an endless loader with no error.
+    //
+    // The vehicle list is the screen's reason to exist; prices are an
+    // enrichment. Losing the enrichment must not lose the screen.
+    final vehicleTypes = await _guard(repo.getVehicleTypes, 'vehicle types');
+    if (vehicleTypes == null) {
       state = state.copyWith(
-        vehicleTypes: vehicleTypes,
-        setPrices: setPrices,
-        selectedVehicle: vehicleTypes.isNotEmpty ? vehicleTypes.first : null,
+        error: 'Could not load vehicles. Check your connection and try again.',
       );
-      _recalculateFare();
-      unawaited(_loadDriverEtas());
+      return;
+    }
+
+    state = state.copyWith(
+      vehicleTypes: vehicleTypes,
+      selectedVehicle: vehicleTypes.isNotEmpty ? vehicleTypes.first : null,
+    );
+
+    final setPrices = await _guard(repo.getSetPrices, 'fare table');
+    if (setPrices != null) {
+      state = state.copyWith(setPrices: setPrices);
+    }
+
+    _recalculateFare();
+    unawaited(_loadDriverEtas());
+  }
+
+  /// Runs [fetch], returning null instead of throwing so one failed call
+  /// cannot abort the rest of the catalogue load.
+  Future<T?> _guard<T>(Future<T> Function() fetch, String label) async {
+    try {
+      return await fetch();
     } catch (e) {
-      state = state.copyWith(error: e.toString());
+      if (kDebugMode) debugPrint('[booking] $label failed: $e');
+      return null;
     }
   }
 

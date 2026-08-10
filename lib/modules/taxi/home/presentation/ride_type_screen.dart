@@ -289,7 +289,17 @@ class _RideTypeScreenState extends ConsumerState<RideTypeScreen> {
                     // Scrollable Vehicle Types List
                     Expanded(
                       child: booking.vehicleTypes.isEmpty
-                          ? const Center(child: CircularProgressIndicator())
+                          // A failed load used to render the same spinner as a
+                          // pending one, so a dead endpoint looked like an
+                          // endless loader with no way out.
+                          ? (booking.error != null
+                              ? _VehicleLoadError(
+                                  message: booking.error!,
+                                  onRetry: () => ref
+                                      .read(bookingControllerProvider.notifier)
+                                      .loadCatalog(),
+                                )
+                              : const Center(child: CircularProgressIndicator()))
                           : ListView.separated(
                               controller: scrollController,
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -616,6 +626,60 @@ class _VehicleSelectionTile extends StatelessWidget {
                 fontWeight: FontWeight.w900,
                 color: Color(0xFF0F172A),
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Shown when the vehicle catalogue could not be fetched.
+///
+/// The screen previously rendered a spinner for both "loading" and "failed",
+/// which meant a dead endpoint was indistinguishable from a slow one and the
+/// user had no way to retry.
+class _VehicleLoadError extends StatelessWidget {
+  const _VehicleLoadError({required this.message, required this.onRetry});
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.directions_car_filled_outlined,
+              size: 40,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.35),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'No rides available right now',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
+            ),
+            const SizedBox(height: 16),
+            OutlinedButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh_rounded, size: 18),
+              label: const Text('Try again'),
             ),
           ],
         ),
