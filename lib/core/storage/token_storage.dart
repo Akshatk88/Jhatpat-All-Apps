@@ -42,6 +42,19 @@ class TokenStorage {
 
   Future<bool> get hasSession async => (await accessToken)?.isNotEmpty ?? false;
 
+  /// Stores an access token on its own, leaving any existing refresh token
+  /// untouched.
+  ///
+  /// The ride-side OTP endpoints return a bare `token` rather than the
+  /// access/refresh pair the food endpoints issue. Until k9's unified auth is
+  /// the only login path, both shapes have to be storable — and blanking the
+  /// refresh token here would silently downgrade a session to non-refreshable.
+  Future<void> saveAccessToken(String accessToken) async {
+    await _ensureLoaded();
+    _accessToken = accessToken;
+    await _storage.write(key: _accessKey, value: accessToken);
+  }
+
   Future<void> save({required String accessToken, required String refreshToken}) async {
     _accessToken = accessToken;
     _refreshToken = refreshToken;
