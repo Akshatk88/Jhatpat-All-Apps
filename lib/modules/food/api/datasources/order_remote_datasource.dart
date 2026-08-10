@@ -1,3 +1,5 @@
+import 'package:superapp_user/core/error/failures.dart';
+import 'package:flutter/foundation.dart';
 import 'package:superapp_user/core/config/api_config.dart';
 import 'package:superapp_user/core/network/api_client.dart';
 import 'package:superapp_user/modules/food/data/models/cart_item_model.dart';
@@ -93,27 +95,14 @@ class OrderRemoteDataSource {
       'scheduledAt': ?scheduledAt?.toUtc().toIso8601String(),
     };
 
-    // Print Calculate API Request Payload
-    // ignore: avoid_print
-    print('[CALCULATE API REQUEST] URL: ${ApiPaths.orderCalculate}');
-    // ignore: avoid_print
-    print('[CART PAYLOAD] $payload');
-
     try {
       final data = await _client.post<Map<String, dynamic>>(
         ApiPaths.orderCalculate,
         body: payload,
       );
-      // ignore: avoid_print
-      print('[CALCULATE API RESPONSE] Status: 200/201 SUCCESS');
-      // ignore: avoid_print
-      print('[CART RESPONSE] $data');
       return OrderCalculation.fromApi(data);
-    } catch (e, stackTrace) {
-      // ignore: avoid_print
-      print('[CALCULATE API ERROR] order_remote_datasource.dart:L46 Error: $e');
-      // ignore: avoid_print
-      print('[CALCULATE API STACKTRACE] $stackTrace');
+    } catch (e) {
+      if (kDebugMode) debugPrint('[checkout] calculate failed: $e');
       rethrow;
     }
   }
@@ -153,22 +142,19 @@ class OrderRemoteDataSource {
       'zoneId': ?zoneId,
     };
 
-    // ignore: avoid_print
-    print('[CHECKOUT PAYLOAD] $payload');
+    // Debug-only: the payload carries the customer's name, phone and full
+    // address, so it must never reach a release log.
+    if (kDebugMode) debugPrint('[checkout] POST ${ApiPaths.orders}');
 
     try {
-      final res = await _client.post<Map<String, dynamic>>(
+      return await _client.post<Map<String, dynamic>>(
         ApiPaths.orders,
         body: payload,
       );
-      // ignore: avoid_print
-      print('[CHECKOUT RESPONSE] $res');
-      return res;
-    } catch (e, stackTrace) {
-      // ignore: avoid_print
-      print('[CHECKOUT PLACE ORDER ERROR] Error: $e');
-      // ignore: avoid_print
-      print('[CHECKOUT PLACE ORDER STACKTRACE] $stackTrace');
+    } on Failure catch (failure) {
+      // Surfaces the server's field-level reason (e.g. "address.state:
+      // State required") instead of a generic placement failure.
+      if (kDebugMode) debugPrint('[checkout] rejected: ${failure.message}');
       rethrow;
     }
   }

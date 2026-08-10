@@ -72,12 +72,37 @@ class AddressModel {
       };
 
   /// Body for the order payload's `address` (GeoJSON `[lng, lat]`).
+  /// Street line for the order API.
+  ///
+  /// `street` is empty whenever an address was captured from the map picker and
+  /// reverse geocoding did not return a structured house/road component. The
+  /// full formatted address is a valid street line in that case, and it is far
+  /// better than sending `''`.
+  String get effectiveStreet =>
+      street.trim().isNotEmpty ? street.trim() : fullAddress.trim();
+
+  /// The field stopping this address from being usable for checkout, or null.
+  ///
+  /// `POST /food/orders` validates `street`, `city` and `state` with
+  /// `min(1)`, while `POST /food/orders/calculate` treats all three as
+  /// optional. That asymmetry is why a cart can price correctly and then fail
+  /// at placement with a bare 400 — worth catching here, with something the
+  /// user can act on, rather than firing a request that cannot succeed.
+  String? get missingOrderField {
+    if (effectiveStreet.isEmpty) return 'street address';
+    if (city.trim().isEmpty) return 'city';
+    if (state.trim().isEmpty) return 'state';
+    return null;
+  }
+
+  bool get isUsableForOrder => missingOrderField == null;
+
   Map<String, dynamic> toOrderPayload({String? customerName}) => {
         'label': type,
         'name': ?customerName,
-        'street': street,
-        'city': city,
-        'state': state,
+        'street': effectiveStreet,
+        'city': city.trim(),
+        'state': state.trim(),
         'zipCode': zipCode,
         'phone': ?contactPhone,
         if (latitude != null && longitude != null)

@@ -170,6 +170,25 @@ class _CartScreenState extends ConsumerState<CartScreen> {
         }
       }
 
+      // `POST /food/orders` requires street, city and state; `/calculate` does
+      // not. Without this check the cart prices happily and then placement
+      // fails with a bare 400 that reads as "payment isn't working", for both
+      // COD and online. Catch it here with something actionable instead.
+      final missing = address.missingOrderField;
+      if (missing != null) {
+        if (!mounted) return;
+        AppSnackbar.warning(
+          context,
+          'Your delivery address is missing a $missing. Please complete it to place the order.',
+          action: SnackBarAction(
+            label: 'Edit',
+            textColor: Colors.white,
+            onPressed: () => context.push(RouteNames.addAddress),
+          ),
+        );
+        return;
+      }
+
       final cartItems = ref.read(cartViewModelProvider).items;
       if (cartItems.isEmpty) return;
 
