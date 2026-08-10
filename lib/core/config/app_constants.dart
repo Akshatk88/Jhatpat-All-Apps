@@ -87,7 +87,7 @@ class AppConstants {
   static const String firebaseStorageBucket = "k9rides-529a8.firebasestorage.app";
 
   /// Google Maps API key (Maps SDK + Geocoding API).
-  static String mapKey = 'AIzaSyCLHQKJg5shpKs0uNiDHiZJTtBUMKl21ak';
+  static String mapKey = 'AIzaSyArBbII2fgAuVaycfkEAm1GcuyvKPTSWyc';
 
   /// Payment Gateway keys.
   static const String stripePublishKey = '';

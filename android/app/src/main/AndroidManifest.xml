@@ -68,7 +68,7 @@
         <!-- Google Maps SDK key for the live order-tracking map -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCLHQKJg5shpKs0uNiDHiZJTtBUMKl21ak" />
+            android:value="AIzaSyArBbII2fgAuVaycfkEAm1GcuyvKPTSWyc" />
 
         <!-- FCM default notification channel & metadata -->
         <meta-data

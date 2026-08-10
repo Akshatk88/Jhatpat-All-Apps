@@ -1,6 +1,6 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+
+import 'package:superapp_user/core/config/app_constants.dart';
 
 /// Single source of truth for every environment-specific value the app needs
 /// (backend host, map/Firebase keys, package identity). Update values here
@@ -10,32 +10,20 @@ class TaxiConstants {
 
   static const String title = 'UdanX';
 
-  /// Backend REST API base URL (all endpoints are mounted under `/api/v1`).
-  static const String baseUrl = 'https://taxi.appzeto.com/api/v1';
+  /// The standalone taxi backend is gone — everything is served by k9 now.
+  /// These delegate to the single source of truth in core/config so there is
+  /// no second host to drift.
+  static const String baseUrl = AppConstants.baseUrl;
+  static const String socketUrl = AppConstants.socketUrl;
 
-  /// Socket.IO server base (same host, root path — see `Backend/socket-server.js`).
-  static const String socketUrl = 'https://taxi.appzeto.com';
-
-  static String firebaseApiKey = (kIsWeb || Platform.isAndroid)
-      ? 'AIzaSyDz_xEgDp2PE8c67Ij39unxTgBfN0pXdzU'
-      : ''; // TODO: fill in once GoogleService-Info.plist is added for iOS
-  static String firebaseAppId = (kIsWeb || Platform.isAndroid)
-      ? '1:147333377409:android:8ec15b107e38b0bbc78c80'
-      : '';
-  static String firebaseMessagingSenderId = (kIsWeb || Platform.isAndroid)
-      ? '147333377409'
-      : '';
-  static String firebaseProjectId = (kIsWeb || Platform.isAndroid)
-      ? 'appzet-taxi'
-      : '';
-
-  /// Google Maps API key (Maps SDK for Android/iOS + Geocoding API enabled).
-  static const String mapKey = 'AIzaSyArBbII2fgAuVaycfkEAm1GcuyvKPTSWyc';
+  /// Google Maps key — delegates to core so the ride and food sides can never
+  /// drift onto different keys (they were on different ones before the merge).
+  static String get mapKey => AppConstants.mapKey;
 
   /// Razorpay publishable key — not yet provided.
   static const String stripPublishKey = '';
 
-  static const String packageName = 'com.supertaxi.user';
+  static String get packageName => AppConstants.packageName;
 
   /// Release keystore signing key alias/password — not yet provided.
   static const String signKey = '';
