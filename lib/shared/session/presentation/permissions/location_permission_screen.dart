@@ -1,3 +1,4 @@
+import 'package:superapp_user/app/routing/app_route_names.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -19,7 +20,7 @@ class _LocationPermissionScreenState extends ConsumerState<LocationPermissionScr
   Future<void> _allow() async {
     setState(() => _requesting = true);
     await ref.read(taxiLocationServiceProvider).ensurePermission();
-    if (mounted) context.go('/auth/notification-permission');
+    if (mounted) context.go(AppRoutePaths.permissionNotifications);
   }
 
   @override
@@ -61,7 +62,7 @@ class _LocationPermissionScreenState extends ConsumerState<LocationPermissionScr
               const SizedBox(height: 12),
               TaxiSecondaryButton(
                 label: 'Not now',
-                onPressed: () => context.go('/auth/notification-permission'),
+                onPressed: () => context.go(AppRoutePaths.permissionNotifications),
               ),
               const SizedBox(height: 24),
             ],

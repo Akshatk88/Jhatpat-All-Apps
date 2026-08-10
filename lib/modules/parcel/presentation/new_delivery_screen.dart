@@ -156,7 +156,7 @@ class _NewDeliveryScreenState extends ConsumerState<NewDeliveryScreen> {
             paymentMethod: _paymentMethod,
           );
       if (!mounted) return;
-      context.pushReplacement('/ride/tracking/${delivery.ride.rideId}');
+      context.pushReplacement('/taxi/rides/${delivery.ride.rideId}/track');
     } catch (e) {
       if (mounted) SnackbarUtils.error(context, e.toString());
     } finally {

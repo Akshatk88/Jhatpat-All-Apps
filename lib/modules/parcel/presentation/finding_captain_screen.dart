@@ -37,7 +37,7 @@ class _FindingCaptainScreenState extends ConsumerState<FindingCaptainScreen> {
     if (!mounted) return;
     if (ok) {
       ref.read(deliveryBookingProvider.notifier).reset();
-      context.go('/home');
+      context.go('/taxi');
     } else {
       SnackbarUtils.error(context, 'Could not cancel. Please try again.');
       setState(() => _cancelling = false);
@@ -58,7 +58,7 @@ class _FindingCaptainScreenState extends ConsumerState<FindingCaptainScreen> {
       if (r.driver != null && r.status.toLowerCase() != 'searching') {
         _left = true;
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) context.pushReplacement('/ride/tracking/${widget.rideId}');
+          if (mounted) context.pushReplacement('/taxi/rides/${widget.rideId}/track');
         });
         return;
       }
@@ -67,7 +67,7 @@ class _FindingCaptainScreenState extends ConsumerState<FindingCaptainScreen> {
       if (r.isCancelled) {
         _left = true;
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) context.go('/home');
+          if (mounted) context.go('/taxi');
         });
       }
     });

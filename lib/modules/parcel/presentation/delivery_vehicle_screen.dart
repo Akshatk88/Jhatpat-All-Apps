@@ -64,7 +64,7 @@ class _DeliveryVehicleScreenState extends ConsumerState<DeliveryVehicleScreen> {
               address: addressToDisplay,
               onBack: () => Navigator.of(context).maybePop(),
               onAddressTap: () {
-                context.push('/delivery/address');
+                context.push('/parcel/addresses');
               },
             ),
 
@@ -137,7 +137,7 @@ class _DeliveryVehicleScreenState extends ConsumerState<DeliveryVehicleScreen> {
                             ref
                                 .read(deliveryBookingProvider.notifier)
                                 .selectDeliveryCategory(category.id);
-                            context.push('/delivery/address');
+                            context.push('/parcel/addresses');
                           },
                         );
                       },

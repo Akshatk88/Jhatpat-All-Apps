@@ -41,7 +41,7 @@ class DeliveryHistoryScreen extends ConsumerWidget {
                     fare: ride.fare,
                     status: ride.status,
                     vehicleType: delivery.parcel.category.isNotEmpty ? delivery.parcel.category : 'Parcel',
-                    onTap: () => context.push('/ride/tracking/${ride.rideId}'),
+                    onTap: () => context.push('/taxi/rides/${ride.rideId}/track'),
                   ),
                 );
               },

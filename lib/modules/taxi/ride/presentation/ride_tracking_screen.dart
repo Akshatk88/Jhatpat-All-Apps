@@ -55,12 +55,12 @@ class _RideTrackingScreenState extends ConsumerState<RideTrackingScreen> {
       if (r != null && r.isCompleted && !_navigatedToRating) {
         _navigatedToRating = true;
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (context.mounted) context.pushReplacement('/ride/${widget.rideId}/rating');
+          if (context.mounted) context.pushReplacement('/taxi/rides/${widget.rideId}/rate');
         });
       }
       if (r != null && r.isCancelled) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (context.mounted) context.go('/home');
+          if (context.mounted) context.go('/taxi');
         });
       }
       if (r?.lastDriverLocation != null && _mapController != null) {
@@ -223,7 +223,7 @@ class _RideTrackingScreenState extends ConsumerState<RideTrackingScreen> {
                       _LightCircleIconButton(
                         icon: Icons.sos,
                         color: TaxiColors.error,
-                        onTap: () => context.push('/support/sos?rideId=${widget.rideId}'),
+                        onTap: () => context.push('/taxi/sos?rideId=${widget.rideId}'),
                       ),
                     ],
                   ),
@@ -384,7 +384,7 @@ class _RideTrackingScreenState extends ConsumerState<RideTrackingScreen> {
                           // Call & Chat Buttons
                           _LightIconButton(
                             icon: Icons.chat_bubble_outline_rounded,
-                            onTap: () => context.push('/ride/${widget.rideId}/chat'),
+                            onTap: () => context.push('/taxi/rides/${widget.rideId}/chat'),
                           ),
                           const SizedBox(width: 8),
                           _LightIconButton(
@@ -591,7 +591,7 @@ class _RideTrackingScreenState extends ConsumerState<RideTrackingScreen> {
             onPressed: () async {
               Navigator.of(context).pop();
               final success = await controller.cancelRide(reason: 'Changed my mind');
-              if (success && context.mounted) context.go('/home');
+              if (success && context.mounted) context.go('/taxi');
             },
           ),
         ],

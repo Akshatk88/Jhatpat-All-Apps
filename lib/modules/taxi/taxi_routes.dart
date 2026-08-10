@@ -18,6 +18,22 @@ import 'package:superapp_user/modules/taxi/ride/presentation/ride_history_screen
 import 'package:superapp_user/modules/taxi/ride/presentation/ride_tracking_screen.dart';
 import 'package:superapp_user/app/shell/module_home_shell.dart';
 import 'package:superapp_user/modules/module_id.dart';
+import 'package:superapp_user/modules/taxi/notifications/presentation/notification_settings_screen.dart';
+import 'package:superapp_user/modules/taxi/notifications/presentation/notifications_screen.dart';
+import 'package:superapp_user/modules/taxi/profile/presentation/delete_account_screen.dart';
+import 'package:superapp_user/modules/taxi/profile/presentation/edit_profile_screen.dart';
+import 'package:superapp_user/modules/taxi/profile/presentation/emergency_contacts_screen.dart';
+import 'package:superapp_user/modules/taxi/profile/presentation/language_screen.dart';
+import 'package:superapp_user/modules/taxi/profile/presentation/theme_screen.dart';
+import 'package:superapp_user/modules/taxi/rewards/presentation/rewards_screen.dart';
+import 'package:superapp_user/modules/taxi/settings/presentation/security_screen.dart';
+import 'package:superapp_user/modules/taxi/settings/presentation/settings_screen.dart';
+import 'package:superapp_user/modules/taxi/subscription/presentation/subscription_screen.dart';
+import 'package:superapp_user/modules/taxi/support/presentation/new_ticket_screen.dart';
+import 'package:superapp_user/modules/taxi/support/presentation/safety_center_screen.dart';
+import 'package:superapp_user/modules/taxi/support/presentation/sos_screen.dart';
+import 'package:superapp_user/modules/taxi/support/presentation/support_home_screen.dart';
+import 'package:superapp_user/modules/taxi/support/presentation/ticket_detail_screen.dart';
 import 'package:superapp_user/modules/taxi/taxi_route_names.dart';
 
 /// The taxi module's route subtree.
@@ -118,4 +134,38 @@ List<RouteBase> taxiRoutes(GlobalKey<NavigatorState> rootNavigatorKey) => [
           ),
         ],
       ),
+
+      // ── ride-side screens with no shared counterpart yet ──────────────
+      GoRoute(name: TaxiSubRouteNames.support, path: TaxiSubRoutePaths.support,
+        builder: (c, s) => const SupportHomeScreen()),
+      GoRoute(name: TaxiSubRouteNames.supportSafety, path: TaxiSubRoutePaths.supportSafety,
+        builder: (c, s) => const SafetyCenterScreen()),
+      GoRoute(name: TaxiSubRouteNames.supportNewTicket, path: TaxiSubRoutePaths.supportNewTicket,
+        builder: (c, s) => const NewTicketScreen()),
+      GoRoute(name: TaxiSubRouteNames.supportTicket, path: TaxiSubRoutePaths.supportTicket,
+        builder: (c, s) => TicketDetailScreen(ticketCode: s.pathParameters['code']!)),
+      GoRoute(name: TaxiSubRouteNames.sos, path: TaxiSubRoutePaths.sos,
+        builder: (c, s) => SosScreen(rideId: s.uri.queryParameters['rideId'])),
+      GoRoute(name: TaxiSubRouteNames.settings, path: TaxiSubRoutePaths.settings,
+        builder: (c, s) => const SettingsScreen()),
+      GoRoute(name: TaxiSubRouteNames.settingsSecurity, path: TaxiSubRoutePaths.settingsSecurity,
+        builder: (c, s) => const SecurityScreen()),
+      GoRoute(name: TaxiSubRouteNames.emergencyContacts, path: TaxiSubRoutePaths.emergencyContacts,
+        builder: (c, s) => const EmergencyContactsScreen()),
+      GoRoute(name: TaxiSubRouteNames.language, path: TaxiSubRoutePaths.language,
+        builder: (c, s) => const LanguageScreen()),
+      GoRoute(name: TaxiSubRouteNames.theme, path: TaxiSubRoutePaths.theme,
+        builder: (c, s) => const ThemeScreen()),
+      GoRoute(name: TaxiSubRouteNames.deleteAccount, path: TaxiSubRoutePaths.deleteAccount,
+        builder: (c, s) => const DeleteAccountScreen()),
+      GoRoute(name: TaxiSubRouteNames.editProfile, path: TaxiSubRoutePaths.editProfile,
+        builder: (c, s) => const TaxiEditProfileScreen()),
+      GoRoute(name: TaxiSubRouteNames.notifications, path: TaxiSubRoutePaths.notifications,
+        builder: (c, s) => const TaxiNotificationsScreen()),
+      GoRoute(name: TaxiSubRouteNames.notificationSettings, path: TaxiSubRoutePaths.notificationSettings,
+        builder: (c, s) => const NotificationSettingsScreen()),
+      GoRoute(name: TaxiSubRouteNames.subscription, path: TaxiSubRoutePaths.subscription,
+        builder: (c, s) => const SubscriptionScreen()),
+      GoRoute(name: TaxiSubRouteNames.rewards, path: TaxiSubRoutePaths.rewards,
+        builder: (c, s) => const RewardsScreen()),
     ];

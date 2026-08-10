@@ -20,7 +20,7 @@ class SafetyCenterScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(20),
         children: [
           GestureDetector(
-            onTap: () => context.push('/support/sos'),
+            onTap: () => context.push('/taxi/sos'),
             child: Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -56,7 +56,7 @@ class SafetyCenterScreen extends ConsumerWidget {
                 leading: const Icon(Icons.person_add_alt_rounded),
                 title: const Text('Add an emergency contact'),
                 subtitle: const Text('They can be reached quickly during a ride'),
-                onTap: () => context.push('/profile/emergency-contacts'),
+                onTap: () => context.push('/taxi/emergency-contacts'),
               ),
             )
           else
@@ -82,7 +82,7 @@ class SafetyCenterScreen extends ConsumerWidget {
                   ListTile(
                     leading: const Icon(Icons.settings_outlined),
                     title: const Text('Manage contacts'),
-                    onTap: () => context.push('/profile/emergency-contacts'),
+                    onTap: () => context.push('/taxi/emergency-contacts'),
                   ),
                 ],
               ),

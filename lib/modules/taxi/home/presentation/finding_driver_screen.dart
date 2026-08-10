@@ -49,7 +49,7 @@ class _FindingDriverScreenState extends ConsumerState<FindingDriverScreen>
         final s = activeRide.status.toLowerCase();
         if (s == 'accepted' || s == 'arriving' || s == 'started' || s == 'arrived') {
           _leaving = true;
-          context.pushReplacement('/ride/tracking/${activeRide.rideId}');
+          context.pushReplacement('/taxi/rides/${activeRide.rideId}/track');
         }
       }
     } catch (_) {}
@@ -74,20 +74,20 @@ class _FindingDriverScreenState extends ConsumerState<FindingDriverScreen>
         final rideId = next.rideId;
         if (rideId == null || rideId.isEmpty) return;
         _leaving = true;
-        context.pushReplacement('/ride/tracking/$rideId');
+        context.pushReplacement('/taxi/rides/$rideId/track');
         break;
       case RideSearchPhase.noDrivers:
         _leaving = true;
-        context.pushReplacement('/home/no-driver');
+        context.pushReplacement('/taxi/no-driver');
         break;
       case RideSearchPhase.failed:
         _leaving = true;
         SnackbarUtils.error(context, next.message ?? 'Could not create your booking');
-        context.pushReplacement('/home/no-driver');
+        context.pushReplacement('/taxi/no-driver');
         break;
       case RideSearchPhase.cancelled:
         _leaving = true;
-        context.go('/home');
+        context.go('/taxi');
         break;
       case RideSearchPhase.idle:
       case RideSearchPhase.creating:
@@ -112,7 +112,7 @@ class _FindingDriverScreenState extends ConsumerState<FindingDriverScreen>
       return;
     }
     ref.read(bookingControllerProvider.notifier).reset();
-    if (mounted) context.go('/home');
+    if (mounted) context.go('/taxi');
   }
 
   String _assetForVehicle(String iconType, String name) {

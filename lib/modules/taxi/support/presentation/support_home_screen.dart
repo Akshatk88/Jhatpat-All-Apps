@@ -64,7 +64,7 @@ class SupportHomeScreen extends ConsumerWidget {
                   ),
                   IconButton(
                     icon: const Icon(Icons.chevron_right_rounded, color: Colors.white),
-                    onPressed: () => context.push('/support/safety-center'),
+                    onPressed: () => context.push('/taxi/support/safety'),
                   ),
                 ],
               ),
@@ -88,7 +88,7 @@ class SupportHomeScreen extends ConsumerWidget {
               children: [
                 Text('My tickets', style: Theme.of(context).textTheme.titleLarge),
                 TextButton.icon(
-                  onPressed: () => context.push('/support/new-ticket'),
+                  onPressed: () => context.push('/taxi/support/tickets/new'),
                   icon: const Icon(Icons.add_rounded, size: 18),
                   label: const Text('Raise ticket'),
                 ),
@@ -118,7 +118,7 @@ class SupportHomeScreen extends ConsumerWidget {
                                     label: Text(ticket.status),
                                     visualDensity: VisualDensity.compact,
                                   ),
-                                  onTap: () => context.push('/support/tickets/${ticket.ticketCode}'),
+                                  onTap: () => context.push('/taxi/support/tickets/${ticket.ticketCode}'),
                                 ),
                               ))
                           .toList(),

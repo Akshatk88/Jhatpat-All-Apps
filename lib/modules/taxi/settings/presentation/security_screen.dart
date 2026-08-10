@@ -43,7 +43,7 @@ class _SecurityScreenState extends ConsumerState<SecurityScreen> {
             title: const Text('Emergency contacts'),
             subtitle: const Text('Manage who is alerted during SOS'),
             trailing: const Icon(Icons.chevron_right_rounded),
-            onTap: () => context.push('/profile/emergency-contacts'),
+            onTap: () => context.push('/taxi/emergency-contacts'),
           ),
           const Divider(height: 1),
           ListTile(

@@ -571,7 +571,7 @@ class RideDetailScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 12),
                       InkWell(
-                        onTap: () => context.push('/support'),
+                        onTap: () => context.push('/taxi/support'),
                         child: const Text(
                           'Contact Support',
                           style: TextStyle(

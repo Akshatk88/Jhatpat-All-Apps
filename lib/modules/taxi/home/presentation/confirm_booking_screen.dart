@@ -49,7 +49,7 @@ class ConfirmBookingScreen extends ConsumerWidget {
             icon: Icons.local_offer_outlined,
             label: 'Promo code',
             value: booking.promoCode ?? 'Add promo code',
-            onTap: () => context.push('/home/promo'),
+            onTap: () => context.push('/taxi/promo'),
           ),
           _OptionRow(
             icon: Icons.schedule_rounded,
@@ -83,9 +83,9 @@ class ConfirmBookingScreen extends ConsumerWidget {
                     final success = await controller.confirmBooking();
                     if (!context.mounted) return;
                     if (success) {
-                      context.pushReplacement('/home/finding-driver');
+                      context.pushReplacement('/taxi/searching');
                     } else {
-                      context.pushReplacement('/home/no-driver');
+                      context.pushReplacement('/taxi/no-driver');
                     }
                   },
           ),

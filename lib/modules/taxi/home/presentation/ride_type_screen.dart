@@ -405,9 +405,9 @@ class _RideTypeScreenState extends ConsumerState<RideTypeScreen> {
                                       final success = await controller.confirmBooking();
                                       if (!context.mounted) return;
                                       if (success) {
-                                        context.pushReplacement('/home/finding-driver');
+                                        context.pushReplacement('/taxi/searching');
                                       } else {
-                                        context.pushReplacement('/home/no-driver');
+                                        context.pushReplacement('/taxi/no-driver');
                                       }
                                     },
                               child: booking.isSubmitting

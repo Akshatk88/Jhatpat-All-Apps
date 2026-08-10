@@ -19,7 +19,7 @@ class NoDriverScreen extends ConsumerWidget {
         onAction: () {
           final controller = ref.read(bookingControllerProvider.notifier);
           controller.goToStep(BookingStep.confirming);
-          context.pushReplacement('/home/confirm');
+          context.pushReplacement('/taxi/confirm');
         },
       ),
     );

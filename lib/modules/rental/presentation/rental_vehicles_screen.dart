@@ -22,7 +22,7 @@ class RentalVehiclesScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.history_rounded),
-            onPressed: () => context.push('/rental/history'),
+            onPressed: () => context.push('/rental'),
           ),
         ],
       ),
@@ -64,7 +64,7 @@ class _RentalVehicleCard extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
-        onTap: () => context.push('/rental/${vehicle.id}/book', extra: vehicle),
+        onTap: () => context.push('/rental/vehicles/${vehicle.id}/book', extra: vehicle),
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(

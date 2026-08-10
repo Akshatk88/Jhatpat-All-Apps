@@ -75,7 +75,7 @@ class TaxiNotificationsScreen extends ConsumerWidget {
                         ref.invalidate(notificationsListProvider);
                         final rideId = notification.data['rideId']?.toString();
                         if (rideId != null && context.mounted) {
-                          context.push('/ride/tracking/$rideId');
+                          context.push('/taxi/rides/$rideId/track');
                         }
                       },
                     );

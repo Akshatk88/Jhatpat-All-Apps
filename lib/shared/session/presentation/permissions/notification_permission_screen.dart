@@ -1,3 +1,4 @@
+import 'package:superapp_user/app/routing/app_route_names.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -18,7 +19,7 @@ class _NotificationPermissionScreenState extends State<NotificationPermissionScr
   Future<void> _allow() async {
     setState(() => _requesting = true);
     await Permission.notification.request();
-    if (mounted) context.go('/auth/account-created');
+    if (mounted) context.go(AppRoutePaths.splash);
   }
 
   @override
@@ -60,7 +61,7 @@ class _NotificationPermissionScreenState extends State<NotificationPermissionScr
               const SizedBox(height: 12),
               TaxiSecondaryButton(
                 label: 'Not now',
-                onPressed: () => context.go('/auth/account-created'),
+                onPressed: () => context.go(AppRoutePaths.splash),
               ),
               const SizedBox(height: 24),
             ],

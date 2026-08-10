@@ -65,9 +65,9 @@ class _RatingReviewScreenState extends ConsumerState<RatingReviewScreen> {
       setState(() => _submitting = false);
       if (success) {
         SnackbarUtils.success(context, 'Thank you for your feedback!');
-        context.go('/home');
+        context.go('/taxi');
       } else {
-        context.go('/home');
+        context.go('/taxi');
       }
     }
   }

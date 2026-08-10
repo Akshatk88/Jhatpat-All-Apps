@@ -109,7 +109,7 @@ class _RentalBookingScreenState extends ConsumerState<RentalBookingScreen> {
       if (!mounted) return;
       SnackbarUtils.success(context, 'Rental booking request submitted');
       context.pop();
-      context.push('/rental/history');
+      context.push('/rental');
     } catch (e) {
       if (mounted) SnackbarUtils.error(context, e.toString());
     } finally {

@@ -79,7 +79,7 @@ class _NewTicketScreenState extends ConsumerState<NewTicketScreen> {
           );
       ref.invalidate(myTicketsProvider);
       if (mounted) {
-        context.pushReplacement('/support/tickets/${ticket.ticketCode}');
+        context.pushReplacement('/taxi/support/tickets/${ticket.ticketCode}');
       }
     } catch (_) {
       if (mounted) {

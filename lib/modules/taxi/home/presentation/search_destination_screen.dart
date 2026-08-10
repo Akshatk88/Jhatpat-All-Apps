@@ -401,7 +401,7 @@ class _SearchDestinationScreenState extends ConsumerState<SearchDestinationScree
       ..goToStep(BookingStep.selectingVehicle);
 
     if (mounted) {
-      context.push('/home/ride-types');
+      context.push('/taxi/vehicles');
     }
   }
 
@@ -691,7 +691,7 @@ class _SearchDestinationScreenState extends ConsumerState<SearchDestinationScree
                   // "Select on map" Chip (Left)
                   InkWell(
                     borderRadius: BorderRadius.circular(24),
-                    onTap: () => context.push('/home/map-picker?type=drop').then(_handleMapPickerResult),
+                    onTap: () => context.push('/taxi/pick-on-map?type=drop').then(_handleMapPickerResult),
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
                       decoration: BoxDecoration(

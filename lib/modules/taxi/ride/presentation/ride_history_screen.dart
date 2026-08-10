@@ -320,7 +320,7 @@ class _RideHistoryScreenState extends ConsumerState<RideHistoryScreen> {
             ? 'Your trips will appear here once you make your first booking.'
             : 'Nothing under ${filter.label} yet.',
         actionLabel: 'Book now',
-        onAction: () => context.go('/home'),
+        onAction: () => context.go('/taxi'),
       );
     }
 

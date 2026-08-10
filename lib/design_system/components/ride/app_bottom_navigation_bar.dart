@@ -40,7 +40,7 @@ class AppBottomNavigationBar extends StatelessWidget {
                 label: 'Home',
                 isActive: currentIndex == 0,
                 onTap: () {
-                  if (currentIndex != 0) context.go('/home');
+                  if (currentIndex != 0) context.go('/taxi');
                 },
               ),
               _BottomNavItem(
@@ -48,7 +48,7 @@ class AppBottomNavigationBar extends StatelessWidget {
                 label: 'All Services',
                 isActive: currentIndex == 1,
                 onTap: () {
-                  if (currentIndex != 1) context.go('/home/all-services');
+                  if (currentIndex != 1) context.go('/taxi/services');
                 },
               ),
               _BottomNavItem(
@@ -56,7 +56,7 @@ class AppBottomNavigationBar extends StatelessWidget {
                 label: 'History',
                 isActive: currentIndex == 2,
                 onTap: () {
-                  if (currentIndex != 2) context.go('/rides');
+                  if (currentIndex != 2) context.go('/taxi/rides');
                 },
               ),
               _BottomNavItem(

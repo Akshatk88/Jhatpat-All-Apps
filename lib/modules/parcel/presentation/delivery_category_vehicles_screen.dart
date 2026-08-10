@@ -96,7 +96,7 @@ class DeliveryCategoryVehiclesScreen extends ConsumerWidget {
                         id: vehicle.id,
                         name: vehicle.name,
                       );
-                  context.push('/delivery/address');
+                  context.push('/parcel/addresses');
                 },
               );
             },

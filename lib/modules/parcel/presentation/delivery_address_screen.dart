@@ -287,7 +287,7 @@ class _DeliveryAddressScreenState extends ConsumerState<DeliveryAddressScreen> {
     try {
       final rideId = await ref.read(deliveryBookingProvider.notifier).confirm();
       if (!mounted) return;
-      context.pushReplacement('/delivery/finding/$rideId');
+      context.pushReplacement('/parcel/searching/$rideId');
     } catch (e) {
       if (mounted) {
         SnackbarUtils.error(context, e.toString());

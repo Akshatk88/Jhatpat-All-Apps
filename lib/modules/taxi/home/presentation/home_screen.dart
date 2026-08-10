@@ -213,7 +213,7 @@ class _HomeScreenState extends ConsumerState<TaxiHomeScreen> {
         ..setDrop(dropLoc);
 
       if (mounted) {
-        context.push('/home/ride-types');
+        context.push('/taxi/vehicles');
       }
     }
   }
@@ -248,7 +248,7 @@ class _HomeScreenState extends ConsumerState<TaxiHomeScreen> {
       padding: const EdgeInsets.only(bottom: 16),
       child: GestureDetector(
         onTap: () async {
-          await context.push('/ride/tracking/${ride.rideId}');
+          await context.push('/taxi/rides/${ride.rideId}/track');
           if (context.mounted) ref.invalidate(myActiveRideProvider);
         },
         child: Container(
@@ -664,7 +664,7 @@ class _HomeScreenState extends ConsumerState<TaxiHomeScreen> {
 
                               // Destination Search Box
                               InkWell(
-                                onTap: () => context.push('/search'),
+                                onTap: () => context.push('/taxi/destination'),
                                 borderRadius: BorderRadius.circular(26),
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
@@ -758,7 +758,7 @@ class _HomeScreenState extends ConsumerState<TaxiHomeScreen> {
                         iconColor: const Color(0xFFF59E0B),
                         title: 'Saved',
                         subtitle: 'Your places',
-                        onTap: () => context.push('/home/saved-places'),
+                        onTap: () => context.push('/taxi/saved-places'),
                       ),
                     ],
                   ),
@@ -767,7 +767,7 @@ class _HomeScreenState extends ConsumerState<TaxiHomeScreen> {
 
                   // --- 4. PROMOTIONAL BANNER CAROUSEL ---
                   InkWell(
-                    onTap: () => context.push('/search'),
+                    onTap: () => context.push('/taxi/destination'),
                     borderRadius: BorderRadius.circular(18),
                     child: Container(
                       width: double.infinity,
@@ -824,7 +824,7 @@ class _HomeScreenState extends ConsumerState<TaxiHomeScreen> {
                         ),
                       ),
                       InkWell(
-                        onTap: () => context.push('/home/all-services'),
+                        onTap: () => context.push('/taxi/services'),
                         child: const Row(
                           children: [
                             Text(
@@ -873,7 +873,7 @@ class _HomeScreenState extends ConsumerState<TaxiHomeScreen> {
                       // Card 1: Ride Now
                       Expanded(
                         child: GestureDetector(
-                          onTap: () => context.push('/search'),
+                          onTap: () => context.push('/taxi/destination'),
                           child: Container(
                             height: 135,
                             decoration: BoxDecoration(
@@ -956,7 +956,7 @@ class _HomeScreenState extends ConsumerState<TaxiHomeScreen> {
                       // Card 2: Delivery
                       Expanded(
                         child: GestureDetector(
-                          onTap: () => context.push('/delivery/vehicle'),
+                          onTap: () => context.push('/parcel/vehicles'),
                           child: Container(
                             height: 135,
                             decoration: BoxDecoration(
@@ -1139,13 +1139,18 @@ class _HomeScreenState extends ConsumerState<TaxiHomeScreen> {
 
     void onTap() {
       if (sType.contains('parcel') || sType.contains('delivery')) {
-        context.push('/delivery/vehicle');
+        context.push('/parcel/vehicles');
       } else if (sType.contains('rental')) {
         context.push('/rental');
       } else if (sType.contains('outstation')) {
-        context.push('/outstation');
+        // No outstation screen exists in either source app -- the original
+        // taxi router had no /outstation route either, so this tile has always
+        // been a dead link. Outstation is a ride *type*, so start the normal
+        // booking funnel; the intercity package picker
+        // (GET /taxi/users/intercity-packages) is a separate build.
+        context.push('/taxi/destination');
       } else {
-        context.push('/search');
+        context.push('/taxi/destination');
       }
     }
 

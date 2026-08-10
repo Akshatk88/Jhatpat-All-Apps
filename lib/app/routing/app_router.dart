@@ -18,6 +18,8 @@ import 'package:superapp_user/shared/profile/presentation/screens/terms_conditio
 import 'package:superapp_user/shared/referral/presentation/screens/referral_screen.dart';
 import 'package:superapp_user/shared/referral/presentation/screens/referral_ticket_result_screen.dart';
 import 'package:superapp_user/shared/search/presentation/screens/search_screen.dart';
+import 'package:superapp_user/shared/session/presentation/permissions/location_permission_screen.dart';
+import 'package:superapp_user/shared/session/presentation/permissions/notification_permission_screen.dart';
 import 'package:superapp_user/shared/session/presentation/splash/splash_screen.dart';
 import 'package:superapp_user/shared/settings/presentation/about/screens/about_screen.dart';
 import 'package:superapp_user/shared/support/presentation/chat/screens/chat_screen.dart';
@@ -92,6 +94,19 @@ List<RouteBase> _sessionRoutes() => [
                 extra?['from']?.toString() ?? state.uri.queryParameters['from'],
           );
         },
+      ),
+      // Permission gates. Ported from the ride app -- food never asked
+      // explicitly, it just fired the system prompt on first frame, which is
+      // both worse UX and easy to permanently deny by accident.
+      GoRoute(
+        name: AppRouteNames.permissionLocation,
+        path: AppRoutePaths.permissionLocation,
+        builder: (context, state) => const LocationPermissionScreen(),
+      ),
+      GoRoute(
+        name: AppRouteNames.permissionNotifications,
+        path: AppRoutePaths.permissionNotifications,
+        builder: (context, state) => const NotificationPermissionScreen(),
       ),
     ];
 

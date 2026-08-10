@@ -14,6 +14,8 @@ class AppRoutePaths {
   // Auth
   static const String authPhone = '/auth/phone';
   static const String authOtp = '/auth/otp';
+  static const String permissionLocation = '/auth/permissions/location';
+  static const String permissionNotifications = '/auth/permissions/notifications';
 
   // Shared features
   static const String profile = '/profile';
@@ -40,6 +42,8 @@ class AppRouteNames {
 
   static const String authPhone = 'auth.phone';
   static const String authOtp = 'auth.otp';
+  static const String permissionLocation = 'auth.permissions.location';
+  static const String permissionNotifications = 'auth.permissions.notifications';
 
   static const String profile = 'profile';
   static const String editProfile = 'profile.edit';
