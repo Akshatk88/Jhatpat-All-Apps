@@ -54,9 +54,42 @@ class AddressModel {
       city: (json['city'] ?? '').toString(),
       state: (json['state'] ?? '').toString(),
       zipCode: (json['zipCode'] ?? '').toString(),
-      latitude: (json['latitude'] as num?)?.toDouble(),
-      longitude: (json['longitude'] as num?)?.toDouble(),
+      latitude: _lat(json),
+      longitude: _lng(json),
     );
+  }
+
+  /// Saved addresses store coordinates **only** as GeoJSON
+  /// (`location: { type: 'Point', coordinates: [lng, lat] }`) — the user
+  /// schema has no flat `latitude`/`longitude` fields at all. Reading just the
+  /// flat keys therefore always yielded null, which meant the order payload
+  /// omitted `location`, Mongoose filled in its `type: 'Point'` default with no
+  /// coordinates, and the `deliveryAddress.location` 2dsphere index rejected
+  /// the insert with "Can't extract geo keys".
+  ///
+  /// The flat keys are still read first because that is what
+  /// [toApiPayload] sends on create (the server converts them), so a
+  /// locally-constructed model round-trips correctly.
+  static double? _lat(Map<String, dynamic> json) {
+    final flat = (json['latitude'] ?? json['lat']) as num?;
+    if (flat != null) return flat.toDouble();
+    return _geo(json)?.$2;
+  }
+
+  static double? _lng(Map<String, dynamic> json) {
+    final flat = (json['longitude'] ?? json['lng'] ?? json['lon']) as num?;
+    if (flat != null) return flat.toDouble();
+    return _geo(json)?.$1;
+  }
+
+  /// `(lng, lat)` from a GeoJSON Point, or null when absent/malformed.
+  static (double, double)? _geo(Map<String, dynamic> json) {
+    final coords = (json['location'] as Map?)?['coordinates'];
+    if (coords is! List || coords.length < 2) return null;
+    final lng = (coords[0] as num?)?.toDouble();
+    final lat = (coords[1] as num?)?.toDouble();
+    if (lng == null || lat == null) return null;
+    return (lng, lat);
   }
 
   /// Body for POST/PATCH /food/user/addresses (flat coordinates).
@@ -92,6 +125,12 @@ class AddressModel {
     if (effectiveStreet.isEmpty) return 'street address';
     if (city.trim().isEmpty) return 'city';
     if (state.trim().isEmpty) return 'state';
+    // Without coordinates the order document gets a half-formed GeoJSON Point
+    // (Mongoose defaults `type: 'Point'`, coordinates stay undefined) and the
+    // `deliveryAddress.location` 2dsphere index refuses the insert. A delivery
+    // address with no location is also undispatchable, so this is worth
+    // blocking on rather than failing at the database.
+    if (latitude == null || longitude == null) return 'map location';
     return null;
   }
 

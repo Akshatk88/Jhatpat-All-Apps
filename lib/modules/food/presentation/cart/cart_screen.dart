@@ -1,3 +1,4 @@
+import 'package:superapp_user/modules/food/application/providers/fee_settings_providers.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -174,6 +175,21 @@ class _CartScreenState extends ConsumerState<CartScreen> {
       // not. Without this check the cart prices happily and then placement
       // fails with a bare 400 that reads as "payment isn't working", for both
       // COD and online. Catch it here with something actionable instead.
+      // The sheet greys COD out above the ceiling, but the total can change
+      // after it closes (item added, coupon removed), so re-check at submit.
+      if (_selectedPaymentMethod == 'cash') {
+        final fees = ref.read(feeSettingsProvider).value ?? FeeSettings.empty;
+        if (!fees.allowsCodFor(pricing.total)) {
+          if (!mounted) return;
+          AppSnackbar.warning(
+            context,
+            'Cash on Delivery is not available for orders of '
+            '₹${fees.codOrderLimit!.toStringAsFixed(0)} or more. Please pay online.',
+          );
+          return;
+        }
+      }
+
       final missing = address.missingOrderField;
       if (missing != null) {
         if (!mounted) return;
@@ -2247,6 +2263,17 @@ class _CartScreenState extends ConsumerState<CartScreen> {
       builder: (ctx) {
         return StatefulBuilder(
           builder: (modalCtx, setModalState) {
+            // The server rejects cash at or above FoodFeeSettings.codOrderLimit
+            // (order.service.js). Surfacing it here means the option is greyed
+            // out with the reason, rather than the user choosing COD and the
+            // order being refused at placement.
+            final feeSettings =
+                ref.watch(feeSettingsProvider).value ?? FeeSettings.empty;
+            final codLimit = feeSettings.codOrderLimit;
+            final codDisabledReason = feeSettings.allowsCodFor(toPay)
+                ? null
+                : 'Not available above ₹${codLimit!.toStringAsFixed(0)} — please pay online';
+
             final modalTextColor = isDark
                 ? AppColors.textPrimaryDark
                 : AppColors.textPrimaryLight;
@@ -2315,7 +2342,9 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                       methodKey: 'cash',
                       icon: Icons.payments_outlined,
                       title: 'Cash on Delivery (COD)',
-                      subtitle: 'Pay in cash when your food is delivered',
+                      subtitle: codDisabledReason ??
+                          'Pay in cash when your food is delivered',
+                      disabledReason: codDisabledReason,
                       isDark: isDark,
                       modalTextColor: modalTextColor,
                       modalSecondaryColor: modalSecondaryColor,
@@ -2362,18 +2391,27 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     required String subtitle,
     String? badgeText,
     Color? badgeColor,
+    String? disabledReason,
     required bool isDark,
     required Color modalTextColor,
     required Color modalSecondaryColor,
   }) {
-    final isSelected = _selectedPaymentMethod == methodKey;
+    final isDisabled = disabledReason != null;
+    final isSelected = !isDisabled && _selectedPaymentMethod == methodKey;
 
-    return InkWell(
-      onTap: () {
-        Haptics.light();
-        setState(() => _selectedPaymentMethod = methodKey);
-        Navigator.pop(ctx);
-      },
+    return Opacity(
+      opacity: isDisabled ? 0.45 : 1,
+      child: InkWell(
+      onTap: isDisabled
+          ? () {
+              Haptics.light();
+              AppSnackbar.warning(context, disabledReason);
+            }
+          : () {
+              Haptics.light();
+              setState(() => _selectedPaymentMethod = methodKey);
+              Navigator.pop(ctx);
+            },
       borderRadius: BorderRadius.circular(14),
       child: Container(
         padding: const EdgeInsets.all(14),
@@ -2464,6 +2502,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
             ),
           ],
         ),
+      ),
       ),
     );
   }
