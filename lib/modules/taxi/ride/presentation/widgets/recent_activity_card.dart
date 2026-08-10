@@ -64,16 +64,16 @@ class RecentActivityCard extends StatelessWidget {
     final isTaxi = serviceType.toLowerCase().contains('taxi') || title.toLowerCase().contains('taxi');
     
     // Choose image asset based on type
-    String imageAsset = 'assets/car.png';
+    String imageAsset = 'assets/images/taxi/car.png';
     String badgeText = 'V';
     Color badgeColor = isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8); // Grey badge
     
     if (isParcel) {
-      imageAsset = 'assets/parcel.png';
+      imageAsset = 'assets/images/taxi/parcel.png';
       badgeText = 'DA';
       badgeColor = const Color(0xFFF59E0B); // Yellow/Orange badge
     } else if (isTaxi) {
-      imageAsset = 'assets/auto_cat.png';
+      imageAsset = 'assets/images/taxi/auto_cat.png';
       badgeText = 'V';
       badgeColor = isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8);
     }

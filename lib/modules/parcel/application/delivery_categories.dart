@@ -32,28 +32,28 @@ const kDeliveryCategories = <DeliveryCategory>[
     title: 'Trucks',
     description: 'Heavy goods, loaders, and cargo-style delivery vehicles.',
     icon: Icons.local_shipping_rounded,
-    assetImage: 'assets/truck_cat.png',
+    assetImage: 'assets/images/taxi/truck_cat.png',
   ),
   DeliveryCategory(
     id: '2wheeler',
     title: '2 Wheeler',
     description: 'Fast lightweight parcel bikes and two-wheel delivery options.',
     icon: Icons.two_wheeler_rounded,
-    assetImage: 'assets/scooter_cat.png',
+    assetImage: 'assets/images/taxi/scooter_cat.png',
   ),
   DeliveryCategory(
     id: 'auto',
     title: 'Auto',
     description: 'Classic three-wheeler Indian auto rickshaw for fast local parcel delivery.',
     icon: Icons.electric_rickshaw_rounded,
-    assetImage: 'assets/auto_cat.png',
+    assetImage: 'assets/images/taxi/auto_cat.png',
   ),
   DeliveryCategory(
     id: 'movers',
     title: 'Packers & Movers',
     description: 'Home shifting, helper-based, and larger move services.',
     icon: Icons.inventory_rounded,
-    assetImage: 'assets/movers_cat.png',
+    assetImage: 'assets/images/taxi/movers_cat.png',
   ),
 ];
 

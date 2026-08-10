@@ -106,6 +106,12 @@ flutter:
   assets:
     - assets/
     - assets/images/
+    # Ride-side vehicle art. These are only a *fallback*: the vehicle list
+    # prefers the image the admin uploads against each vehicle type. They
+    # exist so a vehicle with no configured image still renders something
+    # instead of throwing "Unable to load asset".
+    - assets/images/taxi/
+    - assets/markers/
     - assets/videos/
     - assets/audio/
     - assets/gif/

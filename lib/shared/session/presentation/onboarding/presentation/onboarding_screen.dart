@@ -21,21 +21,21 @@ class _OnboardPage {
 
 const _pages = [
   _OnboardPage(
-    image: 'assets/1.png',
+    image: 'assets/images/taxi/1.png',
     titlePrefix: 'Quick and Reliable',
     titleSuffix: 'Ride Tracking',
     description:
         'Experience our real-time tracking feature to see exactly where your driver is and when they will arrive at your stop.',
   ),
   _OnboardPage(
-    image: 'assets/2.png',
+    image: 'assets/images/taxi/2.png',
     titlePrefix: 'Welcome to',
     titleSuffix: 'SuperTaxi',
     description:
         'Delivering comfort with care, driven by trust solutions to keep you moving everyday.',
   ),
   _OnboardPage(
-    image: 'assets/3.png',
+    image: 'assets/images/taxi/3.png',
     titlePrefix: 'Effortless',
     titleSuffix: 'Payments',
     description:

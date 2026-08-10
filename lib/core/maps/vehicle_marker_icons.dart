@@ -12,9 +12,9 @@ class VehicleMarkerIcons {
   VehicleMarkerIcons._();
 
   static const _assetsByFamily = <String, String>{
-    'bike': 'assets/markerbike.png',
-    'auto': 'assets/markerauto.webp',
-    'car': 'assets/markersedan.webp',
+    'bike': 'assets/markers/markerbike.png',
+    'auto': 'assets/markers/markerauto.webp',
+    'car': 'assets/markers/markersedan.webp',
   };
 
   static const _defaultFamily = 'car';

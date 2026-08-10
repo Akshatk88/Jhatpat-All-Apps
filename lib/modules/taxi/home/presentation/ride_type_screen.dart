@@ -1,3 +1,4 @@
+import 'package:superapp_user/core/config/api_config.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -540,21 +541,53 @@ class _VehicleSelectionTile extends StatelessWidget {
     required this.onTap,
   });
 
-  String _assetForVehicle(String iconType, String name) {
-    final lower = (iconType + name).toLowerCase();
-    if (lower.contains('bike')) return 'assets/bike.png';
-    if (lower.contains('parcel')) return 'assets/parcel.png';
-    if (lower.contains('all') || lower.contains('cab')) return 'assets/allservice.png';
-    return 'assets/booknow.png';
+  /// Bundled art for a vehicle type, used only when the admin has not
+  /// uploaded an image for it.
+  ///
+  /// These live under assets/images/taxi/ — the paths used to point at
+  /// assets/*.png, which never existed in this project and produced
+  /// "Unable to load asset: assets/bike.png" on every row.
+  static String _assetForVehicle(String iconType, String name) {
+    final lower = '$iconType $name'.toLowerCase();
+    if (lower.contains('bike') || lower.contains('moto')) {
+      return 'assets/images/taxi/bike.png';
+    }
+    if (lower.contains('scooter')) return 'assets/images/taxi/scooter_cat.png';
+    if (lower.contains('auto') || lower.contains('rickshaw')) {
+      return 'assets/images/taxi/auto_cat.png';
+    }
+    if (lower.contains('truck') || lower.contains('tempo')) {
+      return 'assets/images/taxi/truck_cat.png';
+    }
+    if (lower.contains('mover') || lower.contains('packer')) {
+      return 'assets/images/taxi/movers_cat.png';
+    }
+    if (lower.contains('parcel') || lower.contains('delivery')) {
+      return 'assets/images/taxi/parcel.png';
+    }
+    if (lower.contains('cab') || lower.contains('car') || lower.contains('sedan') ||
+        lower.contains('suv') || lower.contains('taxi')) {
+      return 'assets/images/taxi/car.png';
+    }
+    return 'assets/images/taxi/booknow.png';
   }
 
   @override
   Widget build(BuildContext context) {
     final assetPath = _assetForVehicle(vehicle.iconType, vehicle.name);
-    // Prefer the list icon; fall back to the map-marker icon before the
-    // bundled local asset, since the backend may only have one of the two
-    // configured for a given vehicle type.
-    final backendImageUrl = vehicle.image.isNotEmpty ? vehicle.image : vehicle.mapIcon;
+
+    // The admin-uploaded image is the source of truth; the bundled asset is
+    // only a fallback for vehicle types that have none configured yet.
+    // map_icon is tried second because the backend often has only one of the
+    // two set for a given type.
+    //
+    // resolveMedia is what makes this work at all: uploads come back as
+    // relative paths ('/uploads/...') as often as absolute URLs, and
+    // CachedNetworkImage cannot fetch a relative path.
+    final rawImage = vehicle.image.trim().isNotEmpty
+        ? vehicle.image.trim()
+        : vehicle.mapIcon.trim();
+    final backendImageUrl = ApiConfig.resolveMedia(rawImage);
 
     return InkWell(
       onTap: onTap,

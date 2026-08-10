@@ -7,8 +7,6 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:superapp_user/design_system/components/feedback/taxi_snackbar_utils.dart';
 import 'package:superapp_user/design_system/components/ride/app_bottom_navigation_bar.dart';
-import 'package:superapp_user/modules/taxi/auth/application/auth_providers.dart';
-import 'package:superapp_user/modules/taxi/notifications/application/notifications_providers.dart';
 import 'package:superapp_user/modules/taxi/ride/application/ride_providers.dart';
 import 'package:superapp_user/modules/taxi/home/application/booking_controller.dart';
 import 'package:superapp_user/modules/taxi/home/application/booking_state.dart';
@@ -85,9 +83,9 @@ class _HomeScreenState extends ConsumerState<TaxiHomeScreen> {
     }
     // Default promotional banner list for infinite loop sliding
     return const [
-      {'image': 'assets/images/banner.png', 'link': ''},
-      {'image': 'assets/images/Ridenow.png', 'link': ''},
-      {'image': 'assets/images/Delivery.png', 'link': ''},
+      {'image': 'assets/images/taxi/banner.png', 'link': ''},
+      {'image': 'assets/images/taxi/Ridenow.png', 'link': ''},
+      {'image': 'assets/images/taxi/Delivery.png', 'link': ''},
     ];
   }
 
@@ -121,18 +119,18 @@ class _HomeScreenState extends ConsumerState<TaxiHomeScreen> {
               width: double.infinity,
               height: 115,
               placeholder: (context, url) =>
-                  Image.asset('assets/banner.png', fit: BoxFit.cover),
+                  Image.asset('assets/images/taxi/banner.png', fit: BoxFit.cover),
               errorWidget: (context, url, error) =>
-                  Image.asset('assets/banner.png', fit: BoxFit.cover),
+                  Image.asset('assets/images/taxi/banner.png', fit: BoxFit.cover),
             );
           } else {
             imageWidget = Image.asset(
-              img.isNotEmpty ? img : 'assets/banner.png',
+              img.isNotEmpty ? img : 'assets/images/taxi/banner.png',
               fit: BoxFit.cover,
               width: double.infinity,
               height: 115,
               errorBuilder: (context, error, stackTrace) =>
-                  Image.asset('assets/banner.png', fit: BoxFit.cover),
+                  Image.asset('assets/images/taxi/banner.png', fit: BoxFit.cover),
             );
           }
 
@@ -216,14 +214,6 @@ class _HomeScreenState extends ConsumerState<TaxiHomeScreen> {
         context.push('/taxi/vehicles');
       }
     }
-  }
-
-  String _getGreeting() {
-    final hour = DateTime.now().hour;
-    if (hour >= 5 && hour < 12) return 'Good morning,';
-    if (hour >= 12 && hour < 17) return 'Good afternoon,';
-    if (hour >= 17 && hour < 22) return 'Good evening,';
-    return 'Good night,';
   }
 
   Widget _buildOngoingRideCard(BuildContext context) {
@@ -322,11 +312,6 @@ class _HomeScreenState extends ConsumerState<TaxiHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = ref.watch(authControllerProvider).user;
-    final displayName = (user?.name != null && user!.name.isNotEmpty)
-        ? user.name.split(' ').first
-        : 'Rishi';
-
     final savedPlaces = ref.watch(savedPlacesProvider);
     SavedAddressModel? homePlace;
     SavedAddressModel? workPlace;
@@ -340,21 +325,14 @@ class _HomeScreenState extends ConsumerState<TaxiHomeScreen> {
       }
     }
 
-    final addressAsync = ref.watch(currentAddressProvider);
-    final pickupAddress = addressAsync.when(
-      data: (addr) => addr.isNotEmpty ? addr : 'Fetching location...',
-      loading: () => 'Fetching location...',
-      error: (e, st) => 'Fetching location...',
-    );
-
     final modulesAsync = ref.watch(appModulesProvider);
-    final unreadCount = ref.watch(unreadNotificationsCountProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
 
     return Scaffold(
       backgroundColor: bgColor,
       body: SafeArea(
+        top: false,
         child: Stack(
           children: [
             SingleChildScrollView(
@@ -363,364 +341,62 @@ class _HomeScreenState extends ConsumerState<TaxiHomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // --- 1. TOP HEADER BAR ---
-                  Row(
-                    children: [
-                      // Hamburger Menu Button
-                      Container(
-                        width: 38,
-                        height: 38,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(14),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color(0x0A000000),
-                              blurRadius: 8,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          icon: const Icon(
-                            Icons.menu_rounded,
-                            color: Color(0xFF0F172A),
-                            size: 20,
-                          ),
-                          onPressed: () {
-                            context.push('/profile');
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-
-                      // Greeting Column
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _getGreeting(),
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFF64748B),
-                              ),
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                  displayName,
-                                  style: const TextStyle(
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.w800,
-                                    color: Color(0xFF0F172A),
-                                    letterSpacing: -0.3,
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                const Text(
-                                  '👋',
-                                  style: TextStyle(fontSize: 15),
-                                ),
-                              ],
-                            ),
-                            const Text(
-                              "Let's make today productive!",
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFF64748B),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Notification Bell with Dynamic Badge & Navigation to /notifications
-                      Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          Container(
-                            width: 38,
-                            height: 38,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(14),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Color(0x0A000000),
-                                  blurRadius: 8,
-                                  offset: Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: IconButton(
-                              padding: EdgeInsets.zero,
-                              icon: const Icon(
-                                Icons.notifications_none_rounded,
-                                color: Color(0xFF0F172A),
-                                size: 20,
-                              ),
-                              onPressed: () {
-                                context.push('/notifications');
-                              },
-                            ),
-                          ),
-                          if (unreadCount > 0)
-                            Positioned(
-                              top: 2,
-                              right: 2,
-                              child: Container(
-                                padding: const EdgeInsets.all(3.5),
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFFFF5C2B),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Text(
-                                  '$unreadCount',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 9.5,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                      const SizedBox(width: 8),
-
-                      // Profile Avatar with Online Dot Badge & Ring
-                      GestureDetector(
-                        onTap: () => context.push('/profile'),
-                        child: Container(
-                          padding: const EdgeInsets.all(2),
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: LinearGradient(
-                              colors: [Color(0xFFFF9500), Color(0xFFFFCC00)],
-                            ),
-                          ),
-                          child: Stack(
-                            children: [
-                              Container(
-                                width: 38,
-                                height: 38,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: const Color(0xFFE2E8F0),
-                                  image:
-                                      (user?.profileImage != null &&
-                                          user!.profileImage!.isNotEmpty)
-                                      ? DecorationImage(
-                                          image: NetworkImage(
-                                            user.profileImage!,
-                                          ),
-                                          fit: BoxFit.cover,
-                                        )
-                                      : null,
-                                ),
-                                child:
-                                    (user?.profileImage == null ||
-                                        user!.profileImage!.isEmpty)
-                                    ? const Icon(
-                                        Icons.person_rounded,
-                                        color: Color(0xFF64748B),
-                                        size: 22,
-                                      )
-                                    : null,
-                              ),
-                              Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: Container(
-                                  width: 10,
-                                  height: 10,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF10B981),
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: Colors.white,
-                                      width: 1.5,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 14),
-
                   // Ongoing active ride alert card if active
                   _buildOngoingRideCard(context),
 
-                  // --- 2. MAIN BOOKING CARD / PICKUP & DESTINATION ---
-                  Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color(0x0E000000),
-                          blurRadius: 14,
-                          offset: Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: Stack(
-                      children: [
-                        // Map Illustration Background (assets/search.png) at top right corner
-                        Positioned(
-                          right: 0,
-                          top: 0,
-                          width: 190,
-                          height: 110,
-                          child: Image.asset(
-                            'assets/search.png',
-                            fit: BoxFit.cover,
-                            alignment: Alignment.topRight,
-                            errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                  // Destination Search Box
+                  InkWell(
+                    onTap: () => context.push('/taxi/destination'),
+                    borderRadius: BorderRadius.circular(26),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(26),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x12000000),
+                            blurRadius: 12,
+                            offset: Offset(0, 3),
                           ),
-                        ),
-
-                        // Card Content
-                        Padding(
-                          padding: const EdgeInsets.all(14.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Pickup Location Label Row
-                              Row(
-                                children: [
-                                  Container(
-                                    width: 8,
-                                    height: 8,
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xFF10B981),
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  const Text(
-                                    'Pickup location',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w600,
-                                      color: Color(0xFF64748B),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 3),
-
-                              // Pickup Address Text & Vertical Dotted Line
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Dotted Vertical Line aligned under green dot
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                      left: 3.0,
-                                      top: 2.0,
-                                      right: 10.0,
-                                    ),
-                                    child: CustomPaint(
-                                      size: const Size(2, 22),
-                                      painter: const _DottedVerticalLinePainter(
-                                        color: Color(0xFFCBD5E1),
-                                      ),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: ConstrainedBox(
-                                      constraints: BoxConstraints(
-                                        maxWidth:
-                                            MediaQuery.of(context).size.width *
-                                            0.46,
-                                      ),
-                                      child: Text(
-                                        pickupAddress,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          fontSize: 12.5,
-                                          fontWeight: FontWeight.w800,
-                                          color: Color(0xFF0F172A),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-
-                              // Destination Search Box
-                              InkWell(
-                                onTap: () => context.push('/taxi/destination'),
-                                borderRadius: BorderRadius.circular(26),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(26),
-                                    boxShadow: const [
-                                      BoxShadow(
-                                        color: Color(0x12000000),
-                                        blurRadius: 12,
-                                        offset: Offset(0, 3),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.location_on_rounded,
-                                        color: Color(0xFFFF5C2B),
-                                        size: 20,
-                                      ),
-                                      const SizedBox(width: 8),
-                                      const Expanded(
-                                        child: Text(
-                                          'Where are you going?',
-                                          style: TextStyle(
-                                            fontSize: 13.5,
-                                            fontWeight: FontWeight.w500,
-                                            color: Color(0xFF94A3B8),
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        width: 38,
-                                        height: 38,
-                                        decoration: const BoxDecoration(
-                                          color: Color(0xFFFF5C2B),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: const Icon(
-                                          Icons.search_rounded,
-                                          color: Colors.white,
-                                          size: 20,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.location_on_rounded,
+                            color: Color(0xFFFF5C2B),
+                            size: 20,
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 8),
+                          const Expanded(
+                            child: Text(
+                              'Where are you going?',
+                              style: TextStyle(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xFF94A3B8),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: 38,
+                            height: 38,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFFF5C2B),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.search_rounded,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
 
@@ -891,12 +567,12 @@ class _HomeScreenState extends ConsumerState<TaxiHomeScreen> {
                               children: [
                                 Positioned.fill(
                                   child: Image.asset(
-                                    'assets/Ridenow.png',
+                                    'assets/images/taxi/Ridenow.png',
                                     fit: BoxFit.cover,
                                     errorBuilder:
                                         (context, error, stackTrace) =>
                                             Image.asset(
-                                              'assets/ride_now_banner.png',
+                                              'assets/images/taxi/Ridenow.png',
                                               fit: BoxFit.cover,
                                             ),
                                   ),
@@ -974,7 +650,7 @@ class _HomeScreenState extends ConsumerState<TaxiHomeScreen> {
                               children: [
                                 Positioned.fill(
                                   child: Image.asset(
-                                    'assets/Delivery.png',
+                                    'assets/images/taxi/Delivery.png',
                                     fit: BoxFit.cover,
                                     errorBuilder:
                                         (
@@ -982,7 +658,7 @@ class _HomeScreenState extends ConsumerState<TaxiHomeScreen> {
                                           error,
                                           stackTrace,
                                         ) => Image.asset(
-                                          'assets/delivery_rider_banner.png',
+                                          'assets/images/taxi/Delivery.png',
                                           fit: BoxFit.cover,
                                         ),
                                   ),
@@ -1120,20 +796,20 @@ class _HomeScreenState extends ConsumerState<TaxiHomeScreen> {
     final String sType = '${m.serviceType} ${m.transportType} ${m.name}'
         .toLowerCase();
 
-    String fallbackAsset = 'assets/taxi_service.png';
+    String fallbackAsset = 'assets/images/taxi/taxi_service.png';
     IconData fallbackIcon = Icons.local_taxi_rounded;
 
     if (sType.contains('bike') || sType.contains('moto')) {
-      fallbackAsset = 'assets/bike_service.png';
+      fallbackAsset = 'assets/images/taxi/bike_service.png';
       fallbackIcon = Icons.two_wheeler_rounded;
     } else if (sType.contains('parcel') || sType.contains('delivery')) {
-      fallbackAsset = 'assets/parcel_service.png';
+      fallbackAsset = 'assets/images/taxi/parcel_service.png';
       fallbackIcon = Icons.inventory_2_rounded;
     } else if (sType.contains('outstation') || sType.contains('intercity')) {
-      fallbackAsset = 'assets/outstation_service.png';
+      fallbackAsset = 'assets/images/taxi/outstation_service.png';
       fallbackIcon = Icons.directions_bus_rounded;
     } else if (sType.contains('rental')) {
-      fallbackAsset = 'assets/2.png';
+      fallbackAsset = 'assets/images/taxi/2.png';
       fallbackIcon = Icons.electric_rickshaw_rounded;
     }
 
@@ -1355,31 +1031,3 @@ class _QuickLocationCard extends StatelessWidget {
   }
 }
 
-class _DottedVerticalLinePainter extends CustomPainter {
-  final Color color;
-  const _DottedVerticalLinePainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 1.8
-      ..strokeCap = StrokeCap.round;
-
-    double startY = 0;
-    const dashHeight = 3.0;
-    const dashSpace = 3.0;
-
-    while (startY < size.height) {
-      canvas.drawLine(
-        Offset(size.width / 2, startY),
-        Offset(size.width / 2, startY + dashHeight),
-        paint,
-      );
-      startY += dashHeight + dashSpace;
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}

@@ -188,7 +188,7 @@ class _DeliveryVehicleScreenState extends ConsumerState<DeliveryVehicleScreen> {
                       child: Opacity(
                         opacity: 0.20,
                         child: Image.asset(
-                          'assets/bottom_truck_bg.png',
+                          'assets/images/taxi/bottom_truck_bg.png',
                           height: 95,
                           fit: BoxFit.contain,
                           errorBuilder: (_, _, _) => const SizedBox.shrink(),
@@ -249,7 +249,7 @@ class _HeaderSection extends StatelessWidget {
             child: Opacity(
               opacity: 0.18,
               // child: Image.asset(
-              //   'assets/top_map_bg.png',
+              //   'assets/images/taxi/top_map_bg.png',
               //   fit: BoxFit.cover,
               //   errorBuilder: (_, _, _) => const SizedBox.shrink(),
               // ),
@@ -418,10 +418,10 @@ class _CategoryCardTile extends StatelessWidget {
 
     String assetToUse = category.assetImage;
     if (assetToUse.isEmpty) {
-      if (category.id == 'trucks') assetToUse = 'assets/truck_cat.png';
-      if (category.id == '2wheeler') assetToUse = 'assets/scooter_cat.png';
-      if (category.id == 'auto') assetToUse = 'assets/auto_cat.png';
-      if (category.id == 'movers') assetToUse = 'assets/movers_cat.png';
+      if (category.id == 'trucks') assetToUse = 'assets/images/taxi/truck_cat.png';
+      if (category.id == '2wheeler') assetToUse = 'assets/images/taxi/scooter_cat.png';
+      if (category.id == 'auto') assetToUse = 'assets/images/taxi/auto_cat.png';
+      if (category.id == 'movers') assetToUse = 'assets/images/taxi/movers_cat.png';
     }
 
     return Material(

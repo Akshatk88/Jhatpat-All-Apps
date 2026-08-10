@@ -117,10 +117,10 @@ class _FindingDriverScreenState extends ConsumerState<FindingDriverScreen>
 
   String _assetForVehicle(String iconType, String name) {
     final lower = (iconType + name).toLowerCase();
-    if (lower.contains('bike')) return 'assets/bike.png';
-    if (lower.contains('parcel')) return 'assets/parcel.png';
-    if (lower.contains('all') || lower.contains('cab')) return 'assets/allservice.png';
-    return 'assets/booknow.png';
+    if (lower.contains('bike')) return 'assets/images/taxi/bike.png';
+    if (lower.contains('parcel')) return 'assets/images/taxi/parcel.png';
+    if (lower.contains('all') || lower.contains('cab')) return 'assets/images/taxi/allservice.png';
+    return 'assets/images/taxi/booknow.png';
   }
 
   Widget _radarRing(double t) {
