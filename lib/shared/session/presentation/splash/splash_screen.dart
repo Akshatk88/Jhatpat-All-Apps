@@ -1,17 +1,19 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:superapp_user/app/routing/app_route_names.dart';
+import 'package:superapp_user/modules/module_registry.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   
   late Animation<double> _blobScale;      
@@ -64,12 +66,13 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     _animationController.forward().then((_) {
       Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted) {
-          // The super app opens on the hub so the user picks a service.
-          // (Previously this went straight into food's home, which was correct
-          // when food was the whole app.) Phase 7 moves this decision into
-          // SessionController's redirect, which will also handle onboarding,
-          // forced logout, maintenance and force-update.
-          context.go(AppRoutePaths.hub);
+          // Land in the first enabled module rather than on a separate hub
+          // screen: the service switcher is now pinned to the top of every
+          // module home, so an extra tap-through would be pure friction.
+          // Resolved from the registry, not hardcoded, so this still works if
+          // food is ever gated off. /hub stays routed for deep links.
+          final modules = ref.read(moduleRegistryProvider).enabled;
+          context.go(modules.isEmpty ? AppRoutePaths.hub : modules.first.entryRoute);
         }
       });
     });

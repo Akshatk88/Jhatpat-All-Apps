@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:superapp_user/app/shell/main_app_shell.dart';
+import 'package:superapp_user/app/shell/module_home_shell.dart';
+import 'package:superapp_user/modules/module_id.dart';
 import 'package:superapp_user/modules/food/data/models/cart_item_model.dart';
 import 'package:superapp_user/modules/food/data/models/food_model.dart';
 import 'package:superapp_user/modules/food/data/models/restaurant_model.dart';
@@ -50,7 +52,10 @@ List<RouteBase> foodRoutes(GlobalKey<NavigatorState> rootNavigatorKey) => [
               GoRoute(
                 name: FoodRouteNames.home,
                 path: FoodRoutePaths.home,
-                builder: (context, state) => const HomeScreen(),
+                builder: (context, state) => const ModuleHomeShell(
+                  moduleId: ModuleId.food,
+                  child: HomeScreen(),
+                ),
               ),
             ],
           ),

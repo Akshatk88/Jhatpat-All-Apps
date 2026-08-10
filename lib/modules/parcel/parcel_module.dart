@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:superapp_user/core/config/backend_ids.dart';
 import 'package:superapp_user/design_system/tokens/module_accent.dart';
+import 'package:superapp_user/app/shell/module_home_shell.dart';
 import 'package:superapp_user/modules/app_module.dart';
 import 'package:superapp_user/modules/module_id.dart';
 import 'package:superapp_user/modules/parcel/presentation/delivery_address_screen.dart';
@@ -69,7 +70,10 @@ class ParcelModule extends AppModule {
         GoRoute(
           name: ParcelRouteNames.home,
           path: ParcelRoutePaths.home,
-          builder: (context, state) => const NewDeliveryScreen(),
+          builder: (context, state) => const ModuleHomeShell(
+            moduleId: ModuleId.parcel,
+            child: NewDeliveryScreen(),
+          ),
         ),
         GoRoute(
           name: ParcelRouteNames.vehicles,

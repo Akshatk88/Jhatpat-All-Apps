@@ -16,6 +16,8 @@ import 'package:superapp_user/modules/taxi/ride/presentation/ride_chat_screen.da
 import 'package:superapp_user/modules/taxi/ride/presentation/ride_detail_screen.dart';
 import 'package:superapp_user/modules/taxi/ride/presentation/ride_history_screen.dart';
 import 'package:superapp_user/modules/taxi/ride/presentation/ride_tracking_screen.dart';
+import 'package:superapp_user/app/shell/module_home_shell.dart';
+import 'package:superapp_user/modules/module_id.dart';
 import 'package:superapp_user/modules/taxi/taxi_route_names.dart';
 
 /// The taxi module's route subtree.
@@ -28,7 +30,10 @@ List<RouteBase> taxiRoutes(GlobalKey<NavigatorState> rootNavigatorKey) => [
       GoRoute(
         name: TaxiRouteNames.home,
         path: TaxiRoutePaths.home,
-        builder: (context, state) => const TaxiHomeScreen(),
+        builder: (context, state) => const ModuleHomeShell(
+          moduleId: ModuleId.taxi,
+          child: TaxiHomeScreen(),
+        ),
       ),
       GoRoute(
         name: TaxiRouteNames.destination,
