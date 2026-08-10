@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import 'package:superapp_user/modules/app_module.dart';
 import 'package:superapp_user/modules/food/food_module.dart';
+import 'package:superapp_user/modules/parcel/parcel_module.dart';
+import 'package:superapp_user/modules/rental/rental_module.dart';
 import 'package:superapp_user/modules/taxi/taxi_module.dart';
 import 'package:superapp_user/modules/module_id.dart';
 
@@ -16,8 +18,8 @@ final moduleRegistryProvider = Provider<ModuleRegistry>((ref) {
   return const ModuleRegistry([
     FoodModule(),
     TaxiModule(),
-    // ParcelModule(),  <- Phase 6
-    // RentalModule(),  <- Phase 6
+    ParcelModule(),
+    RentalModule(),
   ]);
 });
 
