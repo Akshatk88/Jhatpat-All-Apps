@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/modules/food/data/models/order_model.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
 
@@ -28,7 +29,7 @@ class OrderStatusCard extends StatelessWidget {
       case 'reached_drop':
       case 'at_drop':
       case 'arriving_soon':
-        return (const Color(0xFFFF7A00), Icons.delivery_dining_rounded, 'On The Way', const Color(0xFFFF7A00).withValues(alpha: 0.1));
+        return (const Color(0xFFE5A600), Icons.delivery_dining_rounded, 'On The Way', const Color(0xFFFFB800).withValues(alpha: 0.1));
       case 'delivered':
       case 'completed':
         return (Colors.green, Icons.check_circle_rounded, 'Delivered', Colors.green.withValues(alpha: 0.1));
@@ -98,16 +99,16 @@ class OrderStatusCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  title,
+                  title.tr,
                   style: TextStyle(
                     fontSize: 18,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w600,
                     color: iconColor,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  subtitle,
+                  subtitle.tr,
                   style: TextStyle(
                     fontSize: 13,
                     color: isDark ? Colors.white70 : AppColors.textPrimaryLight.withValues(alpha: 0.8),

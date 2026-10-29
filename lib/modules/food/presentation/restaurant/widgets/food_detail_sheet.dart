@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -505,7 +506,7 @@ class _FoodDetailSheetBodyState extends ConsumerState<_FoodDetailSheetBody>
             style: TextStyle(
               color: Colors.white,
               fontSize: 12.sp,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],
@@ -517,7 +518,7 @@ class _FoodDetailSheetBodyState extends ConsumerState<_FoodDetailSheetBody>
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF3E8),
+        color: const Color(0xFFFFF8E1),
         borderRadius: BorderRadius.circular(20.r),
       ),
       child: Row(
@@ -529,8 +530,8 @@ class _FoodDetailSheetBodyState extends ConsumerState<_FoodDetailSheetBody>
             label,
             style: TextStyle(
               fontSize: 11.sp,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primary,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFFE5A600),
             ),
           ),
         ],
@@ -546,8 +547,8 @@ class _FoodDetailSheetBodyState extends ConsumerState<_FoodDetailSheetBody>
   ) {
     final badges = [
       if (food.isPopular)
-        _pillBadge('Bestseller', Icons.local_fire_department_rounded),
-      if (food.isSpicy) _pillBadge('Spicy', Icons.whatshot_rounded),
+        _pillBadge('Bestseller'.tr, Icons.local_fire_department_rounded),
+      if (food.isSpicy) _pillBadge('Spicy'.tr, Icons.whatshot_rounded),
     ];
 
     return Padding(
@@ -561,8 +562,8 @@ class _FoodDetailSheetBodyState extends ConsumerState<_FoodDetailSheetBody>
               widget.restaurantName!,
               style: TextStyle(
                 fontSize: 12.sp,
-                fontWeight: FontWeight.w600,
-                color: AppColors.primary,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFFE5A600),
               ),
             ),
             SizedBox(height: 4.h),
@@ -577,7 +578,7 @@ class _FoodDetailSheetBodyState extends ConsumerState<_FoodDetailSheetBody>
                   food.name,
                   style: TextStyle(
                     fontSize: 22.sp,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: textColor,
                     height: 1.2,
                   ),
@@ -591,8 +592,8 @@ class _FoodDetailSheetBodyState extends ConsumerState<_FoodDetailSheetBody>
                     '₹${food.price.toStringAsFixed(0)}',
                     style: TextStyle(
                       fontSize: 20.sp,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFFE5A600),
                     ),
                   ),
                   if (food.originalPrice != null) ...[
@@ -603,7 +604,7 @@ class _FoodDetailSheetBodyState extends ConsumerState<_FoodDetailSheetBody>
                           '₹${food.originalPrice!.toStringAsFixed(0)}',
                           style: TextStyle(
                             fontSize: 13.sp,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w500,
                             color: secondaryTextColor,
                             decoration: TextDecoration.lineThrough,
                           ),
@@ -615,15 +616,15 @@ class _FoodDetailSheetBodyState extends ConsumerState<_FoodDetailSheetBody>
                             vertical: 2.h,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFFF3E8),
+                            color: const Color(0xFFFFF8E1),
                             borderRadius: BorderRadius.circular(4.r),
                           ),
                           child: Text(
-                            '${food.discountPercent}% OFF',
+                            '{percent}% OFF'.trArgs({'percent': food.discountPercent}),
                             style: TextStyle(
                               fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFFE5A600),
                             ),
                           ),
                         ),
@@ -661,7 +662,7 @@ class _FoodDetailSheetBodyState extends ConsumerState<_FoodDetailSheetBody>
                       food.reviewCount > 0
                           ? '${food.rating.toStringAsFixed(1)} (${food.reviewCount})'
                           : food.rating.toStringAsFixed(1),
-                      'Ratings',
+                      'Ratings'.tr,
                       textColor,
                       secondaryTextColor,
                       isDark,
@@ -676,7 +677,7 @@ class _FoodDetailSheetBodyState extends ConsumerState<_FoodDetailSheetBody>
                       Icons.local_fire_department_rounded,
                       AppColors.primary,
                       '${food.calories} Kcal',
-                      'Calories',
+                      'Calories'.tr,
                       textColor,
                       secondaryTextColor,
                       isDark,
@@ -691,7 +692,7 @@ class _FoodDetailSheetBodyState extends ConsumerState<_FoodDetailSheetBody>
                       Icons.access_time_rounded,
                       secondaryTextColor,
                       food.deliveryTime,
-                      'Prep Time',
+                      'Prep Time'.tr,
                       textColor,
                       secondaryTextColor,
                       isDark,
@@ -736,7 +737,7 @@ class _FoodDetailSheetBodyState extends ConsumerState<_FoodDetailSheetBody>
                   value,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     fontSize: 12.sp,
                     color: textColor,
                   ),
@@ -773,7 +774,7 @@ class _FoodDetailSheetBodyState extends ConsumerState<_FoodDetailSheetBody>
                 title,
                 style: TextStyle(
                   fontSize: 15.sp,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   color: textColor,
                 ),
               ),
@@ -794,10 +795,10 @@ class _FoodDetailSheetBodyState extends ConsumerState<_FoodDetailSheetBody>
             borderRadius: BorderRadius.circular(20.r),
           ),
           child: Text(
-            required ? 'REQUIRED' : 'OPTIONAL',
+            required ? 'REQUIRED'.tr : 'OPTIONAL'.tr,
             style: TextStyle(
               fontSize: 10.sp,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
               color: required ? Colors.white : secondaryTextColor,
             ),
           ),
@@ -848,7 +849,7 @@ class _FoodDetailSheetBodyState extends ConsumerState<_FoodDetailSheetBody>
                     title,
                     style: TextStyle(
                       fontSize: 13.5.sp,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w500,
                       color: textColor,
                     ),
                   ),
@@ -872,7 +873,7 @@ class _FoodDetailSheetBodyState extends ConsumerState<_FoodDetailSheetBody>
               priceLabel,
               style: TextStyle(
                 fontSize: 12.5.sp,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w500,
                 color: secondaryTextColor,
               ),
             ),
@@ -931,8 +932,8 @@ class _FoodDetailSheetBodyState extends ConsumerState<_FoodDetailSheetBody>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _groupHeader(
-              title: 'Choose Size',
-              subtitle: 'Select 1 option',
+              title: 'Choose Size'.tr,
+              subtitle: 'Select 1 option'.tr,
               required: true,
               textColor: textColor,
               secondaryTextColor: secondaryTextColor,
@@ -943,7 +944,7 @@ class _FoodDetailSheetBodyState extends ConsumerState<_FoodDetailSheetBody>
               final isSelected = _selectedVariant?.name == variant.name;
               final delta = variant.price - food.price;
               final priceLabel = delta == 0
-                  ? 'Included'
+                  ? 'Included'.tr
                   : '${delta > 0 ? '+' : '-'}₹${delta.abs().toStringAsFixed(0)}';
               return _buildOptionRow(
                 title: variant.name,
@@ -1005,8 +1006,8 @@ class _FoodDetailSheetBodyState extends ConsumerState<_FoodDetailSheetBody>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _groupHeader(
-              title: 'Add Extras',
-              subtitle: 'Select any that you like',
+              title: 'Add Extras'.tr,
+              subtitle: 'Select any that you like'.tr,
               required: false,
               textColor: textColor,
               secondaryTextColor: secondaryTextColor,
@@ -1119,18 +1120,18 @@ class _FoodDetailSheetBodyState extends ConsumerState<_FoodDetailSheetBody>
                     children: [
                       Icon(
                         Icons.shopping_cart_outlined,
-                        color: Colors.white,
+                        color: const Color(0xFF121212),
                         size: 18.sp,
                       ),
                       SizedBox(width: 8.w),
                       Text(
                         widget.existingCartItem != null
-                            ? 'Update Cart • ₹${unitPrice.toStringAsFixed(0)}'
-                            : 'Add to Cart • ₹${unitPrice.toStringAsFixed(0)}',
+                            ? 'Update Cart • ₹{price}'.trArgs({'price': unitPrice.toStringAsFixed(0)})
+                            : 'Add to Cart • ₹{price}'.trArgs({'price': unitPrice.toStringAsFixed(0)}),
                         style: TextStyle(
-                          color: Colors.white,
+                          color: const Color(0xFF121212),
                           fontSize: 15.sp,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],

@@ -6,6 +6,7 @@ import 'package:superapp_user/modules/taxi/application/taxi_core_providers.dart'
 import 'package:superapp_user/core/maps/app_map_style.dart';
 import 'package:superapp_user/design_system/components/ride/primary_button.dart';
 import 'package:superapp_user/modules/taxi/home/application/home_providers.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 const _fallbackLatLng = LatLng(22.7196, 75.8577); // Indore center
 
@@ -43,6 +44,7 @@ class _MapPickerScreenState extends ConsumerState<MapPickerScreen> {
     final target = LatLng(position.latitude, position.longitude);
     setState(() => _center = target);
     _controller?.animateCamera(CameraUpdate.newLatLngZoom(target, 16.5));
+    _resolveAddress(target);
   }
 
   Future<void> _recenterToCurrentLocation() async {
@@ -51,6 +53,7 @@ class _MapPickerScreenState extends ConsumerState<MapPickerScreen> {
     final target = LatLng(position.latitude, position.longitude);
     setState(() => _center = target);
     _controller?.animateCamera(CameraUpdate.newLatLngZoom(target, 16.5));
+    _resolveAddress(target);
   }
 
   Future<void> _resolveAddress(LatLng point) async {
@@ -76,7 +79,7 @@ class _MapPickerScreenState extends ConsumerState<MapPickerScreen> {
 
   void _onCameraIdle() {
     _debounceTimer?.cancel();
-    _debounceTimer = Timer(const Duration(milliseconds: 1500), () {
+    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
       _resolveAddress(_center);
     });
   }
@@ -121,18 +124,18 @@ class _MapPickerScreenState extends ConsumerState<MapPickerScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: isPickup ? const Color(0xFF10B981) : const Color(0xFFFF5200),
+                      color: isPickup ? const Color(0xFF10B981) : const Color(0xFFFFB800),
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: const [
                         BoxShadow(color: Colors.black26, blurRadius: 4),
                       ],
                     ),
                     child: Text(
-                      isPickup ? 'Set Pickup' : 'Set Drop',
-                      style: const TextStyle(
-                        color: Colors.white,
+                      isPickup ? 'Set Pickup'.tr : 'Set Drop'.tr,
+                      style: TextStyle(
+                        color: isPickup ? Colors.white : const Color(0xFF121212),
                         fontSize: 11,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
@@ -140,7 +143,7 @@ class _MapPickerScreenState extends ConsumerState<MapPickerScreen> {
                   Icon(
                     Icons.location_on_rounded,
                     size: 46,
-                    color: isPickup ? const Color(0xFF10B981) : const Color(0xFFFF5200),
+                    color: isPickup ? const Color(0xFF10B981) : const Color(0xFFE5A600),
                   ),
                   Container(
                     width: 8,
@@ -163,9 +166,13 @@ class _MapPickerScreenState extends ConsumerState<MapPickerScreen> {
                 color: cardBgColor,
                 shape: const CircleBorder(),
                 elevation: 3,
-                child: IconButton(
-                  icon: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: textPrimary),
-                  onPressed: () => Navigator.of(context).maybePop(),
+                child: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: () => Navigator.of(context).maybePop(),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: textPrimary),
+                  ),
                 ),
               ),
             ),
@@ -182,7 +189,7 @@ class _MapPickerScreenState extends ConsumerState<MapPickerScreen> {
               onPressed: _recenterToCurrentLocation,
               child: const Icon(
                 Icons.my_location_rounded,
-                color: Color(0xFFFF5200),
+                color: Color(0xFFE5A600),
                 size: 24,
               ),
             ),
@@ -191,59 +198,81 @@ class _MapPickerScreenState extends ConsumerState<MapPickerScreen> {
           // --- BOTTOM ADDRESS & CONFIRM CARD ---
           Align(
             alignment: Alignment.bottomCenter,
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
-              decoration: BoxDecoration(
-                color: cardBgColor,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.08),
-                    blurRadius: 16,
-                    offset: const Offset(0, -4),
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    isPickup ? 'Set pickup point' : 'Set drop point',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      color: textPrimary,
+            child: SafeArea(
+              top: false,
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+                decoration: BoxDecoration(
+                  color: cardBgColor,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.08),
+                      blurRadius: 16,
+                      offset: const Offset(0, -4),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  _resolving
-                      ? const SizedBox(
-                          height: 18,
-                          width: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFFF5200)),
-                        )
-                      : Text(
-                          _address,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: textSecondary,
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isPickup ? 'Set pickup point'.tr : 'Set drop point'.tr,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    _resolving
+                        ? const SizedBox(
+                            height: 18,
+                            width: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFFFB800)),
+                          )
+                        : Text(
+                            _address.tr,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: textSecondary,
+                            ),
                           ),
-                        ),
-                  const SizedBox(height: 16),
-                  TaxiPrimaryButton(
-                    label: 'Confirm ${isPickup ? 'pickup' : 'drop'}',
-                    onPressed: _resolving
-                        ? null
-                        : () => Navigator.of(context).pop({
-                              'type': widget.type,
-                              'lat': _center.latitude,
-                              'lng': _center.longitude,
-                              'address': _address,
-                            }),
-                  ),
-                ],
+                    const SizedBox(height: 16),
+                    TaxiPrimaryButton(
+                      label: isPickup ? 'Confirm pickup'.tr : 'Confirm drop'.tr,
+                      onPressed: _resolving
+                          ? null
+                          : () async {
+                              final navigator = Navigator.of(context);
+                              String finalAddr = _address;
+                              if (finalAddr == 'Move the map to set location' || finalAddr.trim().isEmpty) {
+                                try {
+                                  final service = ref.read(taxiLocationServiceProvider);
+                                  final resolved = await service.getAddressFromCoordinates(_center.latitude, _center.longitude);
+                                  if (resolved.isNotEmpty) {
+                                    finalAddr = resolved;
+                                  } else {
+                                    finalAddr = '${_center.latitude.toStringAsFixed(5)}, ${_center.longitude.toStringAsFixed(5)}';
+                                  }
+                                } catch (_) {
+                                  finalAddr = '${_center.latitude.toStringAsFixed(5)}, ${_center.longitude.toStringAsFixed(5)}';
+                                }
+                              }
+                              if (mounted) {
+                                navigator.pop({
+                                  'type': widget.type,
+                                  'lat': _center.latitude,
+                                  'lng': _center.longitude,
+                                  'address': finalAddr,
+                                });
+                              }
+                            },
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
 
 class FireParticleShareButton extends StatefulWidget {
@@ -50,14 +51,14 @@ class _FireParticleShareButtonState extends State<FireParticleShareButton>
           height: 52.h,
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [Color(0xFFFF7A00), Color(0xFFFF9900)],
+              colors: [Color(0xFFFFB800), Color(0xFFFFC72C)],
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
             ),
             borderRadius: BorderRadius.circular(26.r),
             boxShadow: const [
               BoxShadow(
-                color: Color(0x66FF7A00),
+                color: Color(0x66FFB800),
                 blurRadius: 16,
                 offset: Offset(0, 6),
               ),
@@ -66,15 +67,19 @@ class _FireParticleShareButtonState extends State<FireParticleShareButton>
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.share_rounded, color: Colors.white, size: 20.sp),
+              Icon(Icons.share_rounded, color: Colors.black, size: 20.sp),
               SizedBox(width: 10.w),
-              Text(
-                'SHARE YOUR TICKET',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1.1,
+              Flexible(
+                child: Text(
+                  'SHARE YOUR TICKET'.tr,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.1,
+                  ),
                 ),
               ),
             ],

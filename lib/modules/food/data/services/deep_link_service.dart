@@ -1,16 +1,17 @@
 import 'package:superapp_user/core/config/app_constants.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 /// Business logic and utility for product deep linking and sharing.
 ///
 /// Follows Clean Architecture guidelines (Domain layer — framework independent).
 class DeepLinkService {
-  static const String appScheme = 'suvio';
+  static const String appScheme = 'JhatPat';
 
   /// The host shared links are built on.
   ///
-  /// Shared links MUST be https, not the suvio:// custom scheme. WhatsApp, SMS,
+  /// Shared links MUST be https, not the justorder:// custom scheme. WhatsApp, SMS,
   /// Instagram and most other chat apps only turn http(s) URLs into tappable
-  /// links — a suvio:// URL is delivered as inert plain text, which is exactly
+  /// links — a justorder:// URL is delivered as inert plain text, which is exactly
   /// what "the link isn't working" was. https also degrades usefully: a
   /// recipient without the app installed lands on the web page instead of an
   /// error, and the link previews with a title and image.
@@ -19,10 +20,11 @@ class DeepLinkService {
   /// silently pointing testers at production.
   static const String webHost = AppConstants.hostUrl;
 
-  static const String playStoreUrl =
-      'https://play.google.com/store/apps/details?id=com.k9bharat.user';
+  static String get playStoreUrl =>
+      'https://play.google.com/store/apps/details?id=${AppConstants.packageName}';
   static const String appStoreUrl =
-      'https://apps.apple.com/app/suvio-food/id123456789';
+      // No iOS listing yet: send iPhone users to the website.
+      'https://jhatpattaxi.com';
 
   /// Deep link to a single dish.
   ///
@@ -63,9 +65,9 @@ class DeepLinkService {
       restaurantId: restaurantId,
     );
     final prefix = (restaurantName != null && restaurantName.isNotEmpty)
-        ? 'Check out "$productName" from $restaurantName on Suvio!'
-        : 'Check out "$productName" on Suvio!';
-    return '$prefix\n\nOrder now on Suvio:\n$link';
+        ? 'Check out "{product}" from {restaurant} on JhatPat!'.trArgs({'product': productName, 'restaurant': restaurantName})
+        : 'Check out "{product}" on JhatPat!'.trArgs({'product': productName});
+    return '$prefix\n\n${'Order now on JhatPat:'.tr}\n$link';
   }
 
   /// Generates human-friendly share text for a restaurant.
@@ -78,12 +80,12 @@ class DeepLinkService {
     final descriptor = (cuisines != null && cuisines.isNotEmpty)
         ? '$restaurantName ($cuisines)'
         : restaurantName;
-    return 'Check out $descriptor on Suvio!\n\nOrder now on Suvio:\n$link';
+    return '${'Check out {name} on JhatPat!'.trArgs({'name': descriptor})}\n\n${'Order now on JhatPat:'.tr}\n$link';
   }
 
   /// Parses a deep link Uri to extract product ID and restaurant ID.
   ///
-  /// Accepts both the https form now shared and the legacy suvio:// form, which
+  /// Accepts both the https form now shared and the legacy justorder:// form, which
   /// links already sent out in the wild still use. In a custom-scheme URI the
   /// first segment lands in `host` rather than `path`, so both are checked.
   static ({String? productId, String? restaurantId}) parseDeepLink(Uri uri) {
@@ -106,7 +108,7 @@ class DeepLinkService {
     if (segments.length >= 2 && segments.first == 'restaurant-detail') {
       return segments[1].isEmpty ? null : segments[1];
     }
-    // Custom-scheme form: suvio://restaurant-detail/<id>
+    // Custom-scheme form: justorder://restaurant-detail/<id>
     if (uri.host == 'restaurant-detail' && segments.isNotEmpty) {
       return segments.first.isEmpty ? null : segments.first;
     }

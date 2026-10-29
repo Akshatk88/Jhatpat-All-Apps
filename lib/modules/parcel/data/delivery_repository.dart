@@ -79,13 +79,35 @@ class DeliveryRepository {
     required List<double> drop,
     String? category,
   }) async {
-    final data = await api.post('${ApiConstants.deliveries}/quote', data: {
+    // There is no `/deliveries/quote`: the backend quotes every transport
+    // type through `POST /rides/quote`, returning `{ quotes: [{ vehicleTypeId,
+    // available, fare: { subtotal, serviceTax, serviceTaxPercent, total } ,
+    // measuredDistanceMeters }] }`.
+    final data = await api.post('${ApiConstants.rides}/quote', data: {
       'vehicleTypeId': vehicleTypeId,
+      'vehicleTypeIds': [vehicleTypeId],
       'pickup': pickup,
       'drop': drop,
-      if (category != null && category.isNotEmpty) 'parcel': {'category': category},
+      'transport_type': 'delivery',
     });
-    return DeliveryQuote.fromJson(Map<String, dynamic>.from(data as Map));
+    final quotes = (data is Map ? data['quotes'] : null) as List? ?? const [];
+    final row = quotes.whereType<Map>().firstWhere(
+          (q) => q['available'] == true && q['fare'] is Map,
+          orElse: () => const {},
+        );
+    final fare = row['fare'];
+    if (fare is! Map) throw StateError('No delivery fare for this vehicle');
+    double d(dynamic v) => double.tryParse('${v ?? 0}') ?? 0;
+    return DeliveryQuote(
+      vehicleTypeId: (row['vehicleTypeId'] ?? vehicleTypeId).toString(),
+      vehicleName: '',
+      distanceKm: double.parse((d(row['measuredDistanceMeters']) / 1000).toStringAsFixed(1)),
+      baseDistanceKm: 0,
+      subtotal: d(fare['subtotal']),
+      serviceTaxPercentage: d(fare['serviceTaxPercent']),
+      serviceTaxAmount: d(fare['serviceTax']),
+      total: d(fare['total']),
+    );
   }
 
   Future<DeliveryModel?> getActiveDelivery() async {
@@ -101,7 +123,7 @@ class DeliveryRepository {
 
   Future<List<DeliveryModel>> listMyDeliveries() async {
     final data = await api.get(ApiConstants.deliveries);
-    final results = (data['results'] as List? ?? []);
-    return results.map((e) => DeliveryModel.fromJson(Map<String, dynamic>.from(e))).toList();
+    final results = (data is Map ? data['results'] : data) as List? ?? const [];
+    return results.whereType<Map>().map((e) => DeliveryModel.fromJson(Map<String, dynamic>.from(e))).toList();
   }
 }

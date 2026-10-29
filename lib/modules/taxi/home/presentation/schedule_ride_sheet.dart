@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:superapp_user/design_system/components/ride/primary_button.dart';
 import 'package:superapp_user/design_system/components/ride/secondary_button.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 class ScheduleRideSheet extends StatefulWidget {
   final DateTime? initial;
@@ -44,23 +45,23 @@ class _ScheduleRideSheetState extends State<ScheduleRideSheet> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Ride later', style: Theme.of(context).textTheme.titleLarge),
+        Text('Ride later'.tr, style: Theme.of(context).textTheme.titleLarge),
         const SizedBox(height: 8),
         Text(
           _selected != null
-              ? '${_selected!.day}/${_selected!.month}/${_selected!.year} at ${TimeOfDay.fromDateTime(_selected!).format(context)}'
-              : 'Pick a date & time for your ride',
+              ? '{date} at {time}'.trArgs({'date': '${_selected!.day}/${_selected!.month}/${_selected!.year}', 'time': TimeOfDay.fromDateTime(_selected!).format(context)})
+              : 'Pick a date & time for your ride'.tr,
           style: Theme.of(context).textTheme.bodyMedium,
         ),
         const SizedBox(height: 16),
-        TaxiSecondaryButton(label: 'Choose date & time', onPressed: _pick),
+        TaxiSecondaryButton(label: 'Choose date & time'.tr, onPressed: _pick),
         const SizedBox(height: 20),
         Row(
           children: [
             if (_selected != null) ...[
               Expanded(
                 child: TaxiSecondaryButton(
-                  label: 'Ride now instead',
+                  label: 'Ride now instead'.tr,
                   onPressed: () => Navigator.of(context).pop(null),
                 ),
               ),
@@ -68,7 +69,7 @@ class _ScheduleRideSheetState extends State<ScheduleRideSheet> {
             ],
             Expanded(
               child: TaxiPrimaryButton(
-                label: 'Confirm',
+                label: 'Confirm'.tr,
                 onPressed: _selected == null ? null : () => Navigator.of(context).pop(_selected),
               ),
             ),

@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:superapp_user/core/error/failures.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/modules/food/api/datasources/address_remote_datasource.dart';
 import 'package:superapp_user/shared/address/data/address_model.dart';
 import 'package:superapp_user/shared/address/application/address_providers.dart';
@@ -112,7 +113,7 @@ class AddressViewModel extends Notifier<List<AddressModel>> {
   }
 
   String _messageOf(Object e) =>
-      e is Failure ? e.message : 'Something went wrong. Please try again.';
+      e is Failure ? e.message : 'Something went wrong. Please try again.'.tr;
 
   void _log(String msg) {
     if (kDebugMode) developer.log(msg, name: 'Address');

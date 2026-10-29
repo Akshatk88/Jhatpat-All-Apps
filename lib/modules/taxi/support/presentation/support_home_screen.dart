@@ -6,6 +6,7 @@ import 'package:superapp_user/core/utils/taxi_formatters.dart';
 import 'package:superapp_user/design_system/components/ride/custom_app_bar.dart';
 import 'package:superapp_user/design_system/components/ride/empty_state.dart';
 import 'package:superapp_user/modules/taxi/support/application/support_providers.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 const _faqs = [
   {
@@ -34,7 +35,7 @@ class SupportHomeScreen extends ConsumerWidget {
     final ticketsAsync = ref.watch(myTicketsProvider);
 
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Help & support'),
+      appBar: CustomAppBar(title: 'Help & support'.tr),
       body: RefreshIndicator(
         onRefresh: () async => ref.invalidate(myTicketsProvider),
         child: ListView(
@@ -43,42 +44,42 @@ class SupportHomeScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: TaxiColors.primaryGradient),
+                gradient: const LinearGradient(colors: [TaxiColors.primary, TaxiColors.primaryDark]),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.shield_rounded, color: Colors.white, size: 32),
+                  const Icon(Icons.shield_rounded, color: Color(0xFF121212), size: 32),
                   const SizedBox(width: 14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Safety center',
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16)),
+                        Text('Safety center'.tr,
+                            style: const TextStyle(color: Color(0xFF121212), fontWeight: FontWeight.w600, fontSize: 16)),
                         const SizedBox(height: 4),
-                        Text('Emergency contacts, SOS & trip safety',
-                            style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 13)),
+                        Text('Emergency contacts, SOS & trip safety'.tr,
+                            style: TextStyle(color: Colors.black54, fontSize: 13)),
                       ],
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.chevron_right_rounded, color: Colors.white),
+                    icon: const Icon(Icons.chevron_right_rounded, color: Color(0xFF121212)),
                     onPressed: () => context.push('/taxi/support/safety'),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 20),
-            Text('Frequently asked questions', style: Theme.of(context).textTheme.titleLarge),
+            Text('Frequently asked questions'.tr, style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 8),
             ...(_faqs.map((faq) => ExpansionTile(
                   tilePadding: EdgeInsets.zero,
-                  title: Text(faq['q']!, style: Theme.of(context).textTheme.titleMedium),
+                  title: Text(faq['q']!.tr, style: Theme.of(context).textTheme.titleMedium),
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(bottom: 12),
-                      child: Text(faq['a']!, style: Theme.of(context).textTheme.bodyMedium),
+                      child: Text(faq['a']!.tr, style: Theme.of(context).textTheme.bodyMedium),
                     ),
                   ],
                 ))),
@@ -86,23 +87,30 @@ class SupportHomeScreen extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('My tickets', style: Theme.of(context).textTheme.titleLarge),
+                Flexible(
+                  child: Text(
+                    'My tickets'.tr,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                ),
                 TextButton.icon(
                   onPressed: () => context.push('/taxi/support/tickets/new'),
                   icon: const Icon(Icons.add_rounded, size: 18),
-                  label: const Text('Raise ticket'),
+                  label: Text('Raise ticket'.tr),
                 ),
               ],
             ),
             const SizedBox(height: 4),
             ticketsAsync.when(
               data: (tickets) => tickets.isEmpty
-                  ? const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16),
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                       child: EmptyState(
                         icon: Icons.confirmation_number_outlined,
-                        title: 'No support tickets',
-                        message: 'Raise a ticket if you need help with a ride, payment or anything else.',
+                        title: 'No support tickets'.tr,
+                        message: 'Raise a ticket if you need help with a ride, payment or anything else.'.tr,
                       ),
                     )
                   : Column(
@@ -127,9 +135,9 @@ class SupportHomeScreen extends ConsumerWidget {
                 padding: EdgeInsets.symmetric(vertical: 24),
                 child: Center(child: CircularProgressIndicator()),
               ),
-              error: (_, _) => const Padding(
-                padding: EdgeInsets.symmetric(vertical: 16),
-                child: Text('Could not load your tickets'),
+              error: (_, _) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Text('Could not load your tickets'.tr),
               ),
             ),
           ],

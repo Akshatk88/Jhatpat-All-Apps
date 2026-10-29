@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -37,6 +38,10 @@ class PopularItemsList extends ConsumerWidget {
     final eligibleFoods = foods.where((f) => f.price <= 99.0).toList();
     if (eligibleFoods.isEmpty) return const SizedBox.shrink();
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    // Each card's three text lines grow with the system font scale; give
+    // every row that extra room so the cards don't overflow at large text.
+    final textGrowth = MediaQuery.textScalerOf(context).scale(42.sp) - 42.sp;
+    final rowGrowth = textGrowth > 0 ? textGrowth : 0.0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,49 +62,55 @@ class PopularItemsList extends ConsumerWidget {
                   child: Text(
                     '99',
                     style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w900,
+                      color: const Color(0xFF121212),
+                      fontWeight: FontWeight.w700,
                       fontSize: 15.sp,
                     ),
                   ),
                 ),
               ),
               SizedBox(width: 8.w),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '99 STORE',
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.primary,
-                      letterSpacing: 0.5,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '99 STORE'.tr,
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFFE5A600),
+                        letterSpacing: 0.5,
+                      ),
                     ),
-                  ),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.check_circle_rounded,
-                        color: AppColors.primary,
-                        size: 12.sp,
-                      ),
-                      SizedBox(width: 3.w),
-                      Text(
-                        'Meals at ₹99 + Free Delivery',
-                        style: TextStyle(
-                          fontSize: 11.sp,
-                          fontWeight: FontWeight.w600,
-                          color: isDark
-                              ? AppColors.textSecondaryDark
-                              : AppColors.textPrimaryLight,
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.check_circle_rounded,
+                          color: AppColors.primary,
+                          size: 12.sp,
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                        SizedBox(width: 3.w),
+                        Flexible(
+                          child: Text(
+                            'Meals at ₹99 + Free Delivery'.tr,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 11.sp,
+                              fontWeight: FontWeight.w500,
+                              color: isDark
+                                  ? AppColors.textSecondaryDark
+                                  : AppColors.textPrimaryLight,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              const Spacer(),
+              SizedBox(width: 8.w),
               InkWell(
                 onTap: () {
                   Haptics.light();
@@ -108,10 +119,10 @@ class PopularItemsList extends ConsumerWidget {
                 child: Row(
                   children: [
                     Text(
-                      'View All',
+                      'View All'.tr,
                       style: TextStyle(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFFE5A600),
+                        fontWeight: FontWeight.w600,
                         fontSize: 12.5.sp,
                       ),
                     ),
@@ -130,7 +141,7 @@ class PopularItemsList extends ConsumerWidget {
 
         // 2-row horizontal-scrolling grid
         SizedBox(
-          height: _cardHeight.h * 2 + 10.h,
+          height: (_cardHeight.h + rowGrowth) * 2 + 10.h,
           child: GridView.builder(
             padding: EdgeInsets.symmetric(horizontal: 16.w),
             scrollDirection: Axis.horizontal,
@@ -271,7 +282,7 @@ class _Home99ProductCardState extends ConsumerState<_Home99ProductCard> {
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 10.5.sp,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ],
@@ -372,8 +383,8 @@ class _Home99ProductCardState extends ConsumerState<_Home99ProductCard> {
                                     Text(
                                       '$quantity',
                                       style: TextStyle(
-                                        color: AppColors.primary,
-                                        fontWeight: FontWeight.w900,
+                                        color: const Color(0xFFE5A600),
+                                        fontWeight: FontWeight.w700,
                                         fontSize: 12.5.sp,
                                       ),
                                     ),
@@ -423,7 +434,7 @@ class _Home99ProductCardState extends ConsumerState<_Home99ProductCard> {
                     widget.food.name,
                     style: TextStyle(
                       fontSize: 12.sp,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       color: widget.isDark
                           ? AppColors.textPrimaryDark
                           : AppColors.textPrimaryLight,
@@ -457,8 +468,8 @@ class _Home99ProductCardState extends ConsumerState<_Home99ProductCard> {
                     '₹${widget.food.price.toStringAsFixed(0)}',
                     style: TextStyle(
                       fontSize: 13.sp,
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w900,
+                      color: const Color(0xFFE5A600),
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ],

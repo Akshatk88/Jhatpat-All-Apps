@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:superapp_user/app/routing/app_route_names.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/app/routing/route_names.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
 import 'package:superapp_user/design_system/components/feedback/app_snackbar.dart';
@@ -12,9 +14,9 @@ import 'package:superapp_user/shared/auth/presentation/viewmodels/auth_viewmodel
 import 'package:superapp_user/shared/address/presentation/viewmodels/address_viewmodel.dart';
 import 'package:superapp_user/modules/food/presentation/coupons/viewmodels/coupons_viewmodel.dart';
 import 'package:superapp_user/shared/profile/presentation/viewmodels/notifications_viewmodel.dart';
+import 'package:superapp_user/shared/profile/presentation/push_test_screen.dart';
 import 'package:superapp_user/modules/food/presentation/orders/viewmodels/orders_viewmodel.dart';
 import 'package:superapp_user/shared/wallet/presentation/viewmodels/wallet_viewmodel.dart';
-import 'package:superapp_user/design_system/theme/theme_color_provider.dart';
 import 'package:superapp_user/design_system/theme/theme_provider.dart';
 import 'package:superapp_user/modules/food/presentation/home/viewmodels/veg_filter_provider.dart';
 
@@ -54,7 +56,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+          // Tablets / desktop: keep the cards a readable width, centred.
+          padding: EdgeInsets.fromLTRB(
+            MediaQuery.sizeOf(context).width > 760
+                ? (MediaQuery.sizeOf(context).width - 720) / 2
+                : 20,
+            12,
+            MediaQuery.sizeOf(context).width > 760
+                ? (MediaQuery.sizeOf(context).width - 720) / 2
+                : 20,
+            28,
+          ),
           children: [
             // 1. Header
             _buildHeader(context, textColor, secondaryColor, isLoggedIn),
@@ -166,18 +178,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Profile',
+                'Profile'.tr,
                 style: TextStyle(
                   fontSize: 26,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   color: textColor,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 isLoggedIn
-                    ? 'Manage your account, orders & preferences'
-                    : 'Log in to unlock orders, addresses & rewards',
+                    ? 'Manage your account, orders & preferences'.tr
+                    : 'Log in to unlock orders, addresses & rewards'.tr,
                 style: TextStyle(fontSize: 13, color: secondaryColor),
               ),
             ],
@@ -198,10 +210,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.cardDark : const Color(0xFFFDF3E7),
+        color: isDark ? AppColors.cardDark : const Color(0xFFFFF8E1),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: const Color(0xFFFF7A00).withValues(alpha: 0.25),
+          color: const Color(0xFFFFB800).withValues(alpha: 0.25),
           width: 1,
         ),
       ),
@@ -215,10 +227,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     width: 64,
                     height: 64,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFF7A00).withValues(alpha: 0.15),
+                      color: const Color(0xFFFFB800).withValues(alpha: 0.15),
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: const Color(0xFFFF7A00),
+                        color: const Color(0xFFFFB800),
                         width: 2,
                       ),
                     ),
@@ -229,7 +241,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               fit: BoxFit.cover,
                               errorBuilder: (_, _, _) => const Icon(
                                 Icons.person_rounded,
-                                color: Color(0xFFFF7A00),
+                                color: Color(0xFFFFB800),
                                 size: 34,
                               ),
                             ),
@@ -247,7 +259,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                           fit: BoxFit.cover,
                                           errorBuilder: (_, _, _) => const Icon(
                                             Icons.person_rounded,
-                                            color: Color(0xFFFF7A00),
+                                            color: Color(0xFFFFB800),
                                             size: 34,
                                           ),
                                         )),
@@ -264,12 +276,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       child: Container(
                         padding: const EdgeInsets.all(4),
                         decoration: const BoxDecoration(
-                          color: Color(0xFFFF7A00),
+                          color: Color(0xFFFFB800),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
                           Icons.camera_alt,
-                          color: Colors.white,
+                          color: Colors.black,
                           size: 12,
                         ),
                       ),
@@ -283,10 +295,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      user?.name ?? 'User',
+                      user?.name ?? 'User'.tr,
                       style: TextStyle(
                         fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                         color: textColor,
                       ),
                     ),
@@ -311,7 +323,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             height: 38,
             child: OutlinedButton.icon(
               style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Color(0xFFFF7A00)),
+                side: const BorderSide(color: Color(0xFFFFB800)),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -323,14 +335,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               icon: const Icon(
                 Icons.edit_outlined,
                 size: 16,
-                color: Color(0xFFFF7A00),
+                color: Color(0xFFE5A600),
               ),
-              label: const Text(
-                'Edit Profile',
+              label: Text(
+                'Edit Profile'.tr,
                 style: TextStyle(
-                  color: Color(0xFFFF7A00),
+                  color: textColor,
                   fontSize: 13,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
@@ -350,10 +362,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.cardDark : const Color(0xFFFDF3E7),
+        color: isDark ? AppColors.cardDark : const Color(0xFFFFF8E1),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: const Color(0xFFFF7A00).withValues(alpha: 0.3),
+          color: const Color(0xFFFFB800).withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -366,12 +378,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFF7A00).withValues(alpha: 0.12),
+                  color: const Color(0xFFFFB800).withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   Icons.person_outline_rounded,
-                  color: Color(0xFFFF7A00),
+                  color: Color(0xFFFFB800),
                   size: 30,
                 ),
               ),
@@ -381,16 +393,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Guest User',
+                      'Guest User'.tr,
                       style: TextStyle(
                         fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                         color: textColor,
                       ),
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      'Sign in to access your orders, saved addresses & profile details.',
+                      'Sign in to access your orders, saved addresses & profile details.'.tr,
                       style: TextStyle(
                         fontSize: 12.5,
                         color: secondaryColor,
@@ -408,7 +420,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             height: 44,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFF7A00),
+                backgroundColor: const Color(0xFFFFB800),
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -420,12 +432,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   '${RouteNames.login}?from=${Uri.encodeComponent(RouteNames.profile)}',
                 );
               },
-              child: const Text(
-                'LOG IN / SIGN UP',
-                style: TextStyle(
-                  color: Colors.white,
+              child: Text(
+                'LOG IN / SIGN UP'.tr,
+                style: const TextStyle(
+                  color: Colors.black,
                   fontSize: 14,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   letterSpacing: 0.5,
                 ),
               ),
@@ -476,22 +488,27 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     width: 42,
                     height: 42,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFF7A00).withValues(alpha: 0.12),
+                      color: const Color(0xFFFFB800).withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
                       Icons.account_balance_wallet_outlined,
-                      color: Color(0xFFFF7A00),
+                      color: Color(0xFFFFB800),
                       size: 20,
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: Column(
+                    child: // One line, shrunk to fit: the half-width tiles are too narrow for
+                    // "View Balance" / "Saved Addresses", which used to break mid-word.
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Wallet',
+                          'Wallet'.tr,
                           style: TextStyle(
                             fontSize: 11.5,
                             color: secondaryColor,
@@ -499,19 +516,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          isLoggedIn ? '₹${walletBalance.toStringAsFixed(2)}' : 'View Balance',
+                          isLoggedIn ? '₹${walletBalance.toStringAsFixed(2)}' : 'View Balance'.tr,
                           style: TextStyle(
                             fontSize: 14.5,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: textColor,
                           ),
                         ),
                       ],
                     ),
+                    ),
                   ),
                   const Icon(
                     Icons.chevron_right_rounded,
-                    color: Color(0xFFFF7A00),
+                    color: Color(0xFFFFB800),
                     size: 16,
                   ),
                 ],
@@ -538,22 +556,27 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     width: 42,
                     height: 42,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFF7A00).withValues(alpha: 0.12),
+                      color: const Color(0xFFFFB800).withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
                       Icons.local_offer_rounded,
-                      color: Color(0xFFFF7A00),
+                      color: Color(0xFFFFB800),
                       size: 20,
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: Column(
+                    child: // One line, shrunk to fit: the half-width tiles are too narrow for
+                    // "View Balance" / "Saved Addresses", which used to break mid-word.
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Coupons',
+                          'Coupons'.tr,
                           style: TextStyle(
                             fontSize: 11.5,
                             color: secondaryColor,
@@ -561,19 +584,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          '$couponCount Active',
+                          '{count} Active'.trArgs({'count': couponCount}),
                           style: TextStyle(
                             fontSize: 15,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: textColor,
                           ),
                         ),
                       ],
                     ),
+                    ),
                   ),
                   const Icon(
                     Icons.chevron_right_rounded,
-                    color: Color(0xFFFF7A00),
+                    color: Color(0xFFFFB800),
                     size: 16,
                   ),
                 ],
@@ -624,22 +648,27 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     width: 42,
                     height: 42,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFF7A00).withValues(alpha: 0.12),
+                      color: const Color(0xFFFFB800).withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
                       Icons.shopping_cart_outlined,
-                      color: Color(0xFFFF7A00),
+                      color: Color(0xFFFFB800),
                       size: 20,
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: Column(
+                    child: // One line, shrunk to fit: the half-width tiles are too narrow for
+                    // "View Balance" / "Saved Addresses", which used to break mid-word.
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'My Cart',
+                          'My Cart'.tr,
                           style: TextStyle(
                             fontSize: 11.5,
                             color: secondaryColor,
@@ -647,19 +676,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'View Cart',
+                          'View Cart'.tr,
                           style: TextStyle(
                             fontSize: 14.5,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: textColor,
                           ),
                         ),
                       ],
                     ),
+                    ),
                   ),
                   const Icon(
                     Icons.chevron_right_rounded,
-                    color: Color(0xFFFF7A00),
+                    color: Color(0xFFFFB800),
                     size: 16,
                   ),
                 ],
@@ -692,22 +722,27 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     width: 42,
                     height: 42,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFF7A00).withValues(alpha: 0.12),
+                      color: const Color(0xFFFFB800).withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
                       Icons.location_on_outlined,
-                      color: Color(0xFFFF7A00),
+                      color: Color(0xFFFFB800),
                       size: 20,
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: Column(
+                    child: // One line, shrunk to fit: the half-width tiles are too narrow for
+                    // "View Balance" / "Saved Addresses", which used to break mid-word.
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Saved Addresses',
+                          'Saved Addresses'.tr,
                           style: TextStyle(
                             fontSize: 11.5,
                             color: secondaryColor,
@@ -715,19 +750,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          '$addressCount Saved',
+                          '{count} Saved'.trArgs({'count': addressCount}),
                           style: TextStyle(
                             fontSize: 14.5,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: textColor,
                           ),
                         ),
                       ],
                     ),
+                    ),
                   ),
                   const Icon(
                     Icons.chevron_right_rounded,
-                    color: Color(0xFFFF7A00),
+                    color: Color(0xFFFFB800),
                     size: 16,
                   ),
                 ],
@@ -767,8 +803,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           // 1. Notifications Preferences
           _buildMenuRow(
             icon: Icons.notifications_active_outlined,
-            title: 'Notifications & Alerts',
-            subtitle: 'Push alerts & promo settings',
+            title: 'Notifications & Alerts'.tr,
+            subtitle: 'Push alerts & promo settings'.tr,
             textColor: textColor,
             secondaryColor: secondaryColor,
             onTap: _showNotificationsModal,
@@ -779,6 +815,26 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             endIndent: 16,
             color: isDark ? AppColors.borderDark : AppColors.dividerLight,
           ),
+
+          // 1b. Push diagnostics (the test endpoint needs auth)
+          if (isLoggedIn) ...[
+            _buildMenuRow(
+              icon: Icons.notification_add_outlined,
+              title: 'Test notifications',
+              subtitle: 'Check FCM setup & send a test push',
+              textColor: textColor,
+              secondaryColor: secondaryColor,
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(builder: (_) => const PushTestScreen()),
+              ),
+            ),
+            Divider(
+              height: 1,
+              indent: 16,
+              endIndent: 16,
+              color: isDark ? AppColors.borderDark : AppColors.dividerLight,
+            ),
+          ],
 
           // 2. Veg Mode Toggle
           Padding(
@@ -804,16 +860,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Veg Mode',
+                        'Veg Mode'.tr,
                         style: TextStyle(
                           fontSize: 14.5,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w500,
                           color: textColor,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'Show only vegetarian food items',
+                        'Show only vegetarian food items'.tr,
                         style: TextStyle(fontSize: 12, color: secondaryColor),
                       ),
                     ],
@@ -840,9 +896,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           // 3. Appearance
           _buildMenuRow(
             icon: Icons.palette_outlined,
-            title: 'Appearance Settings',
-            subtitle:
-                'Theme: ${_getThemeString(ref.watch(themeProvider))} mode',
+            title: 'Appearance Settings'.tr,
+            subtitle: 'Theme: {mode} mode'.trArgs({
+              'mode': _getThemeString(ref.watch(themeProvider)).tr,
+            }),
             textColor: textColor,
             secondaryColor: secondaryColor,
             onTap: _showAppearanceModal,
@@ -854,28 +911,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             color: isDark ? AppColors.borderDark : AppColors.dividerLight,
           ),
 
-          // 3b. App Theme (brand color)
-          _buildMenuRow(
-            icon: Icons.color_lens_outlined,
-            title: 'App Theme',
-            subtitle:
-                '${ref.watch(themeColorProvider).emoji} ${ref.watch(themeColorProvider).label}',
-            textColor: textColor,
-            secondaryColor: secondaryColor,
-            onTap: _showThemeColorModal,
-          ),
-          Divider(
-            height: 1,
-            indent: 16,
-            endIndent: 16,
-            color: isDark ? AppColors.borderDark : AppColors.dividerLight,
-          ),
+          // (App Theme colour picker removed: the app ships one brand theme.)
 
           // 4. Favorites
           _buildMenuRow(
             icon: Icons.favorite_border_rounded,
-            title: 'Favorites',
-            subtitle: 'Your favorite restaurants & dishes',
+            title: 'Favorites'.tr,
+            subtitle: 'Your favorite restaurants & dishes'.tr,
             textColor: textColor,
             secondaryColor: secondaryColor,
             onTap: () => context.push(RouteNames.favorites),
@@ -921,35 +963,48 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'My Orders',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: textColor,
+              Flexible(
+                child: Text(
+                  'My Orders'.tr,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: textColor,
+                  ),
                 ),
               ),
-              InkWell(
+              const SizedBox(width: 8),
+              // Flexible: at large text sizes on a 320dp phone the title plus
+              // this link were wider than the card.
+              Flexible(
+                child: InkWell(
                 onTap: () =>
                     _protectedNavigation(RouteNames.orders, isLoggedIn),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      'View All Orders',
-                      style: TextStyle(
-                        color: Color(0xFFFF7A00),
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w600,
+                    Flexible(
+                      child: Text(
+                        'View All Orders'.tr,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Color(0xFFE5A600),
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
-                    Icon(
+                    const Icon(
                       Icons.chevron_right_rounded,
-                      color: Color(0xFFFF7A00),
+                      color: Color(0xFFFFB800),
                       size: 16,
                     ),
                   ],
                 ),
+              ),
               ),
             ],
           ),
@@ -959,9 +1014,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             children: [
               _orderStat(
                 Icons.shopping_bag_rounded,
-                const Color(0xFFFF7A00),
+                const Color(0xFFFFB800),
                 upcoming,
-                'Upcoming',
+                'Upcoming'.tr,
                 textColor,
                 secondaryColor,
               ),
@@ -969,7 +1024,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 Icons.check_circle_rounded,
                 const Color(0xFF39C96B),
                 completed,
-                'Completed',
+                'Completed'.tr,
                 textColor,
                 secondaryColor,
               ),
@@ -977,15 +1032,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 Icons.cancel_rounded,
                 const Color(0xFFFF6464),
                 cancelled,
-                'Cancelled',
+                'Cancelled'.tr,
                 textColor,
                 secondaryColor,
               ),
               _orderStat(
                 Icons.replay_circle_filled_rounded,
-                const Color(0xFFFF7A00),
+                const Color(0xFFFFB800),
                 refunded,
-                'Refunds',
+                'Refunds'.tr,
                 textColor,
                 secondaryColor,
               ),
@@ -1004,7 +1059,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     Color textColor,
     Color secondaryColor,
   ) {
-    return Column(
+    return Expanded(
+      child: Column(
       children: [
         Container(
           width: 42,
@@ -1020,13 +1076,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           value,
           style: TextStyle(
             fontSize: 15,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
             color: textColor,
           ),
         ),
         const SizedBox(height: 2),
-        Text(label, style: TextStyle(fontSize: 11.5, color: secondaryColor)),
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(label, style: TextStyle(fontSize: 11.5, color: secondaryColor)),
+        ),
       ],
+      ),
     );
   }
 
@@ -1057,8 +1117,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           // 1. Refer & Earn
           _buildMenuRow(
             icon: Icons.card_giftcard_rounded,
-            title: 'Refer & Earn',
-            subtitle: 'Code: $referralCode • Share & earn ₹100',
+            title: 'Refer & Earn'.tr,
+            subtitle: 'Code: {code} • Share & earn ₹100'.trArgs({'code': referralCode}),
             textColor: textColor,
             secondaryColor: secondaryColor,
             onTap: () {
@@ -1076,8 +1136,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           // 2. Rate App
           _buildMenuRow(
             icon: Icons.star_border_rounded,
-            title: 'Rate App',
-            subtitle: 'Love our app? Leave us a 5-star rating',
+            title: 'Rate App'.tr,
+            subtitle: 'Love our app? Leave us a 5-star rating'.tr,
             textColor: textColor,
             secondaryColor: secondaryColor,
             onTap: _showRateAppModal,
@@ -1092,8 +1152,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           // 3. Share App
           _buildMenuRow(
             icon: Icons.share_outlined,
-            title: 'Share App',
-            subtitle: 'Share Suvio food delivery app with friends',
+            title: 'Share App'.tr,
+            subtitle: 'Share JhatPat food delivery app with friends'.tr,
             textColor: textColor,
             secondaryColor: secondaryColor,
             onTap: () {
@@ -1101,12 +1161,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               Clipboard.setData(
                 const ClipboardData(
                   text:
-                      'Check out Suvio app for delicious food delivery: https://suvio.appzeto.com',
+                      'Check out JhatPat app for delicious food delivery: https://jhatpattaxi.com',
                 ),
               );
               AppSnackbar.success(
                 context,
-                'App invite link copied to clipboard! 🚀',
+                'App invite link copied to clipboard! 🚀'.tr,
                 duration: const Duration(seconds: 2),
               );
             },
@@ -1142,8 +1202,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           // 1. Help & Support
           _buildMenuRow(
             icon: Icons.headset_mic_outlined,
-            title: 'Help & Support',
-            subtitle: 'FAQs, order refund status & 24/7 support',
+            title: 'Help & Support'.tr,
+            subtitle: 'FAQs, order refund status & 24/7 support'.tr,
             textColor: textColor,
             secondaryColor: secondaryColor,
             onTap: () => context.push(RouteNames.helpSupport),
@@ -1158,8 +1218,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           // 2. About Us
           _buildMenuRow(
             icon: Icons.info_outline_rounded,
-            title: 'About Us',
-            subtitle: 'Version 1.2.0 • Suvio Food & Drink',
+            title: 'About Us'.tr,
+            subtitle: 'Version 1.2.0 • JhatPat Food & Drink'.tr,
             textColor: textColor,
             secondaryColor: secondaryColor,
             onTap: () => context.push(RouteNames.about),
@@ -1174,8 +1234,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           // 3. Privacy Policy
           _buildMenuRow(
             icon: Icons.shield_outlined,
-            title: 'Privacy Policy',
-            subtitle: 'How we protect & manage your data',
+            title: 'Privacy Policy'.tr,
+            subtitle: 'How we protect & manage your data'.tr,
             textColor: textColor,
             secondaryColor: secondaryColor,
             onTap: () => context.push(RouteNames.privacyPolicy),
@@ -1190,8 +1250,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           // 4. Terms & Conditions
           _buildMenuRow(
             icon: Icons.description_outlined,
-            title: 'Terms & Conditions',
-            subtitle: 'Service rules & delivery terms',
+            title: 'Terms & Conditions'.tr,
+            subtitle: 'Service rules & delivery terms'.tr,
             textColor: textColor,
             secondaryColor: secondaryColor,
             onTap: () => context.push(RouteNames.termsConditions),
@@ -1237,7 +1297,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     title,
                     style: TextStyle(
                       fontSize: 14.5,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w500,
                       color: textColor,
                     ),
                   ),
@@ -1274,14 +1334,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         showDialog(
           context: context,
           builder: (ctx) => AlertDialog(
-            title: const Text('Log Out'),
-            content: const Text(
-              'Are you sure you want to log out of your account?',
+            title: Text('Log Out'.tr),
+            content: Text(
+              'Are you sure you want to log out of your account?'.tr,
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
-                child: const Text('Cancel'),
+                child: Text('Cancel'.tr),
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -1289,18 +1349,24 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
                 onPressed: () async {
                   Navigator.pop(ctx);
+                  // Captured before the await: the profile screen is replaced
+                  // below, and nothing else routes a logged-out user anywhere
+                  // (the router has no auth guard) — they were left on a
+                  // profile screen with no user, i.e. blank.
+                  final router = GoRouter.of(context);
+                  final messenger = ScaffoldMessenger.of(context);
                   await ref.read(authViewModelProvider.notifier).logout();
-                  if (mounted) {
-                    AppSnackbar.success(
-                      context,
-                      'Logged out successfully',
+                  router.go(AppRoutePaths.authPhone);
+                  messenger.showSnackBar(
+                    SnackBar(
+                      content: Text('Logged out successfully'.tr),
                       duration: const Duration(seconds: 2),
-                    );
-                  }
+                    ),
+                  );
                 },
-                child: const Text(
-                  'Log Out',
-                  style: TextStyle(color: Colors.white),
+                child: Text(
+                  'Log Out'.tr,
+                  style: const TextStyle(color: Colors.white),
                 ),
               ),
             ],
@@ -1318,17 +1384,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             color: isDark ? AppColors.borderDark : AppColors.borderLight,
           ),
         ),
-        child: const Row(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.logout_rounded, color: Color(0xFFFF6464), size: 20),
-            SizedBox(width: 10),
+            const Icon(Icons.logout_rounded, color: Color(0xFFFF6464), size: 20),
+            const SizedBox(width: 10),
             Text(
-              'Log Out',
-              style: TextStyle(
+              'Log Out'.tr,
+              style: const TextStyle(
                 color: Color(0xFFFF6464),
                 fontSize: 15,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ],
@@ -1351,21 +1417,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: cardColor,
+          color: const Color(0xFFFFB800),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFFF7A00)),
         ),
-        child: const Row(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.login_rounded, color: Color(0xFFFF7A00), size: 20),
-            SizedBox(width: 10),
+            const Icon(Icons.login_rounded, color: Colors.black, size: 20),
+            const SizedBox(width: 10),
             Text(
-              'Log In to Account',
-              style: TextStyle(
-                color: Color(0xFFFF7A00),
+              'Log In to Account'.tr,
+              style: const TextStyle(
+                color: Colors.black,
                 fontSize: 15,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ],
@@ -1400,9 +1465,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Saved Addresses 📍',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  Text(
+                    'Saved Addresses 📍'.tr,
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                   ),
                   IconButton(
                     icon: const Icon(Icons.close),
@@ -1428,14 +1493,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               : (addr.type == 'Work'
                                     ? Icons.work_rounded
                                     : Icons.location_on_rounded),
-                          color: const Color(0xFFFF7A00),
+                          color: const Color(0xFFFFB800),
                         ),
                         title: Row(
                           children: [
-                            Text(
-                              addr.title,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
+                            Flexible(
+                              child: Text(
+                                addr.title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                             if (addr.isDefault) ...[
@@ -1447,16 +1516,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 ),
                                 decoration: BoxDecoration(
                                   color: const Color(
-                                    0xFFFF7A00,
+                                    0xFFFFB800,
                                   ).withValues(alpha: 0.15),
                                   borderRadius: BorderRadius.circular(6),
                                 ),
-                                child: const Text(
-                                  'DEFAULT',
-                                  style: TextStyle(
+                                child: Text(
+                                  'DEFAULT'.tr,
+                                  style: const TextStyle(
                                     fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFFFF7A00),
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFFE5A600),
                                   ),
                                 ),
                               ),
@@ -1497,19 +1566,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 height: 46,
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFF7A00),
+                    backgroundColor: const Color(0xFFFFB800),
                   ),
                   onPressed: () {
                     Haptics.light();
                     Navigator.pop(ctx);
                     context.push(RouteNames.addAddress);
                   },
-                  icon: const Icon(Icons.add, color: Colors.white),
-                  label: const Text(
-                    'Add New Address',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+                  icon: const Icon(Icons.add, color: Colors.black),
+                  label: Text(
+                    'Add New Address'.tr,
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
@@ -1543,9 +1612,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Available Coupons 🏷️',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  Text(
+                    'Available Coupons 🏷️'.tr,
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                   ),
                   IconButton(
                     icon: const Icon(Icons.close),
@@ -1568,25 +1637,29 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         padding: const EdgeInsets.all(14),
                         child: Row(
                           children: [
-                            Container(
+                            Flexible(
+                              child: Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 10,
                                 vertical: 6,
                               ),
                               decoration: BoxDecoration(
                                 color: const Color(
-                                  0xFFFF7A00,
+                                  0xFFFFB800,
                                 ).withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
                                 c.code,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFFFF7A00),
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFFE5A600),
                                   letterSpacing: 1,
                                 ),
                               ),
+                            ),
                             ),
                             const SizedBox(width: 12),
                             Expanded(
@@ -1596,7 +1669,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                   Text(
                                     c.discountText,
                                     style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w600,
                                       fontSize: 14,
                                     ),
                                   ),
@@ -1618,14 +1691,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 Navigator.pop(ctx);
                                 AppSnackbar.success(
                                   context,
-                                  'Coupon code ${c.code} copied!',
+                                  'Coupon code {code} copied!'.trArgs({'code': c.code}),
                                 );
                               },
-                              child: const Text(
-                                'COPY',
-                                style: TextStyle(
-                                  color: Color(0xFFFF7A00),
-                                  fontWeight: FontWeight.bold,
+                              child: Text(
+                                'COPY'.tr,
+                                style: const TextStyle(
+                                  color: Color(0xFFE5A600),
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
                             ),
@@ -1665,15 +1738,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Notification Preferences 🔔',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  Text(
+                    'Notification Preferences 🔔'.tr,
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 16),
                   SwitchListTile(
-                    title: const Text('Order Status & Delivery Alerts'),
+                    title: Text('Order Status & Delivery Alerts'.tr),
                     value: notifSettings.orderStatus,
-                    activeThumbColor: const Color(0xFFFF7A00),
+                    activeThumbColor: const Color(0xFFFFB800),
                     onChanged: (val) {
                       Haptics.light();
                       ref
@@ -1682,9 +1755,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     },
                   ),
                   SwitchListTile(
-                    title: const Text('Promotional Offers & Discounts'),
+                    title: Text('Promotional Offers & Discounts'.tr),
                     value: notifSettings.promoOffers,
-                    activeThumbColor: const Color(0xFFFF7A00),
+                    activeThumbColor: const Color(0xFFFFB800),
                     onChanged: (val) {
                       Haptics.light();
                       ref
@@ -1693,9 +1766,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     },
                   ),
                   SwitchListTile(
-                    title: const Text('App Sound & Haptic Alerts'),
+                    title: Text('App Sound & Haptic Alerts'.tr),
                     value: notifSettings.soundAlerts,
-                    activeThumbColor: const Color(0xFFFF7A00),
+                    activeThumbColor: const Color(0xFFFFB800),
                     onChanged: (val) {
                       Haptics.light();
                       ref
@@ -1728,9 +1801,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Select Theme Appearance 🎨',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              Text(
+                'Select Theme Appearance 🎨'.tr,
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 16),
               _themeOptionTile(
@@ -1758,108 +1831,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  void _showThemeColorModal() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) {
-        final isDark = Theme.of(ctx).brightness == Brightness.dark;
-        return Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: isDark ? AppColors.surfaceDark : Colors.white,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'App Theme 🎨',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Pick your favorite brand color',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondaryLight,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Consumer(
-                builder: (context, ref, _) {
-                  final selected = ref.watch(themeColorProvider);
-                  return Wrap(
-                    spacing: 20,
-                    runSpacing: 20,
-                    children: AppThemeColor.values.map((option) {
-                      final isSelected = option == selected;
-                      return GestureDetector(
-                        onTap: () {
-                          Haptics.light();
-                          ref.read(themeColorProvider.notifier).setColor(option);
-                          Navigator.pop(ctx);
-                        },
-                        child: Column(
-                          children: [
-                            Container(
-                              width: 52,
-                              height: 52,
-                              decoration: BoxDecoration(
-                                color: option.color,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: isSelected
-                                      ? (isDark ? Colors.white : Colors.black87)
-                                      : Colors.transparent,
-                                  width: 2.5,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: option.color.withValues(alpha: 0.35),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: isSelected
-                                  ? const Icon(
-                                      Icons.check_rounded,
-                                      color: Colors.white,
-                                      size: 24,
-                                    )
-                                  : null,
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              option.label,
-                              style: TextStyle(
-                                fontSize: 11.5,
-                                fontWeight:
-                                    isSelected ? FontWeight.bold : FontWeight.normal,
-                                color: isDark
-                                    ? AppColors.textPrimaryDark
-                                    : AppColors.textPrimaryLight,
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                  );
-                },
-              ),
-              const SizedBox(height: 8),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   Widget _themeOptionTile(
     BuildContext ctx,
     String label,
@@ -1871,16 +1842,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return ListTile(
       leading: Icon(
         icon,
-        color: isSelected ? const Color(0xFFFF7A00) : Colors.grey,
+        color: isSelected ? const Color(0xFFFFB800) : Colors.grey,
       ),
       title: Text(
-        label,
+        label.tr,
         style: TextStyle(
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
         ),
       ),
       trailing: isSelected
-          ? const Icon(Icons.check_circle_rounded, color: Color(0xFFFF7A00))
+          ? const Icon(Icons.check_circle_rounded, color: Color(0xFFFFB800))
           : null,
       onTap: () {
         Haptics.light();
@@ -1910,14 +1881,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
-                    'Enjoying Suvio? ⭐',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  Text(
+                    'Enjoying JhatPat? ⭐'.tr,
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 6),
-                  const Text(
-                    'Tap a star to rate your experience',
-                    style: TextStyle(fontSize: 13, color: Colors.grey),
+                  Text(
+                    'Tap a star to rate your experience'.tr,
+                    style: const TextStyle(fontSize: 13, color: Colors.grey),
                   ),
                   const SizedBox(height: 16),
                   Row(
@@ -1928,7 +1899,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           index < rating
                               ? Icons.star_rounded
                               : Icons.star_border_rounded,
-                          color: const Color(0xFFFF7A00),
+                          color: const Color(0xFFFFB800),
                           size: 36,
                         ),
                         onPressed: () {
@@ -1944,21 +1915,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     height: 48,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFF7A00),
+                        backgroundColor: const Color(0xFFFFB800),
                       ),
                       onPressed: () {
                         Haptics.success();
                         Navigator.pop(ctx);
                         AppSnackbar.success(
                           context,
-                          'Thank you for giving us $rating stars! ❤️',
+                          'Thank you for giving us {rating} stars! ❤️'.trArgs({'rating': rating}),
                         );
                       },
-                      child: const Text(
-                        'Submit Rating',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                      child: Text(
+                        'Submit Rating'.tr,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),

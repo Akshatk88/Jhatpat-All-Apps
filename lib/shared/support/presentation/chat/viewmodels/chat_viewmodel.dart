@@ -3,16 +3,25 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:superapp_user/modules/food/data/models/chat_model.dart';
+import 'package:superapp_user/modules/food/presentation/orders/viewmodels/order_conversations_viewmodel.dart';
 import 'package:superapp_user/shared/support/application/chat_providers.dart';
-import 'package:superapp_user/core/network/network_providers.dart';
+import 'package:superapp_user/core/error/failures.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/core/push/push_providers.dart';
 import 'package:superapp_user/modules/food/application/providers/socket_providers.dart';
 import 'package:superapp_user/shared/auth/presentation/viewmodels/auth_viewmodel.dart';
 
-/// Identifies one chat thread. For the delivery-partner chat, [orderId]
-/// uniquely pins the conversation; support chat (`peerRole: ADMIN`) needs
-/// neither [peerId] nor [orderId].
-typedef ChatTarget = ({String peerRole, String? peerId, String? orderId});
+/// Identifies one chat thread.
+///
+/// Backend contract (`/food/chat`):
+/// * customer <-> rider on an order: `conversationId` is the order's Mongo id
+///   itself, and sending needs only `{ orderId, text }` (peer resolved from
+///   the order's assigned rider);
+/// * support (`peerRole: ADMIN`): `{ peerRole: 'ADMIN', orderId?, text }`,
+///   threads keyed `<orderId|direct>::ADMIN|USER:<id>`.
+///
+/// [conversationId] is set when opening a known thread from a list.
+typedef ChatTarget = ({String peerRole, String? peerId, String? orderId, String? conversationId});
 
 class ChatState {
   final List<ChatMessage> messages;
@@ -61,14 +70,28 @@ class ChatViewModel extends Notifier<ChatState> {
   StreamSubscription? _messageSub;
   StreamSubscription? _pushSub;
   StreamSubscription? _typingSub;
+  StreamSubscription? _connectedSub;
   Timer? _typingResetTimer;
+  bool _disposed = false;
+
+  /// Order id, with the empty string the support route passes treated as none.
+  String? get _orderId {
+    final id = arg.orderId?.trim();
+    return (id == null || id.isEmpty) ? null : id;
+  }
+
+  String get _peerRole => arg.peerRole.toUpperCase();
+
+  bool get _isRiderThread => _peerRole == 'DELIVERY_PARTNER';
 
   @override
   ChatState build() {
     ref.onDispose(() {
+      _disposed = true;
       _messageSub?.cancel();
       _pushSub?.cancel();
       _typingSub?.cancel();
+      _connectedSub?.cancel();
       _typingResetTimer?.cancel();
     });
     _listenSocket();
@@ -79,31 +102,16 @@ class ChatViewModel extends Notifier<ChatState> {
 
   void _listenPush() {
     final pushService = ref.read(pushServiceProvider);
+    // The push only carries {type, conversationId, orderId} and a preview —
+    // no message id — so building a bubble from it would duplicate the socket
+    // copy. Treat it as a nudge to re-sync instead (covers a dead socket).
     _pushSub = pushService.onForeground.listen((msg) {
       final data = msg.data;
-      if (!_isForThisThread(data)) return;
-
-      final map = Map<String, dynamic>.from(data);
-      if (map['text'] == null || map['text'].toString().isEmpty) {
-        map['text'] = msg.notification?.body ?? '';
-      }
-      if (map['createdAt'] == null) {
-        map['createdAt'] = DateTime.now().toIso8601String();
-      }
-
-      final message = ChatMessage.fromApi(map);
-      // Avoid duplicate messages
-      if (state.messages.any((m) => m.id == message.id && m.id.isNotEmpty)) return;
-
-      state = state.copyWith(
-        messages: [...state.messages, message],
-        conversationId: state.conversationId ?? message.conversationId,
-      );
-
+      if (data['type']?.toString() != 'chat_message') return;
       final convId = state.conversationId;
-      if (convId != null && convId.isNotEmpty) {
-        unawaited(ref.read(chatRemoteDataSourceProvider).markRead(convId));
-      }
+      final matches = (convId != null && data['conversationId']?.toString() == convId) ||
+          (_orderId != null && data['orderId']?.toString() == _orderId);
+      if (matches) unawaited(resumeChat());
     });
   }
 
@@ -113,89 +121,142 @@ class ChatViewModel extends Notifier<ChatState> {
       final data = msg.data;
       if (!_isForThisThread(data)) return;
       final message = ChatMessage.fromApi(data);
-      // Avoid duplicating a message we just sent and already appended
-      // optimistically (same id arriving back over the socket).
-      if (state.messages.any((m) => m.id == message.id && m.id.isNotEmpty)) return;
-      state = state.copyWith(
-        messages: [...state.messages, message],
-        conversationId: state.conversationId ?? message.conversationId,
-      );
-      final convId = state.conversationId;
-      if (convId != null && convId.isNotEmpty) {
-        unawaited(ref.read(chatRemoteDataSourceProvider).markRead(convId));
+      final added = _merge([message]);
+      if (!added) return;
+      if (state.conversationId == null && message.conversationId.isNotEmpty) {
+        state = state.copyWith(conversationId: message.conversationId);
       }
+      if (!message.isFromUser) _markRead();
     });
     _typingSub = service.chatTyping.listen((msg) {
       if (!_isForThisThread(msg.data)) return;
       final typing = msg.data['typing'] as bool? ?? false;
       state = state.copyWith(peerTyping: typing);
     });
+    // Anything sent while the socket was down never arrives; re-read.
+    _connectedSub = service.onConnected.listen((_) => unawaited(resumeChat()));
   }
 
   bool _isForThisThread(Map<String, dynamic> data) {
     final convId = state.conversationId;
-    if (convId != null && data['conversationId'] == convId) return true;
-    if (arg.orderId != null && data['orderId'] == arg.orderId) return true;
-    return false;
+    final msgConv = data['conversationId']?.toString();
+    if (convId != null && msgConv != null && msgConv.isNotEmpty) return msgConv == convId;
+
+    // Thread not known yet (nothing exchanged): same order and same peer kind.
+    final msgOrder = data['orderId']?.toString();
+    final sameOrder = _orderId == null
+        ? (msgOrder == null || msgOrder.isEmpty)
+        : msgOrder == _orderId;
+    if (!sameOrder) return false;
+    final roles = {
+      data['senderRole']?.toString().toUpperCase(),
+      data['recipientRole']?.toString().toUpperCase(),
+    };
+    return roles.contains(_peerRole);
+  }
+
+  /// Adds [incoming] not already present (by id), keeping time order.
+  /// Returns whether anything was added.
+  bool _merge(List<ChatMessage> incoming) {
+    final existing = state.messages.map((m) => m.id).where((id) => id.isNotEmpty).toSet();
+    final fresh = incoming.where((m) => m.id.isEmpty || !existing.contains(m.id)).toList();
+    if (fresh.isEmpty) return false;
+    final all = [...state.messages, ...fresh]
+      ..sort((a, b) => (a.createdAt ?? DateTime.now()).compareTo(b.createdAt ?? DateTime.now()));
+    state = state.copyWith(messages: all);
+    return true;
+  }
+
+  void _markRead() {
+    final convId = state.conversationId;
+    if (convId == null || convId.isEmpty) return;
+    unawaited(() async {
+      try {
+        await ref.read(chatRemoteDataSourceProvider).markRead(convId);
+        if (_disposed) return;
+        final orderId = _orderId;
+        if (orderId != null) ref.invalidate(orderConversationsProvider(orderId));
+      } catch (_) {
+        // Read receipts are best effort.
+      }
+    }());
+  }
+
+  /// Works out which thread this is, then loads its history.
+  Future<String?> _resolveConversationId() async {
+    final explicit = arg.conversationId;
+    if (explicit != null && explicit.isNotEmpty) return explicit;
+
+    // Match on order AND peer kind: an order can also have a support thread,
+    // which must not be mistaken for the rider chat (or vice versa).
+    List<ChatConversation> conversations = const [];
+    try {
+      conversations =
+          await ref.read(chatRemoteDataSourceProvider).getConversations(orderId: _orderId);
+    } catch (_) {
+      if (!(_isRiderThread && _orderId != null)) rethrow;
+    }
+    final match = conversations.where((c) {
+      if (c.peerRole.toUpperCase() != _peerRole) return false;
+      final cOrder = (c.orderId ?? '').isEmpty ? null : c.orderId;
+      return cOrder == _orderId;
+    });
+    if (match.isNotEmpty) return match.first.conversationId;
+
+    // The customer <-> rider thread is keyed on the order id itself, so even
+    // before the first message we know where it will live.
+    if (_isRiderThread && _orderId != null) return _orderId;
+    return null;
   }
 
   Future<void> _init() async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
-      final conversations = await ref.read(chatRemoteDataSourceProvider).getConversations();
-      final existing = conversations.where((c) {
-        if (arg.orderId != null) return c.orderId == arg.orderId;
-        return c.peerRole == arg.peerRole;
-      }).toList();
-
-      if (existing.isEmpty) {
-        // No messages exchanged yet — start with an empty thread; the first
-        // send establishes the conversation.
+      final conversationId = await _resolveConversationId();
+      if (_disposed) return;
+      if (conversationId == null) {
+        // Nothing exchanged yet — the first send establishes the thread.
         state = state.copyWith(isLoading: false, messages: const []);
         return;
       }
-
-      final conversationId = existing.first.conversationId;
-      final result = await ref.read(chatRemoteDataSourceProvider).getMessages(conversationId: conversationId);
-      state = state.copyWith(isLoading: false, messages: result.messages, conversationId: conversationId);
-      unawaited(ref.read(chatRemoteDataSourceProvider).markRead(conversationId));
+      final result = await ref
+          .read(chatRemoteDataSourceProvider)
+          .getMessages(conversationId: conversationId, limit: 100);
+      if (_disposed) return;
+      // Keep anything the socket delivered while this was in flight.
+      final byId = {for (final m in state.messages) m.id: m, for (final m in result.messages) m.id: m};
+      final all = byId.values.toList()
+        ..sort((a, b) => (a.createdAt ?? DateTime.now()).compareTo(b.createdAt ?? DateTime.now()));
+      state = state.copyWith(isLoading: false, messages: all, conversationId: conversationId);
+      // getMessages already marks incoming as read server-side; refresh the
+      // badge on the order screen.
+      final orderId = _orderId;
+      if (orderId != null) ref.invalidate(orderConversationsProvider(orderId));
     } catch (_) {
-      state = state.copyWith(isLoading: false, error: 'Could not load messages. Pull down to retry.');
+      if (_disposed) return;
+      state = state.copyWith(isLoading: false, error: 'Could not load messages. Pull down to retry.'.tr);
     }
   }
 
+  /// Re-syncs after the app resumes, the socket reconnects or a push lands.
   Future<void> resumeChat() async {
+    ref.read(socketServiceProvider).ensureConnected();
+
     final convId = state.conversationId;
-    if (convId == null || convId.isEmpty) return;
-
-    // 1. Reconnect socket if needed
-    final socketService = ref.read(socketServiceProvider);
-    if (!socketService.isConnected) {
-      final token = await ref.read(tokenStorageProvider).accessToken;
-      if (token != null && token.isNotEmpty) {
-        socketService.disconnect();
-        socketService.connect(token);
-      }
+    if (convId == null || convId.isEmpty) {
+      if (!state.isLoading) await _init();
+      return;
     }
-
-    // 2. Fetch recent messages to sync any missed ones
     try {
       final result = await ref.read(chatRemoteDataSourceProvider).getMessages(
             conversationId: convId,
             page: 1,
-            limit: 20,
+            limit: 50,
           );
-
-      final existingIds = state.messages.map((m) => m.id).toSet();
-      final newMessages = result.messages.where((m) => !existingIds.contains(m.id)).toList();
-      if (newMessages.isNotEmpty) {
-        // Sort by createdAt
-        newMessages.sort((a, b) => (a.createdAt ?? DateTime.now()).compareTo(b.createdAt ?? DateTime.now()));
-        state = state.copyWith(
-          messages: [...state.messages, ...newMessages],
-        );
-      }
-      unawaited(ref.read(chatRemoteDataSourceProvider).markRead(convId));
+      if (_disposed) return;
+      _merge(result.messages);
+      final orderId = _orderId;
+      if (orderId != null) ref.invalidate(orderConversationsProvider(orderId));
     } catch (_) {
       // Keep existing state if offline
     }
@@ -206,23 +267,36 @@ class ChatViewModel extends Notifier<ChatState> {
   Future<String?> sendMessage(String text) async {
     final trimmed = text.trim();
     if (trimmed.isEmpty) return null;
+    if (trimmed.length > 2000) return 'Message is too long.'.tr;
     state = state.copyWith(isSending: true, clearError: true);
     try {
       final message = await ref.read(chatRemoteDataSourceProvider).sendMessage(
-            peerRole: arg.peerRole,
-            peerId: arg.peerId,
-            orderId: arg.orderId,
+            peerRole: _peerRole,
+            // Order chats resolve the peer from the order server-side; a peer
+            // id is only meaningful outside an order.
+            peerId: _orderId == null ? arg.peerId : null,
+            orderId: _orderId,
             text: trimmed,
           );
+      if (_disposed) return null;
+      // The socket echo can beat the HTTP response — merge, don't append.
+      _merge([message]);
       state = state.copyWith(
-        messages: [...state.messages, message],
-        conversationId: state.conversationId ?? message.conversationId,
+        conversationId: state.conversationId ??
+            (message.conversationId.isEmpty ? null : message.conversationId),
         isSending: false,
       );
       return null;
-    } catch (_) {
+    } catch (e) {
+      if (_disposed) return null;
       state = state.copyWith(isSending: false);
-      return 'Could not send. Check your connection and try again.';
+      final reason = e.toString();
+      // Surface the server's reason when it is one the user can act on.
+      if (reason.contains('No delivery partner is assigned')) {
+        return 'A delivery partner has not been assigned yet.'.tr;
+      }
+      if (e is ValidationFailure) return e.message;
+      return 'Could not send. Check your connection and try again.'.tr;
     }
   }
 
@@ -239,6 +313,7 @@ class ChatViewModel extends Notifier<ChatState> {
         );
     _typingResetTimer?.cancel();
     _typingResetTimer = Timer(const Duration(seconds: 3), () {
+      if (_disposed) return;
       ref.read(socketServiceProvider).emitChatTyping(
             toRole: arg.peerRole,
             toId: arg.peerId,

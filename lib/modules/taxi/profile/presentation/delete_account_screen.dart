@@ -5,6 +5,7 @@ import 'package:superapp_user/modules/taxi/auth/application/auth_providers.dart'
 import 'package:superapp_user/design_system/components/ride/app_text_field.dart';
 import 'package:superapp_user/design_system/components/ride/custom_app_bar.dart';
 import 'package:superapp_user/design_system/components/ride/primary_button.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 class DeleteAccountScreen extends ConsumerStatefulWidget {
   const DeleteAccountScreen({super.key});
@@ -20,7 +21,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Delete account'),
+      appBar: CustomAppBar(title: 'Delete account'.tr),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -38,7 +39,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'This submits a request for admin review. Your account, ride history and wallet balance may be permanently removed once approved.',
+                      'This submits a request for admin review. Your account, ride history and wallet balance may be permanently removed once approved.'.tr,
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ),
@@ -48,13 +49,13 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
             const SizedBox(height: 24),
             AppTextField(
               controller: _reasonController,
-              label: 'Reason for leaving',
-              hint: 'Tell us why you want to delete your account',
+              label: 'Reason for leaving'.tr,
+              hint: 'Tell us why you want to delete your account'.tr,
               maxLines: 4,
             ),
             const SizedBox(height: 24),
             TaxiPrimaryButton(
-              label: 'Submit deletion request',
+              label: 'Submit deletion request'.tr,
               isLoading: _submitting,
               onPressed: _submit,
             ),
@@ -69,13 +70,13 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete account?'),
-        content: const Text('This action cannot be undone once approved. Continue?'),
+        title: Text('Delete account?'.tr),
+        content: Text('This action cannot be undone once approved. Continue?'.tr),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text('Cancel'.tr)),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete', style: TextStyle(color: TaxiColors.error)),
+            child: Text('Delete'.tr, style: const TextStyle(color: TaxiColors.error)),
           ),
         ],
       ),
@@ -87,14 +88,14 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
       await ref.read(taxiAuthRepositoryProvider).requestAccountDeletion(_reasonController.text.trim());
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Deletion request submitted for review')),
+          SnackBar(content: Text('Deletion request submitted for review'.tr)),
         );
         Navigator.of(context).pop();
       }
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not submit request. Please try again.')),
+          SnackBar(content: Text('Could not submit request. Please try again.'.tr)),
         );
       }
     } finally {

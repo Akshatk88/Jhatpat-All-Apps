@@ -34,7 +34,7 @@ class OtpField extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       textStyle: TextStyle(
         fontSize: 20,
-        fontWeight: FontWeight.w800,
+        fontWeight: FontWeight.w600,
         color: textColor,
       ),
       pinTheme: PinTheme(
@@ -43,8 +43,8 @@ class OtpField extends StatelessWidget {
         fieldHeight: 50,
         fieldWidth: 50,
         borderWidth: 1.2,
-        activeColor: const Color(0xFFFF5200),
-        selectedColor: const Color(0xFFFF5200),
+        activeColor: const Color(0xFFFFB800),
+        selectedColor: const Color(0xFFFFB800),
         inactiveColor: borderColor,
         activeFillColor: boxBgColor,
         selectedFillColor: boxBgColor,

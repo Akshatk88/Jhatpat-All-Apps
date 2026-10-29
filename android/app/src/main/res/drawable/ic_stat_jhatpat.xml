@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Status-bar (small) notification icon: white, monochrome lightning bolt.
+     Android masks small icons to their alpha channel, so it must not be the
+     full-colour launcher icon (that renders as a solid square / Flutter logo). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:tint="#FFFFFF">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M13.5,2L4.5,13.5H11L9.5,22L19.5,9.5H13L13.5,2Z" />
+</vector>

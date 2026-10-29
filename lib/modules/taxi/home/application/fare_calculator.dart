@@ -5,7 +5,13 @@ class FareBreakdown {
   final double distanceFare;
   final double timeFare;
   final double serviceTax;
+  final double platformFee;
+  final double surge;
   final double total;
+
+  /// True when this came from the server quote (exact charge), false for the
+  /// on-device estimate shown while the quote loads.
+  final bool fromServer;
 
   const FareBreakdown({
     required this.baseFare,
@@ -13,7 +19,26 @@ class FareBreakdown {
     required this.timeFare,
     required this.serviceTax,
     required this.total,
+    this.platformFee = 0,
+    this.surge = 0,
+    this.fromServer = false,
   });
+
+  static FareBreakdown? fromQuote(Map<String, dynamic> fare) {
+    double d(dynamic v) => double.tryParse('${v ?? 0}') ?? 0;
+    final total = d(fare['total']);
+    if (total <= 0) return null;
+    return FareBreakdown(
+      baseFare: d(fare['baseFare']),
+      distanceFare: d(fare['distanceFare']),
+      timeFare: d(fare['timeFare']),
+      serviceTax: d(fare['serviceTax']),
+      platformFee: d(fare['platformFee']),
+      surge: d(fare['surge']),
+      total: total,
+      fromServer: true,
+    );
+  }
 }
 
 class FareCalculator {
@@ -30,7 +55,10 @@ class FareCalculator {
 
     final baseFare = pricing.basePrice;
     final distanceFare = chargeableKm * pricing.pricePerDistance;
-    final timeFare = durationMinutes * pricing.timePrice;
+    // Same as the backend (rideFare.js): a trip inside the base distance
+    // pays only the base fare — no distance or time charge.
+    final withinBase = pricing.baseDistanceKm > 0 && distanceKm <= pricing.baseDistanceKm;
+    final timeFare = withinBase ? 0.0 : durationMinutes * pricing.timePrice;
     final subtotal = baseFare + distanceFare + timeFare;
     final serviceTax = subtotal * (pricing.serviceTaxPercent / 100);
     final total = (subtotal + serviceTax).clamp(pricing.basePrice, double.infinity);

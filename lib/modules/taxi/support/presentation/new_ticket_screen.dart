@@ -5,6 +5,7 @@ import 'package:superapp_user/design_system/components/ride/app_text_field.dart'
 import 'package:superapp_user/design_system/components/ride/custom_app_bar.dart';
 import 'package:superapp_user/design_system/components/ride/primary_button.dart';
 import 'package:superapp_user/modules/taxi/support/application/support_providers.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 class NewTicketScreen extends ConsumerStatefulWidget {
   const NewTicketScreen({super.key});
@@ -24,45 +25,57 @@ class _NewTicketScreenState extends ConsumerState<NewTicketScreen> {
     final titlesAsync = ref.watch(supportTitlesProvider);
 
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Raise a ticket'),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('What do you need help with?', style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 10),
-            titlesAsync.when(
-              data: (titles) => Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: titles
-                    .map((t) => ChoiceChip(
-                          label: Text(t.title),
-                          selected: _selectedTitleId == t.id,
-                          onSelected: (_) => setState(() {
-                            _selectedTitleId = t.id;
-                            _selectedTitle = t.title;
-                          }),
-                        ))
-                    .toList(),
+      appBar: CustomAppBar(title: 'Raise a ticket'.tr),
+      // Scrollable so the keyboard (6-line field + wrapped topic chips) can't
+      // push the submit button into a bottom overflow; min-height + Spacer
+      // keeps the button pinned to the bottom when there is room.
+      body: LayoutBuilder(
+        builder: (context, constraints) => SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: IntrinsicHeight(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('What do you need help with?'.tr, style: Theme.of(context).textTheme.titleMedium),
+                    const SizedBox(height: 10),
+                    titlesAsync.when(
+                      data: (titles) => Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: titles
+                            .map((t) => ChoiceChip(
+                                  label: Text(t.title),
+                                  selected: _selectedTitleId == t.id,
+                                  onSelected: (_) => setState(() {
+                                    _selectedTitleId = t.id;
+                                    _selectedTitle = t.title;
+                                  }),
+                                ))
+                            .toList(),
+                      ),
+                      loading: () => const SizedBox(
+                        height: 32,
+                        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                      ),
+                      error: (_, _) => const SizedBox.shrink(),
+                    ),
+                    const SizedBox(height: 20),
+                    AppTextField(
+                      controller: _messageController,
+                      label: 'Describe your issue'.tr,
+                      hint: 'Tell us what happened…'.tr,
+                      maxLines: 6,
+                    ),
+                    const Spacer(),
+                    TaxiPrimaryButton(label: 'Submit ticket'.tr, isLoading: _submitting, onPressed: _submit),
+                  ],
+                ),
               ),
-              loading: () => const SizedBox(
-                height: 32,
-                child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-              ),
-              error: (_, _) => const SizedBox.shrink(),
             ),
-            const SizedBox(height: 20),
-            AppTextField(
-              controller: _messageController,
-              label: 'Describe your issue',
-              hint: 'Tell us what happened…',
-              maxLines: 6,
-            ),
-            const Spacer(),
-            TaxiPrimaryButton(label: 'Submit ticket', isLoading: _submitting, onPressed: _submit),
-          ],
+          ),
         ),
       ),
     );
@@ -84,7 +97,7 @@ class _NewTicketScreenState extends ConsumerState<NewTicketScreen> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not submit ticket. Please try again.')),
+          SnackBar(content: Text('Could not submit ticket. Please try again.'.tr)),
         );
       }
     } finally {

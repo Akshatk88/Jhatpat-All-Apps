@@ -1,4 +1,5 @@
 import 'package:superapp_user/core/error/failures.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/core/network/api_response.dart';
 import 'package:superapp_user/core/storage/token_storage.dart';
 import 'package:superapp_user/modules/food/data/contracts/auth_repository.dart';
@@ -29,7 +30,7 @@ class AuthRepositoryImpl implements AuthRepository {
         await _tokens.clear();
       }
       final devOtp = await _remote.requestOtp(digits);
-      return ApiResponse.success(devOtp, 'OTP sent');
+      return ApiResponse.success(devOtp, 'OTP sent'.tr);
     });
   }
 
@@ -53,7 +54,7 @@ class AuthRepositoryImpl implements AuthRepository {
         accessToken: session.accessToken,
         refreshToken: session.refreshToken,
       );
-      return ApiResponse.success(session, 'Login successful');
+      return ApiResponse.success(session, 'Login successful'.tr);
     });
   }
 
@@ -78,9 +79,9 @@ class AuthRepositoryImpl implements AuthRepository {
         'anniversary': ?anniversary,
       };
       if (payload.isEmpty) {
-        return ApiResponse<UserModel>.error('Nothing to update');
+        return ApiResponse<UserModel>.error('Nothing to update'.tr);
       }
-      return ApiResponse.success(await _remote.updateProfile(payload), 'Profile updated');
+      return ApiResponse.success(await _remote.updateProfile(payload), 'Profile updated'.tr);
     });
   }
 
@@ -107,7 +108,7 @@ class AuthRepositoryImpl implements AuthRepository {
       // cleared either way, otherwise a network blip strands the user logged in.
     }
     await _tokens.clear();
-    return const ApiResponse.success(null, 'Logged out');
+    return ApiResponse.success(null, 'Logged out'.tr);
   }
 
   /// Converts typed failures into the [ApiResponse] envelope callers expect.
@@ -117,7 +118,7 @@ class AuthRepositoryImpl implements AuthRepository {
     } on Failure catch (f) {
       return ApiResponse<T>.error(f.message);
     } catch (e) {
-      return ApiResponse<T>.error('Something went wrong. Please try again.');
+      return ApiResponse<T>.error('Something went wrong. Please try again.'.tr);
     }
   }
 }

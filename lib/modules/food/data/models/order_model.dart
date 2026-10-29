@@ -1,4 +1,5 @@
 import 'package:superapp_user/core/config/api_config.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 /// One line item on a placed order.
 class OrderItem {
@@ -42,8 +43,8 @@ class OrderItem {
     return OrderItem(
       itemId: (json['itemId'] ?? '').toString(),
       name: (json['name'] ?? '').toString(),
-      price: (json['price'] as num?)?.toDouble() ?? 0.0,
-      quantity: (json['quantity'] as num?)?.toInt() ?? 1,
+      price: num.tryParse('${json['price']}')?.toDouble() ?? 0.0,
+      quantity: num.tryParse('${json['quantity']}')?.toInt() ?? 1,
       imageUrl: ApiConfig.resolveMedia(json['image'] as String?),
       isVeg: json['isVeg'] as bool? ?? false,
       variants:
@@ -135,8 +136,8 @@ class OrderEta {
   factory OrderEta.fromApi(Map<String, dynamic>? json) {
     if (json == null) return const OrderEta();
     return OrderEta(
-      minutes: (json['minutes'] as num?)?.toInt(),
-      distanceKm: (json['distanceKm'] as num?)?.toDouble(),
+      minutes: num.tryParse('${json['minutes']}')?.toInt(),
+      distanceKm: num.tryParse('${json['distanceKm']}')?.toDouble(),
       source: (json['source'] ?? 'unavailable').toString(),
       target: json['target']?.toString(),
     );
@@ -187,9 +188,9 @@ class DeliveryPartner {
       id: (json['_id'] ?? '').toString(),
       name: (json['name'] ?? json['fullName'] ?? '').toString(),
       phone: (json['phone'] ?? json['phoneNumber'] ?? '').toString(),
-      rating: (json['rating'] as num?)?.toDouble() ?? 0,
+      rating: num.tryParse('${json['rating']}')?.toDouble() ?? 0,
       photoUrl: ApiConfig.resolveMedia(imageUrl),
-      totalRatings: (json['totalRatings'] as num?)?.toInt() ?? 0,
+      totalRatings: num.tryParse('${json['totalRatings']}')?.toInt() ?? 0,
       vehicleType: (json['vehicleType'] ?? json['vehicleName'] ?? '')
           .toString(),
       vehicleNumber: (json['vehicleNumber'] ?? '').toString(),
@@ -420,11 +421,11 @@ class OrderModel {
     final deadline = acceptanceDeadlineAt;
     if (!isAwaitingAcceptance || deadline == null) return null;
     final remaining = deadline.difference(DateTime.now());
-    if (remaining.isNegative) return 'Confirming any moment now';
+    if (remaining.isNegative) return 'Confirming any moment now'.tr;
     final mins = remaining.inMinutes;
     final secs = remaining.inSeconds % 60;
-    if (mins <= 0) return 'Confirming within ${secs}s';
-    return 'Usually confirmed within ${mins}m ${secs}s';
+    if (mins <= 0) return 'Confirming within {secs}s'.trArgs({'secs': secs});
+    return 'Usually confirmed within {mins}m {secs}s'.trArgs({'mins': mins, 'secs': secs});
   }
 
   /// The backend rejects cancellation once the food is on its way.
@@ -447,29 +448,29 @@ class OrderModel {
   String get statusLabel {
     switch (orderStatus) {
       case 'pending_payment':
-        return 'Awaiting payment';
+        return 'Awaiting payment'.tr;
       case 'created':
-        return 'Order placed';
+        return 'Order placed'.tr;
       case 'confirmed':
-        return 'Confirmed';
+        return 'Confirmed'.tr;
       case 'preparing':
-        return 'Preparing your food';
+        return 'Preparing your food'.tr;
       case 'ready_for_pickup':
-        return 'Ready for pickup';
+        return 'Ready for pickup'.tr;
       case 'reached_pickup':
-        return 'Rider at restaurant';
+        return 'Rider at restaurant'.tr;
       case 'picked_up':
-        return 'On the way';
+        return 'On the way'.tr;
       case 'reached_drop':
-        return 'Rider has arrived';
+        return 'Rider has arrived'.tr;
       case 'delivered':
-        return 'Delivered';
+        return 'Delivered'.tr;
       case 'cancelled_by_user':
-        return 'Cancelled by you';
+        return 'Cancelled by you'.tr;
       case 'cancelled_by_restaurant':
-        return 'Cancelled by restaurant';
+        return 'Cancelled by restaurant'.tr;
       case 'cancelled_by_admin':
-        return 'Cancelled';
+        return 'Cancelled'.tr;
       default:
         return orderStatus;
     }
@@ -486,18 +487,19 @@ class OrderModel {
       case 'estimate':
         final mins = eta.minutes;
         if (mins == null || mins <= 0) break;
-        final verb = eta.target == 'restaurant'
-            ? 'Rider reaching restaurant in'
-            : 'Arriving in';
-        return '$verb $mins min${mins == 1 ? '' : 's'}';
+        final restaurantLeg = eta.target == 'restaurant';
+        if (mins == 1) {
+          return (restaurantLeg ? 'Rider reaching restaurant in {mins} min' : 'Arriving in {mins} min').trArgs({'mins': mins});
+        }
+        return (restaurantLeg ? 'Rider reaching restaurant in {mins} mins' : 'Arriving in {mins} mins').trArgs({'mins': mins});
       case 'unavailable':
-        return 'Calculating...';
+        return 'Calculating...'.tr;
       case 'completed':
         return null;
     }
     final mins = roadDurationMins;
     if (mins == null || mins <= 0) return null;
-    return 'Arriving in $mins min${mins == 1 ? '' : 's'}';
+    return (mins == 1 ? 'Arriving in {mins} min' : 'Arriving in {mins} mins').trArgs({'mins': mins});
   }
 
   /// A number-first version of [etaLabel] for tight spaces (the floating
@@ -506,13 +508,13 @@ class OrderModel {
     if (isDelivered || isCancelled) return null;
     final mins = eta.minutes ?? roadDurationMins;
     if (mins == null || mins <= 0) return null;
-    return '$mins min${mins == 1 ? '' : 's'}';
+    return (mins == 1 ? '{mins} min' : '{mins} mins').trArgs({'mins': mins});
   }
 
   String? get distanceLabel {
     final km = eta.distanceKm ?? roadDistanceKm;
     if (km == null || km <= 0) return null;
-    return '${km.toStringAsFixed(1)} km away';
+    return '{km} km away'.trArgs({'km': km.toStringAsFixed(1)});
   }
 
   /// The order's happy-path lifecycle, in order. Cancellations are terminal and
@@ -565,21 +567,21 @@ class OrderModel {
   static String _labelFor(String status) {
     switch (status) {
       case 'created':
-        return 'Order placed';
+        return 'Order placed'.tr;
       case 'confirmed':
-        return 'Order confirmed';
+        return 'Order confirmed'.tr;
       case 'preparing':
-        return 'Preparing your food';
+        return 'Preparing your food'.tr;
       case 'ready_for_pickup':
-        return 'Food is ready';
+        return 'Food is ready'.tr;
       case 'reached_pickup':
-        return 'Rider at restaurant';
+        return 'Rider at restaurant'.tr;
       case 'picked_up':
-        return 'Order picked up';
+        return 'Order picked up'.tr;
       case 'reached_drop':
-        return 'Arriving at your door';
+        return 'Arriving at your door'.tr;
       case 'delivered':
-        return 'Delivered';
+        return 'Delivered'.tr;
       default:
         return status;
     }
@@ -587,7 +589,7 @@ class OrderModel {
 
   static double? _coord(dynamic list, int index) {
     if (list is List && list.length > index) {
-      return (list[index] as num?)?.toDouble();
+      return num.tryParse('${list[index]}')?.toDouble();
     }
     return null;
   }
@@ -641,7 +643,7 @@ class OrderModel {
         restaurantMap['profileImage'] as String?,
       ),
       restaurantAddress: (restaurantMap['address'] ?? '').toString(),
-      restaurantRating: (restaurantMap['rating'] as num?)?.toDouble() ?? 0.0,
+      restaurantRating: num.tryParse('${restaurantMap['rating']}')?.toDouble() ?? 0.0,
       restaurantIsOpen: restaurantMap['isOpen'] as bool? ?? false,
       restaurantIsVerified: restaurantMap['isVerified'] as bool? ?? false,
       items: ((json['items'] as List?) ?? const [])
@@ -697,8 +699,8 @@ class OrderModel {
       deliveryPartner: partner is Map
           ? DeliveryPartner.fromApi(partner.cast<String, dynamic>())
           : null,
-      riderLat: (currentLocation?['lat'] as num?)?.toDouble(),
-      riderLng: (currentLocation?['lng'] as num?)?.toDouble(),
+      riderLat: num.tryParse('${currentLocation?['lat']}')?.toDouble(),
+      riderLng: num.tryParse('${currentLocation?['lng']}')?.toDouble(),
       // GeoJSON is [lng, lat] everywhere it is stored or returned.
       restaurantLat: _coord(
         (restaurantMap['location'] as Map?)?['coordinates'],
@@ -710,8 +712,8 @@ class OrderModel {
       ),
       dropLat: _coord((address['location'] as Map?)?['coordinates'], 1),
       dropLng: _coord((address['location'] as Map?)?['coordinates'], 0),
-      roadDistanceKm: (pricing['roadDistanceKm'] as num?)?.toDouble(),
-      roadDurationMins: (pricing['roadDurationMins'] as num?)?.toInt(),
+      roadDistanceKm: num.tryParse('${pricing['roadDistanceKm']}')?.toDouble(),
+      roadDurationMins: num.tryParse('${pricing['roadDurationMins']}')?.toInt(),
       eta: OrderEta.fromApi((json['eta'] as Map?)?.cast<String, dynamic>()),
       dropOtpRequired: dropOtp['required'] as bool? ?? false,
       dropOtpVerified: dropOtp['verified'] as bool? ?? false,
@@ -738,8 +740,8 @@ class OrderModel {
       customerPhone: (json['customerPhone'] ?? address['phone'] ?? '')
           .toString(),
       landmark: (address['landmark'] ?? '').toString(),
-      foodRating: (restaurantRatingMap?['rating'] as num?)?.toDouble() ?? 0.0,
-      deliveryRating: (deliveryRatingMap?['rating'] as num?)?.toDouble() ?? 0.0,
+      foodRating: num.tryParse('${restaurantRatingMap?['rating']}')?.toDouble() ?? 0.0,
+      deliveryRating: num.tryParse('${deliveryRatingMap?['rating']}')?.toDouble() ?? 0.0,
       foodRatingComment: (restaurantRatingMap?['comment'] ?? '').toString(),
       deliveryRatingComment: (deliveryRatingMap?['comment'] ?? '').toString(),
     );

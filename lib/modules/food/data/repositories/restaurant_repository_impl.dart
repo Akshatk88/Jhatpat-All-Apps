@@ -1,4 +1,5 @@
 import 'package:superapp_user/core/error/failures.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/core/network/api_response.dart';
 import 'package:superapp_user/modules/food/data/contracts/restaurant_repository.dart';
 import 'package:superapp_user/modules/food/api/datasources/catalog_remote_datasource.dart';
@@ -56,7 +57,7 @@ class RestaurantRepositoryImpl implements RestaurantRepository {
     } on Failure catch (f) {
       return ApiResponse<T>.error(f.message);
     } catch (_) {
-      return ApiResponse<T>.error('Something went wrong. Please try again.');
+      return ApiResponse<T>.error('Something went wrong. Please try again.'.tr);
     }
   }
 }

@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The lock-screen / over-other-apps offer card, laid out like the in-app
+  captain-style offer (lib/core/presentation/widgets/offer_request_card.dart):
+  "1 Order" top bar with the sound pill, a narrow rail with the countdown ring
+  and payout, and a bordered card with the job chip, the payout, the two-stop
+  timeline and the decline ring next to a yellow Accept.
+
+  Plain views on purpose: this is inflated before any Flutter engine exists, so
+  it must not depend on one.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F2F3F5"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <!-- Top bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="20dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="12dp">
+
+        <TextView
+            android:id="@+id/incoming_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="1 Order"
+            android:textColor="#111111"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <!-- Mutes the ringing only; the offer stays up. -->
+        <TextView
+            android:id="@+id/incoming_sound"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/incoming_pill_bg"
+            android:paddingStart="14dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="14dp"
+            android:paddingBottom="8dp"
+            android:text="Sound ON"
+            android:textColor="#111111"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!-- Rail: countdown ring and payout at a glance -->
+            <LinearLayout
+                android:layout_width="72dp"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingTop="18dp">
+
+                <ProgressBar
+                    android:id="@+id/incoming_rail_ring"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:indeterminate="false"
+                    android:max="1000"
+                    android:progress="1000"
+                    android:progressDrawable="@drawable/incoming_countdown_ring" />
+
+                <TextView
+                    android:id="@+id/incoming_rail_fare"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:maxLines="1"
+                    android:textColor="#111111"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/incoming_rail_bonus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:textColor="#1E9E5A"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <!-- The offer card -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="24dp"
+                android:layout_weight="1"
+                android:background="@drawable/incoming_card_bg"
+                android:orientation="vertical"
+                android:paddingStart="16dp"
+                android:paddingTop="14dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="16dp">
+
+                <TextView
+                    android:id="@+id/incoming_subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/incoming_pill_bg"
+                    android:maxLines="1"
+                    android:paddingStart="10dp"
+                    android:paddingTop="6dp"
+                    android:paddingEnd="10dp"
+                    android:paddingBottom="6dp"
+                    android:text="Food delivery"
+                    android:textColor="#111111"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/incoming_fare"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:maxLines="1"
+                    android:textColor="#111111"
+                    android:textSize="34sp"
+                    android:textStyle="bold" />
+
+                <!-- Stop 1: rider to pickup -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="18dp"
+                        android:layout_height="match_parent"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <View
+                            android:layout_width="9dp"
+                            android:layout_height="9dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/incoming_dot_pickup" />
+
+                        <View
+                            android:layout_width="1.5dp"
+                            android:layout_height="match_parent"
+                            android:background="#B3111111" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:paddingBottom="16dp">
+
+                        <TextView
+                            android:id="@+id/incoming_pickup_distance"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#111111"
+                            android:textSize="20sp" />
+
+                        <TextView
+                            android:id="@+id/incoming_pickup"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:ellipsize="end"
+                            android:lineSpacingMultiplier="1.2"
+                            android:maxLines="4"
+                            android:textColor="#111111"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Stop 2: the trip itself -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="18dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:gravity="center_horizontal"
+                        android:text="▼"
+                        android:textColor="#111111"
+                        android:textSize="12sp" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/incoming_drop_distance"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#111111"
+                            android:textSize="20sp" />
+
+                        <TextView
+                            android:id="@+id/incoming_drop"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:ellipsize="end"
+                            android:lineSpacingMultiplier="1.2"
+                            android:maxLines="4"
+                            android:textColor="#111111"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Actions: the countdown ring is also the decline button -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <FrameLayout
+                        android:id="@+id/incoming_reject"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        android:layout_marginEnd="12dp"
+                        android:background="@drawable/incoming_reject_bg"
+                        android:clickable="true"
+                        android:contentDescription="Reject"
+                        android:focusable="true">
+
+                        <ProgressBar
+                            android:id="@+id/incoming_reject_ring"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:indeterminate="false"
+                            android:max="1000"
+                            android:progress="1000"
+                            android:progressDrawable="@drawable/incoming_countdown_ring" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="−"
+                            android:textColor="#111111"
+                            android:textSize="26sp"
+                            android:textStyle="bold" />
+                    </FrameLayout>
+
+                    <Button
+                        android:id="@+id/incoming_accept"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:background="@drawable/incoming_accept_bg"
+                        android:text="Accept"
+                        android:textAllCaps="false"
+                        android:textColor="#111111"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

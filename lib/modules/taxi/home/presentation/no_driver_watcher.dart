@@ -8,6 +8,7 @@ import 'package:superapp_user/modules/taxi/home/application/booking_controller.d
 import 'package:superapp_user/modules/taxi/home/application/booking_state.dart';
 import 'package:superapp_user/modules/taxi/home/application/ride_search_controller.dart';
 import 'package:superapp_user/modules/taxi/home/application/ride_search_state.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 /// Surfaces "no drivers found" no matter which screen the rider is on.
 ///
@@ -59,20 +60,20 @@ class _NoDriverWatcherState extends ConsumerState<NoDriverWatcher> {
       barrierDismissible: false,
       builder: (dialogContext) => AlertDialog(
         icon: const Icon(Icons.search_off_rounded, size: 40, color: TaxiColors.primary),
-        title: const Text('Driver not found'),
-        content: const Text(
+        title: Text('Driver not found'.tr),
+        content: Text(
           'We could not find a driver nearby right now. '
-          'Your booking has been cancelled and you have not been charged.',
+          'Your booking has been cancelled and you have not been charged.'.tr,
         ),
         actionsAlignment: MainAxisAlignment.spaceBetween,
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Close'),
+            child: Text('Close'.tr),
           ),
           FilledButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Try again'),
+            child: Text('Try again'.tr),
           ),
         ],
       ),

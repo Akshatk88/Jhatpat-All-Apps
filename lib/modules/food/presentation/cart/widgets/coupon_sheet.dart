@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:superapp_user/core/utils/haptics.dart';
@@ -22,7 +23,13 @@ class CouponSheet {
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => const _CouponSheetBody(),
+      // Lift the sheet above the keyboard while the coupon code is typed.
+      builder: (sheetContext) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.viewInsetsOf(sheetContext).bottom,
+        ),
+        child: const _CouponSheetBody(),
+      ),
     );
   }
 }
@@ -69,12 +76,11 @@ class _CouponSheetBodyState extends ConsumerState<_CouponSheetBody> {
     if (applied) {
       AppSnackbar.success(
         context,
-        'Coupon ${pricing!.couponCode ?? code.trim().toUpperCase()} applied! '
-        'You saved ₹${pricing.discount.toStringAsFixed(0)}',
+        'Coupon {code} applied! You saved ₹{amount}'.trArgs({'code': pricing!.couponCode ?? code.trim().toUpperCase(), 'amount': pricing.discount.toStringAsFixed(0)}),
       );
       Navigator.of(context).pop();
     } else {
-      AppSnackbar.error(context, 'This coupon is not applicable to your order.');
+      AppSnackbar.error(context, 'This coupon is not applicable to your order.'.tr);
     }
   }
 
@@ -82,7 +88,7 @@ class _CouponSheetBodyState extends ConsumerState<_CouponSheetBody> {
     Haptics.light();
     await ref.read(checkoutViewModelProvider.notifier).removeCoupon();
     if (!mounted || !context.mounted) return;
-    AppSnackbar.info(context, 'Coupon removed');
+    AppSnackbar.info(context, 'Coupon removed'.tr);
     Navigator.of(context).pop();
   }
 
@@ -135,10 +141,10 @@ class _CouponSheetBodyState extends ConsumerState<_CouponSheetBody> {
                     padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
                     children: [
                       Text(
-                        'Apply Coupon',
+                        'Apply Coupon'.tr,
                         style: TextStyle(
                           fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: textColor,
                         ),
                       ),
@@ -156,14 +162,14 @@ class _CouponSheetBodyState extends ConsumerState<_CouponSheetBody> {
                               const SizedBox(width: 10),
                               Expanded(
                                 child: Text(
-                                  '$appliedCode applied · You saved ₹${pricing!.discount.toStringAsFixed(0)}',
+                                  '{code} applied · You saved ₹{amount}'.trArgs({'code': appliedCode, 'amount': pricing!.discount.toStringAsFixed(0)}),
                                   style: const TextStyle(
                                     color: AppColors.success,
-                                    fontWeight: FontWeight.w600,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
                               ),
-                              _textPill('REMOVE', AppColors.success, _remove),
+                              _textPill('REMOVE'.tr, AppColors.success, _remove),
                             ],
                           ),
                         ),
@@ -177,7 +183,7 @@ class _CouponSheetBodyState extends ConsumerState<_CouponSheetBody> {
                               controller: _controller,
                               textCapitalization: TextCapitalization.characters,
                               decoration: InputDecoration(
-                                hintText: 'Enter coupon code',
+                                hintText: 'Enter coupon code'.tr,
                                 filled: true,
                                 fillColor:
                                     isDark ? AppColors.cardDark : const Color(0xFFF5F6F8),
@@ -200,12 +206,12 @@ class _CouponSheetBodyState extends ConsumerState<_CouponSheetBody> {
                                     height: 16,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
-                                      color: Colors.white,
+                                      color: Color(0xFF121212),
                                     ),
                                   )
-                                : const Text(
-                                    'APPLY',
-                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                : Text(
+                                    'APPLY'.tr,
+                                    style: const TextStyle(color: Color(0xFF121212), fontWeight: FontWeight.w600),
                                   ),
                             _applying ? null : () => _apply(_controller.text),
                           ),
@@ -217,7 +223,7 @@ class _CouponSheetBodyState extends ConsumerState<_CouponSheetBody> {
                           padding: const EdgeInsets.symmetric(vertical: 24),
                           child: Center(
                             child: Text(
-                              'No eligible coupon found.',
+                              'No eligible coupon found.'.tr,
                               style: TextStyle(color: secondaryColor),
                             ),
                           ),
@@ -268,7 +274,7 @@ class _CouponSheetBodyState extends ConsumerState<_CouponSheetBody> {
             label,
             style: TextStyle(
               color: onTap == null ? color.withValues(alpha: 0.4) : color,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
               fontSize: 13,
             ),
           ),
@@ -301,7 +307,7 @@ class _CouponSheetBodyState extends ConsumerState<_CouponSheetBody> {
                 children: [
                   Text(
                     c.code,
-                    style: TextStyle(fontWeight: FontWeight.bold, color: textColor),
+                    style: TextStyle(fontWeight: FontWeight.w600, color: textColor),
                   ),
                   const SizedBox(height: 2),
                   Text(
@@ -312,7 +318,7 @@ class _CouponSheetBodyState extends ConsumerState<_CouponSheetBody> {
                     Padding(
                       padding: const EdgeInsets.only(top: 4),
                       child: Text(
-                        'Min order ₹${c.minSpend.toStringAsFixed(0)}',
+                        'Min order ₹{amount}'.trArgs({'amount': c.minSpend.toStringAsFixed(0)}),
                         style: const TextStyle(color: Colors.redAccent, fontSize: 11),
                       ),
                     ),
@@ -320,8 +326,8 @@ class _CouponSheetBodyState extends ConsumerState<_CouponSheetBody> {
               ),
             ),
             _textPill(
-              'APPLY',
-              AppColors.primary,
+              'APPLY'.tr,
+              const Color(0xFFE5A600),
               (!eligible || _applying) ? null : () => _apply(c.code),
             ),
           ],

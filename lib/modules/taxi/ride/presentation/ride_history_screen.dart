@@ -2,18 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/design_system/tokens/taxi_colors.dart';
 import 'package:superapp_user/design_system/components/ride/empty_state.dart';
 import 'package:superapp_user/design_system/components/ride/loading_widget.dart';
-import 'package:superapp_user/design_system/components/ride/app_bottom_navigation_bar.dart';
+import 'package:superapp_user/modules/taxi/home/application/home_providers.dart';
+import 'package:superapp_user/modules/taxi/home/application/vehicle_image.dart';
+import 'package:superapp_user/modules/taxi/home/data/models/vehicle_type_model.dart';
 import 'package:superapp_user/modules/taxi/ride/data/models/ride_model.dart';
 import 'package:superapp_user/modules/taxi/ride/application/ride_history_controller.dart';
 import 'package:superapp_user/modules/taxi/ride/application/ride_history_state.dart';
-import 'package:superapp_user/modules/rental/application/rental_providers.dart';
-import 'package:superapp_user/modules/rental/data/models/rental_booking_model.dart';
 import 'package:superapp_user/modules/taxi/ride/presentation/widgets/recent_activity_card.dart';
 
-/// Normalized history entry representing either a Ride or a Rental booking.
+/// Normalized history entry for a ride.
 class _HistoryEntry {
   final String rideId;
   final String title;
@@ -25,9 +26,11 @@ class _HistoryEntry {
   final String status;
   final String serviceType;
   final String? vehicleIconType;
+  final String? vehicleType;
   final String route;
 
   const _HistoryEntry({
+    this.vehicleType,
     required this.rideId,
     required this.title,
     required this.subtitle,
@@ -76,41 +79,24 @@ class _HistoryEntry {
       status: ride.status,
       serviceType: serviceType,
       vehicleIconType: ride.vehicleIconType,
-      route: '/rides/${ride.rideId}',
+      vehicleType: ride.vehicleType,
+      route: '/taxi/rides/${ride.rideId}',
     );
   }
 
-  factory _HistoryEntry.fromRental(RentalBookingModel booking) {
-    return _HistoryEntry(
-      rideId: booking.id,
-      title: booking.vehicleName.isNotEmpty ? booking.vehicleName : 'Rental Vehicle',
-      subtitle: booking.packageLabel.isNotEmpty
-          ? booking.packageLabel.toUpperCase()
-          : 'RENTAL BOOKING',
-      pickup: booking.vehicleName,
-      drop: booking.packageLabel,
-      date: booking.pickupDateTime ?? booking.createdAt ?? DateTime.now(),
-      fare: booking.totalCost,
-      status: booking.status,
-      serviceType: 'rental',
-      route: '/rental/history',
-    );
-  }
 }
 
 class _HistoryFilter {
   final String id;
   final String label;
 
-  /// Category query sent to backend (null means not fetched from ride API)
-  final String? rideCategory;
-  final bool includesRentals;
+  /// Category query sent to backend.
+  final String rideCategory;
 
   const _HistoryFilter({
     required this.id,
     required this.label,
-    this.rideCategory,
-    this.includesRentals = false,
+    required this.rideCategory,
   });
 }
 
@@ -125,12 +111,9 @@ class _RideHistoryScreenState extends ConsumerState<RideHistoryScreen> {
   final _scrollController = ScrollController();
 
   static const _filters = <_HistoryFilter>[
-    _HistoryFilter(id: 'all', label: 'ALL', rideCategory: 'all', includesRentals: true),
+    _HistoryFilter(id: 'all', label: 'ALL', rideCategory: 'all'),
     _HistoryFilter(id: 'rides', label: 'RIDES', rideCategory: 'rides'),
     _HistoryFilter(id: 'parcels', label: 'PARCELS', rideCategory: 'parcels'),
-    _HistoryFilter(id: 'rental', label: 'RENTAL', includesRentals: true),
-    _HistoryFilter(id: 'outstation', label: 'OUTSTATION', rideCategory: 'outstation'),
-    _HistoryFilter(id: 'bus', label: 'BUS', rideCategory: 'bus'),
   ];
 
   String _selectedId = 'all';
@@ -153,7 +136,6 @@ class _RideHistoryScreenState extends ConsumerState<RideHistoryScreen> {
 
   void _onScroll() {
     if (!_scrollController.hasClients) return;
-    if (_selected.rideCategory == null) return;
 
     final position = _scrollController.position;
     if (position.pixels >= position.maxScrollExtent - 300) {
@@ -166,19 +148,16 @@ class _RideHistoryScreenState extends ConsumerState<RideHistoryScreen> {
     setState(() => _selectedId = id);
 
     final filter = _filters.firstWhere((f) => f.id == id);
-    if (filter.rideCategory != null) {
-      ref.read(rideHistoryControllerProvider.notifier).setCategory(filter.rideCategory!);
-    }
+    ref.read(rideHistoryControllerProvider.notifier).setCategory(filter.rideCategory);
   }
 
   List<_HistoryEntry> _entriesFor(
     _HistoryFilter filter,
     RideHistoryState rideState,
-    List<RentalBookingModel> rentals,
   ) {
     final entries = <_HistoryEntry>[];
 
-    if (filter.rideCategory != null) {
+    {
       final rides = rideState.rides.map(_HistoryEntry.fromRide);
       if (filter.id == 'all') {
         entries.addAll(rides);
@@ -187,22 +166,12 @@ class _RideHistoryScreenState extends ConsumerState<RideHistoryScreen> {
             e.serviceType != 'parcel' &&
             e.serviceType != 'intercity' &&
             e.serviceType != 'outstation' &&
-            e.serviceType != 'bus' &&
-            e.serviceType != 'rental'));
+            e.serviceType != 'bus'));
       } else if (filter.id == 'parcels') {
         entries.addAll(rides.where((e) => e.serviceType == 'parcel'));
-      } else if (filter.id == 'outstation') {
-        entries.addAll(rides.where((e) =>
-            e.serviceType == 'outstation' || e.serviceType == 'intercity'));
-      } else if (filter.id == 'bus') {
-        entries.addAll(rides.where((e) => e.serviceType == 'bus'));
       } else {
         entries.addAll(rides);
       }
-    }
-
-    if (filter.includesRentals) {
-      entries.addAll(rentals.map(_HistoryEntry.fromRental));
     }
 
     entries.sort((a, b) => b.date.compareTo(a.date));
@@ -212,102 +181,69 @@ class _RideHistoryScreenState extends ConsumerState<RideHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     final rideState = ref.watch(rideHistoryControllerProvider);
-    final rentalsAsync = ref.watch(myRentalBookingsProvider);
     final filter = _selected;
 
-    final rentals = rentalsAsync.value ?? const <RentalBookingModel>[];
-
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? TaxiColors.darkBackground : TaxiColors.lightBackground;
     final textPrimary = isDark ? TaxiColors.darkTextPrimary : TaxiColors.lightTextPrimary;
     final textSecondary = isDark ? TaxiColors.darkTextSecondary : TaxiColors.lightTextSecondary;
 
-    return Scaffold(
-      backgroundColor: bgColor,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        title: Text(
-          'MY BOOKINGS',
-          style: TextStyle(
-            color: textSecondary,
-            fontSize: 12,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.5,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Recent activity'.tr,
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: textPrimary,
+                  fontSize: 24,
+                  letterSpacing: -0.5,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Your recent trips, deliveries, and bookings'.tr,
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: textSecondary,
+                  fontSize: 13,
+                ),
+              ),
+            ],
           ),
         ),
-        centerTitle: false,
-        titleSpacing: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: textPrimary, size: 20),
-          onPressed: () => Navigator.of(context).maybePop(),
+        _FilterBar(
+          filters: _filters,
+          selectedId: _selectedId,
+          onSelected: _onFilterSelected,
         ),
-      ),
-      bottomNavigationBar: const AppBottomNavigationBar(currentIndex: 2),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Recent activity',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w900,
-                    color: textPrimary,
-                    fontSize: 24,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Your recent trips, deliveries, and bookings',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    color: textSecondary,
-                    fontSize: 13,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          _FilterBar(
-            filters: _filters,
-            selectedId: _selectedId,
-            onSelected: _onFilterSelected,
-          ),
-          Expanded(
-            child: _buildBody(filter, rideState, rentals, rentalsAsync.isLoading),
-          ),
-        ],
-      ),
+        Expanded(
+          child: _buildBody(filter, rideState),
+        ),
+      ],
     );
   }
 
   Widget _buildBody(
     _HistoryFilter filter,
     RideHistoryState rideState,
-    List<RentalBookingModel> rentals,
-    bool rentalsLoading,
   ) {
-    final loading = filter.rideCategory != null
-        ? rideState.isLoading
-        : rentalsLoading;
-    if (loading) {
-      return const LoadingWidget(message: 'Loading your bookings…');
+    if (rideState.isLoading) {
+      return LoadingWidget(message: 'Loading your bookings…'.tr);
     }
 
-    final entries = _entriesFor(filter, rideState, rentals);
+    final entries = _entriesFor(filter, rideState);
 
-    if (entries.isEmpty && rideState.error != null && filter.rideCategory != null) {
+    if (entries.isEmpty && rideState.error != null) {
       return EmptyState(
         icon: Icons.error_outline,
-        title: 'Could not load your bookings',
-        message: 'Please check your connection and try again.',
-        actionLabel: 'Retry',
+        title: 'Could not load your bookings'.tr,
+        message: 'Please check your connection and try again.'.tr,
+        actionLabel: 'Retry'.tr,
         onAction: _refresh,
       );
     }
@@ -315,16 +251,19 @@ class _RideHistoryScreenState extends ConsumerState<RideHistoryScreen> {
     if (entries.isEmpty) {
       return EmptyState(
         icon: Icons.receipt_long_outlined,
-        title: 'No bookings yet',
+        title: 'No bookings yet'.tr,
         message: filter.id == 'all'
-            ? 'Your trips will appear here once you make your first booking.'
-            : 'Nothing under ${filter.label} yet.',
-        actionLabel: 'Book now',
+            ? 'Your trips will appear here once you make your first booking.'.tr
+            : 'Nothing under {label} yet.'.trArgs({'label': filter.label.tr}),
+        actionLabel: 'Book now'.tr,
         onAction: () => context.go('/taxi'),
       );
     }
 
-    final showFooterLoader = filter.rideCategory != null && rideState.isLoadingMore;
+    final showFooterLoader = rideState.isLoadingMore;
+    // Admin vehicle art; empty until it loads, so cards show bundled art first.
+    final vehicleCatalog =
+        ref.watch(allVehicleTypesProvider).asData?.value ?? const <VehicleTypeModel>[];
 
     return RefreshIndicator(
       onRefresh: _refresh,
@@ -353,6 +292,11 @@ class _RideHistoryScreenState extends ConsumerState<RideHistoryScreen> {
             status: entry.status,
             serviceType: entry.serviceType,
             vehicleIconType: entry.vehicleIconType,
+            vehicleImageUrl: adminVehicleImage(findVehicleType(
+              vehicleCatalog,
+              idOrName: entry.vehicleType,
+              iconType: entry.vehicleIconType,
+            )),
             onTap: () {
               if (entry.route.isNotEmpty) {
                 context.push(entry.route);
@@ -365,10 +309,7 @@ class _RideHistoryScreenState extends ConsumerState<RideHistoryScreen> {
   }
 
   Future<void> _refresh() async {
-    ref.invalidate(myRentalBookingsProvider);
-    if (_selected.rideCategory != null) {
-      await ref.read(rideHistoryControllerProvider.notifier).loadFirstPage();
-    }
+    await ref.read(rideHistoryControllerProvider.notifier).loadFirstPage();
   }
 }
 
@@ -402,14 +343,14 @@ class _FilterBar extends StatelessWidget {
             return Padding(
               padding: const EdgeInsets.only(right: 8),
               child: ChoiceChip(
-                label: Text(filter.label),
+                label: Text(filter.label.tr),
                 selected: selected,
                 onSelected: (_) => onSelected(filter.id),
                 showCheckmark: false,
                 labelStyle: TextStyle(
                   fontSize: 12.5,
-                  fontWeight: FontWeight.w700,
-                  color: selected ? Colors.white : unselectedText,
+                  fontWeight: FontWeight.w600,
+                  color: selected ? (isDark ? const Color(0xFF121212) : Colors.white) : unselectedText,
                 ),
                 selectedColor: selectedBg,
                 backgroundColor: unselectedBg,

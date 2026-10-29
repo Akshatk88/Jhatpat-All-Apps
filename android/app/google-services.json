@@ -1,22 +1,21 @@
 {
   "project_info": {
-    "project_number": "857854567102",
-    "firebase_url": "https://k9rides-529a8-default-rtdb.asia-southeast1.firebasedatabase.app",
-    "project_id": "k9rides-529a8",
-    "storage_bucket": "k9rides-529a8.firebasestorage.app"
+    "project_number": "1068476980955",
+    "project_id": "jhatpat-d0e4f",
+    "storage_bucket": "jhatpat-d0e4f.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:857854567102:android:3ec6ac79aa71818bfc34ef",
+        "mobilesdk_app_id": "1:1068476980955:android:dc5b3f71a74b56c2dfb6fe",
         "android_client_info": {
-          "package_name": "com.k9bharat.delivery"
+          "package_name": "com.delivery.jhatpat"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDt1UEqn5kYbrbQoRJnQ5klKZbLNVrGvuQ"
+          "current_key": "AIzaSyAAeZjaXyhCUBCtp7_ne-eGxWw7fFzj7Ck"
         }
       ],
       "services": {
@@ -27,15 +26,15 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:857854567102:android:b44efcd88c3b0592fc34ef",
+        "mobilesdk_app_id": "1:1068476980955:android:9f214668a5797b00dfb6fe",
         "android_client_info": {
-          "package_name": "com.k9bharat.restaurant"
+          "package_name": "com.restaurant.jhatpat"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDt1UEqn5kYbrbQoRJnQ5klKZbLNVrGvuQ"
+          "current_key": "AIzaSyAAeZjaXyhCUBCtp7_ne-eGxWw7fFzj7Ck"
         }
       ],
       "services": {
@@ -46,34 +45,15 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:857854567102:android:0472547c3baf400bfc34ef",
+        "mobilesdk_app_id": "1:1068476980955:android:8b05a954e6d3e3d8dfb6fe",
         "android_client_info": {
-          "package_name": "com.k9bharat.user"
+          "package_name": "com.user.jhatpat"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDt1UEqn5kYbrbQoRJnQ5klKZbLNVrGvuQ"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:857854567102:android:aacf84880be7ff54fc34ef",
-        "android_client_info": {
-          "package_name": "com.k9bharat.vendor"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDt1UEqn5kYbrbQoRJnQ5klKZbLNVrGvuQ"
+          "current_key": "AIzaSyAAeZjaXyhCUBCtp7_ne-eGxWw7fFzj7Ck"
         }
       ],
       "services": {

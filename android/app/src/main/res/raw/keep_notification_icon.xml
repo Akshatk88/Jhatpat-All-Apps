@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The notification icon is looked up by name at runtime (geolocator /
+     flutter_local_notifications), so release resource shrinking cannot see it. -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/ic_stat_jhatpat" />

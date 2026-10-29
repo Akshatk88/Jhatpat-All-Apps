@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:superapp_user/design_system/tokens/taxi_colors.dart';
 import 'package:superapp_user/modules/taxi/profile/application/emergency_contacts_provider.dart';
 import 'package:superapp_user/design_system/components/ride/profile_tile.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 class SafetyCenterScreen extends ConsumerWidget {
   const SafetyCenterScreen({super.key});
@@ -15,7 +16,7 @@ class SafetyCenterScreen extends ConsumerWidget {
     final contacts = ref.watch(emergencyContactsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Safety center')),
+      appBar: AppBar(title: Text('Safety center'.tr)),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
@@ -31,14 +32,14 @@ class SafetyCenterScreen extends ConsumerWidget {
                 children: [
                   const Icon(Icons.emergency_share_rounded, color: Colors.white, size: 36),
                   const SizedBox(width: 16),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Emergency SOS',
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 17)),
-                        SizedBox(height: 4),
-                        Text('Alert our safety team instantly', style: TextStyle(color: Colors.white70)),
+                        Text('Emergency SOS'.tr,
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 17)),
+                        const SizedBox(height: 4),
+                        Text('Alert our safety team instantly'.tr, style: const TextStyle(color: Colors.white70)),
                       ],
                     ),
                   ),
@@ -48,14 +49,14 @@ class SafetyCenterScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 24),
-          Text('Trusted contacts', style: Theme.of(context).textTheme.titleLarge),
+          Text('Trusted contacts'.tr, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 8),
           if (contacts.isEmpty)
             Card(
               child: ListTile(
                 leading: const Icon(Icons.person_add_alt_rounded),
-                title: const Text('Add an emergency contact'),
-                subtitle: const Text('They can be reached quickly during a ride'),
+                title: Text('Add an emergency contact'.tr),
+                subtitle: Text('They can be reached quickly during a ride'.tr),
                 onTap: () => context.push('/taxi/emergency-contacts'),
               ),
             )
@@ -69,7 +70,7 @@ class SafetyCenterScreen extends ConsumerWidget {
                         backgroundColor: TaxiColors.primary.withValues(alpha: 0.08),
                         child: Text(
                           contact.name.isNotEmpty ? contact.name[0].toUpperCase() : '?',
-                          style: const TextStyle(color: TaxiColors.primary, fontWeight: FontWeight.w700),
+                          style: const TextStyle(color: TaxiColors.primaryDark, fontWeight: FontWeight.w600),
                         ),
                       ),
                       title: Text(contact.name),
@@ -81,30 +82,30 @@ class SafetyCenterScreen extends ConsumerWidget {
                     ),
                   ListTile(
                     leading: const Icon(Icons.settings_outlined),
-                    title: const Text('Manage contacts'),
+                    title: Text('Manage contacts'.tr),
                     onTap: () => context.push('/taxi/emergency-contacts'),
                   ),
                 ],
               ),
             ),
           const SizedBox(height: 24),
-          Text('More', style: Theme.of(context).textTheme.titleLarge),
+          Text('More'.tr, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 8),
           Card(
             child: Column(
               children: [
                 ProfileTile(
                   icon: Icons.ios_share_rounded,
-                  title: 'Share my trip',
-                  subtitle: 'Let someone track your ride',
+                  title: 'Share my trip'.tr,
+                  subtitle: 'Let someone track your ride'.tr,
                   onTap: () => Share.share(
-                    'I\'m on a ride booked through the Taxi app. I\'ll share updates here.',
+                    'I\'m on a ride booked through the Taxi app. I\'ll share updates here.'.tr,
                   ),
                 ),
                 const Divider(height: 1),
                 ProfileTile(
                   icon: Icons.local_police_outlined,
-                  title: 'Call local police',
+                  title: 'Call local police'.tr,
                   onTap: () => launchUrl(Uri.parse('tel:100')),
                 ),
               ],

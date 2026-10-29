@@ -9,14 +9,14 @@ class SupportRepository {
 
   Future<List<SupportTitleModel>> getTitles() async {
     final data = await api.get(ApiConstants.supportTitles, query: {'userType': 'user'});
-    final results = (data['results'] as List? ?? []);
-    return results.map((e) => SupportTitleModel.fromJson(Map<String, dynamic>.from(e))).toList();
+    final results = (data is Map ? data['results'] : data) as List? ?? const [];
+    return results.whereType<Map>().map((e) => SupportTitleModel.fromJson(Map<String, dynamic>.from(e))).toList();
   }
 
   Future<List<SupportTicketModel>> getMyTickets() async {
     final data = await api.get(ApiConstants.myTickets);
-    final results = (data['results'] as List? ?? []);
-    return results.map((e) => SupportTicketModel.fromJson(Map<String, dynamic>.from(e))).toList();
+    final results = (data is Map ? data['results'] : data) as List? ?? const [];
+    return results.whereType<Map>().map((e) => SupportTicketModel.fromJson(Map<String, dynamic>.from(e))).toList();
   }
 
   Future<SupportTicketModel> getTicketDetail(String ticketCode) async {

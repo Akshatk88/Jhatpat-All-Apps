@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:superapp_user/design_system/components/ride/app_bottom_navigation_bar.dart';
 import 'package:superapp_user/modules/taxi/home/presentation/all_services_screen.dart';
 import 'package:superapp_user/modules/taxi/home/presentation/confirm_booking_screen.dart';
 import 'package:superapp_user/modules/taxi/home/presentation/finding_driver_screen.dart';
@@ -28,7 +29,6 @@ import 'package:superapp_user/modules/taxi/profile/presentation/theme_screen.dar
 import 'package:superapp_user/modules/taxi/rewards/presentation/rewards_screen.dart';
 import 'package:superapp_user/modules/taxi/settings/presentation/security_screen.dart';
 import 'package:superapp_user/modules/taxi/settings/presentation/settings_screen.dart';
-import 'package:superapp_user/modules/taxi/subscription/presentation/subscription_screen.dart';
 import 'package:superapp_user/modules/taxi/support/presentation/new_ticket_screen.dart';
 import 'package:superapp_user/modules/taxi/support/presentation/safety_center_screen.dart';
 import 'package:superapp_user/modules/taxi/support/presentation/sos_screen.dart';
@@ -43,129 +43,188 @@ import 'package:superapp_user/modules/taxi/taxi_route_names.dart';
 /// mid-funnel is how a half-built booking gets lost. The stock taxi app put
 /// `AppBottomNavigationBar` on these screens — that is not carried over.
 List<RouteBase> taxiRoutes(GlobalKey<NavigatorState> rootNavigatorKey) => [
+  GoRoute(
+    name: TaxiRouteNames.home,
+    path: TaxiRoutePaths.home,
+    builder: (context, state) => const ModuleHomeShell(
+      moduleId: ModuleId.taxi,
+      bottomNavigationBar: AppBottomNavigationBar(
+        currentIndex: AppBottomNavigationBar.ride,
+      ),
+      showHeaderLocation: false,
+      child: TaxiHomeScreen(),
+    ),
+  ),
+  GoRoute(
+    name: TaxiRouteNames.destination,
+    path: TaxiRoutePaths.destination,
+    builder: (context, state) => const SearchDestinationScreen(),
+  ),
+  GoRoute(
+    name: TaxiRouteNames.pickOnMap,
+    path: TaxiRoutePaths.pickOnMap,
+    builder: (context, state) =>
+        MapPickerScreen(type: state.uri.queryParameters['type'] ?? 'pickup'),
+  ),
+  GoRoute(
+    name: TaxiRouteNames.savedPlaces,
+    path: TaxiRoutePaths.savedPlaces,
+    builder: (context, state) => const SavedPlacesScreen(),
+  ),
+  GoRoute(
+    name: TaxiRouteNames.vehicles,
+    path: TaxiRoutePaths.vehicles,
+    builder: (context, state) => const RideTypeScreen(),
+  ),
+  GoRoute(
+    name: TaxiRouteNames.confirm,
+    path: TaxiRoutePaths.confirm,
+    builder: (context, state) => const ConfirmBookingScreen(),
+  ),
+  GoRoute(
+    name: TaxiRouteNames.searching,
+    path: TaxiRoutePaths.searching,
+    builder: (context, state) => const FindingDriverScreen(),
+  ),
+  GoRoute(
+    name: TaxiRouteNames.noDriver,
+    path: TaxiRoutePaths.noDriver,
+    builder: (context, state) => const NoDriverScreen(),
+  ),
+  GoRoute(
+    name: TaxiRouteNames.promo,
+    path: TaxiRoutePaths.promo,
+    builder: (context, state) => const PromoScreen(),
+  ),
+  GoRoute(
+    name: TaxiRouteNames.allServices,
+    path: TaxiRoutePaths.allServices,
+    builder: (context, state) => const ModuleHomeShell(
+      moduleId: ModuleId.taxi,
+      bottomNavigationBar: AppBottomNavigationBar(
+        currentIndex: AppBottomNavigationBar.services,
+      ),
+      child: AllServicesScreen(),
+    ),
+  ),
+  GoRoute(
+    name: TaxiRouteNames.rides,
+    path: TaxiRoutePaths.rides,
+    builder: (context, state) => const ModuleHomeShell(
+      moduleId: ModuleId.taxi,
+      bottomNavigationBar: AppBottomNavigationBar(
+        currentIndex: AppBottomNavigationBar.history,
+      ),
+      child: RideHistoryScreen(),
+    ),
+    routes: [
+      // More specific children first so ':rideId' does not swallow them.
       GoRoute(
-        name: TaxiRouteNames.home,
-        path: TaxiRoutePaths.home,
-        builder: (context, state) => const ModuleHomeShell(
-          moduleId: ModuleId.taxi,
-          child: TaxiHomeScreen(),
-        ),
+        name: TaxiRouteNames.rideTracking,
+        path: ':rideId/track',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) =>
+            RideTrackingScreen(rideId: state.pathParameters['rideId']!),
       ),
       GoRoute(
-        name: TaxiRouteNames.destination,
-        path: TaxiRoutePaths.destination,
-        builder: (context, state) => const SearchDestinationScreen(),
+        name: TaxiRouteNames.rideRating,
+        path: ':rideId/rate',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) =>
+            RatingReviewScreen(rideId: state.pathParameters['rideId']!),
       ),
       GoRoute(
-        name: TaxiRouteNames.pickOnMap,
-        path: TaxiRoutePaths.pickOnMap,
-        builder: (context, state) => MapPickerScreen(
-          type: state.uri.queryParameters['type'] ?? 'pickup',
-        ),
+        name: TaxiRouteNames.rideChat,
+        path: ':rideId/chat',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) =>
+            RideChatScreen(rideId: state.pathParameters['rideId']!),
       ),
       GoRoute(
-        name: TaxiRouteNames.savedPlaces,
-        path: TaxiRoutePaths.savedPlaces,
-        builder: (context, state) => const SavedPlacesScreen(),
+        name: TaxiRouteNames.rideDetail,
+        path: ':rideId',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) =>
+            RideDetailScreen(rideId: state.pathParameters['rideId']!),
       ),
-      GoRoute(
-        name: TaxiRouteNames.vehicles,
-        path: TaxiRoutePaths.vehicles,
-        builder: (context, state) => const RideTypeScreen(),
-      ),
-      GoRoute(
-        name: TaxiRouteNames.confirm,
-        path: TaxiRoutePaths.confirm,
-        builder: (context, state) => const ConfirmBookingScreen(),
-      ),
-      GoRoute(
-        name: TaxiRouteNames.searching,
-        path: TaxiRoutePaths.searching,
-        builder: (context, state) => const FindingDriverScreen(),
-      ),
-      GoRoute(
-        name: TaxiRouteNames.noDriver,
-        path: TaxiRoutePaths.noDriver,
-        builder: (context, state) => const NoDriverScreen(),
-      ),
-      GoRoute(
-        name: TaxiRouteNames.promo,
-        path: TaxiRoutePaths.promo,
-        builder: (context, state) => const PromoScreen(),
-      ),
-      GoRoute(
-        name: TaxiRouteNames.allServices,
-        path: TaxiRoutePaths.allServices,
-        builder: (context, state) => const AllServicesScreen(),
-      ),
-      GoRoute(
-        name: TaxiRouteNames.rides,
-        path: TaxiRoutePaths.rides,
-        builder: (context, state) => const RideHistoryScreen(),
-        routes: [
-          // More specific children first so ':rideId' does not swallow them.
-          GoRoute(
-            name: TaxiRouteNames.rideTracking,
-            path: ':rideId/track',
-            parentNavigatorKey: rootNavigatorKey,
-            builder: (context, state) =>
-                RideTrackingScreen(rideId: state.pathParameters['rideId']!),
-          ),
-          GoRoute(
-            name: TaxiRouteNames.rideRating,
-            path: ':rideId/rate',
-            parentNavigatorKey: rootNavigatorKey,
-            builder: (context, state) =>
-                RatingReviewScreen(rideId: state.pathParameters['rideId']!),
-          ),
-          GoRoute(
-            name: TaxiRouteNames.rideChat,
-            path: ':rideId/chat',
-            parentNavigatorKey: rootNavigatorKey,
-            builder: (context, state) =>
-                RideChatScreen(rideId: state.pathParameters['rideId']!),
-          ),
-          GoRoute(
-            name: TaxiRouteNames.rideDetail,
-            path: ':rideId',
-            parentNavigatorKey: rootNavigatorKey,
-            builder: (context, state) =>
-                RideDetailScreen(rideId: state.pathParameters['rideId']!),
-          ),
-        ],
-      ),
+    ],
+  ),
 
-      // ── ride-side screens with no shared counterpart yet ──────────────
-      GoRoute(name: TaxiSubRouteNames.support, path: TaxiSubRoutePaths.support,
-        builder: (c, s) => const SupportHomeScreen()),
-      GoRoute(name: TaxiSubRouteNames.supportSafety, path: TaxiSubRoutePaths.supportSafety,
-        builder: (c, s) => const SafetyCenterScreen()),
-      GoRoute(name: TaxiSubRouteNames.supportNewTicket, path: TaxiSubRoutePaths.supportNewTicket,
-        builder: (c, s) => const NewTicketScreen()),
-      GoRoute(name: TaxiSubRouteNames.supportTicket, path: TaxiSubRoutePaths.supportTicket,
-        builder: (c, s) => TicketDetailScreen(ticketCode: s.pathParameters['code']!)),
-      GoRoute(name: TaxiSubRouteNames.sos, path: TaxiSubRoutePaths.sos,
-        builder: (c, s) => SosScreen(rideId: s.uri.queryParameters['rideId'])),
-      GoRoute(name: TaxiSubRouteNames.settings, path: TaxiSubRoutePaths.settings,
-        builder: (c, s) => const SettingsScreen()),
-      GoRoute(name: TaxiSubRouteNames.settingsSecurity, path: TaxiSubRoutePaths.settingsSecurity,
-        builder: (c, s) => const SecurityScreen()),
-      GoRoute(name: TaxiSubRouteNames.emergencyContacts, path: TaxiSubRoutePaths.emergencyContacts,
-        builder: (c, s) => const EmergencyContactsScreen()),
-      GoRoute(name: TaxiSubRouteNames.language, path: TaxiSubRoutePaths.language,
-        builder: (c, s) => const LanguageScreen()),
-      GoRoute(name: TaxiSubRouteNames.theme, path: TaxiSubRoutePaths.theme,
-        builder: (c, s) => const ThemeScreen()),
-      GoRoute(name: TaxiSubRouteNames.deleteAccount, path: TaxiSubRoutePaths.deleteAccount,
-        builder: (c, s) => const DeleteAccountScreen()),
-      GoRoute(name: TaxiSubRouteNames.editProfile, path: TaxiSubRoutePaths.editProfile,
-        builder: (c, s) => const TaxiEditProfileScreen()),
-      GoRoute(name: TaxiSubRouteNames.notifications, path: TaxiSubRoutePaths.notifications,
-        builder: (c, s) => const TaxiNotificationsScreen()),
-      GoRoute(name: TaxiSubRouteNames.notificationSettings, path: TaxiSubRoutePaths.notificationSettings,
-        builder: (c, s) => const NotificationSettingsScreen()),
-      GoRoute(name: TaxiSubRouteNames.subscription, path: TaxiSubRoutePaths.subscription,
-        builder: (c, s) => const SubscriptionScreen()),
-      GoRoute(name: TaxiSubRouteNames.rewards, path: TaxiSubRoutePaths.rewards,
-        builder: (c, s) => const RewardsScreen()),
-    ];
+  // ── ride-side screens with no shared counterpart yet ──────────────
+  GoRoute(
+    name: TaxiSubRouteNames.support,
+    path: TaxiSubRoutePaths.support,
+    builder: (c, s) => const SupportHomeScreen(),
+  ),
+  GoRoute(
+    name: TaxiSubRouteNames.supportSafety,
+    path: TaxiSubRoutePaths.supportSafety,
+    builder: (c, s) => const SafetyCenterScreen(),
+  ),
+  GoRoute(
+    name: TaxiSubRouteNames.supportNewTicket,
+    path: TaxiSubRoutePaths.supportNewTicket,
+    builder: (c, s) => const NewTicketScreen(),
+  ),
+  GoRoute(
+    name: TaxiSubRouteNames.supportTicket,
+    path: TaxiSubRoutePaths.supportTicket,
+    builder: (c, s) =>
+        TicketDetailScreen(ticketCode: s.pathParameters['code']!),
+  ),
+  GoRoute(
+    name: TaxiSubRouteNames.sos,
+    path: TaxiSubRoutePaths.sos,
+    builder: (c, s) => SosScreen(rideId: s.uri.queryParameters['rideId']),
+  ),
+  GoRoute(
+    name: TaxiSubRouteNames.settings,
+    path: TaxiSubRoutePaths.settings,
+    builder: (c, s) => const SettingsScreen(),
+  ),
+  GoRoute(
+    name: TaxiSubRouteNames.settingsSecurity,
+    path: TaxiSubRoutePaths.settingsSecurity,
+    builder: (c, s) => const SecurityScreen(),
+  ),
+  GoRoute(
+    name: TaxiSubRouteNames.emergencyContacts,
+    path: TaxiSubRoutePaths.emergencyContacts,
+    builder: (c, s) => const EmergencyContactsScreen(),
+  ),
+  GoRoute(
+    name: TaxiSubRouteNames.language,
+    path: TaxiSubRoutePaths.language,
+    builder: (c, s) => const LanguageScreen(),
+  ),
+  GoRoute(
+    name: TaxiSubRouteNames.theme,
+    path: TaxiSubRoutePaths.theme,
+    builder: (c, s) => const ThemeScreen(),
+  ),
+  GoRoute(
+    name: TaxiSubRouteNames.deleteAccount,
+    path: TaxiSubRoutePaths.deleteAccount,
+    builder: (c, s) => const DeleteAccountScreen(),
+  ),
+  GoRoute(
+    name: TaxiSubRouteNames.editProfile,
+    path: TaxiSubRoutePaths.editProfile,
+    builder: (c, s) => const TaxiEditProfileScreen(),
+  ),
+  GoRoute(
+    name: TaxiSubRouteNames.notifications,
+    path: TaxiSubRoutePaths.notifications,
+    builder: (c, s) => const TaxiNotificationsScreen(),
+  ),
+  GoRoute(
+    name: TaxiSubRouteNames.notificationSettings,
+    path: TaxiSubRoutePaths.notificationSettings,
+    builder: (c, s) => const NotificationSettingsScreen(),
+  ),
+  GoRoute(
+    name: TaxiSubRouteNames.rewards,
+    path: TaxiSubRoutePaths.rewards,
+    builder: (c, s) => const RewardsScreen(),
+  ),
+];

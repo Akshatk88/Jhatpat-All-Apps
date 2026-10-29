@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/modules/food/data/models/order_model.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
 import 'package:superapp_user/design_system/components/media/smart_image.dart';
@@ -36,10 +37,10 @@ class OrderItemsCard extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(20),
             child: Text(
-              'Items Ordered',
+              'Items Ordered'.tr,
               style: TextStyle(
                 fontSize: 16,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
                 color: textColor,
               ),
             ),
@@ -101,7 +102,7 @@ class OrderItemsCard extends StatelessWidget {
                             : '${item.name} (${item.variants.join(', ')})',
                         style: TextStyle(
                           fontSize: 15,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: textColor,
                         ),
                       ),
@@ -158,20 +159,27 @@ class OrderItemsCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
-                        'Qty: ${item.quantity}',
+                        'Qty: {qty}'.trArgs({'qty': item.quantity}),
                         style: TextStyle(
                           fontSize: 12,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w500,
                           color: textColor,
                         ),
                       ),
                     ),
-                    Text(
-                      '${order.currency} ${item.lineTotal.toStringAsFixed(2)}',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: textColor,
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          '${order.currency} ${item.lineTotal.toStringAsFixed(2)}',
+                          maxLines: 1,
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: textColor,
+                          ),
+                        ),
                       ),
                     ),
                   ],

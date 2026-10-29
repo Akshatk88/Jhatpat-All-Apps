@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/shared/wallet/data/wallet_model.dart';
 import 'package:superapp_user/shared/auth/presentation/viewmodels/auth_viewmodel.dart';
 import 'package:superapp_user/shared/referral/presentation/viewmodels/referral_viewmodel.dart';
@@ -54,7 +55,7 @@ class ReferralTicketCard extends ConsumerWidget {
           height: cardHeight,
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color(0xFFFF7A00), Color(0xFFFF9900)],
+              colors: [Color(0xFFFFB800), Color(0xFFFFC72C)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -67,44 +68,50 @@ class ReferralTicketCard extends ConsumerWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
+                  Flexible(
+                    child: Row(
                     children: [
                       Container(
                         padding: EdgeInsets.all(6.r),
                         decoration: const BoxDecoration(
-                          color: Colors.white24,
+                          color: Colors.black12,
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           Icons.fastfood_rounded,
-                          color: Colors.white,
+                          color: Colors.black,
                           size: 18.sp,
                         ),
                       ),
                       SizedBox(width: 8.w),
-                      Text(
-                        'SUVIO FOOD',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 13.sp,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 1.2,
+                      Flexible(
+                        child: Text(
+                          'SUVIO FOOD',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 13.sp,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 1.2,
+                          ),
                         ),
                       ),
                     ],
+                    ),
                   ),
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Colors.black,
                       borderRadius: BorderRadius.circular(10.r),
                     ),
                     child: Text(
-                      'TICKET',
+                      'TICKET'.tr,
                       style: TextStyle(
-                        color: const Color(0xFFFF7A00),
+                        color: const Color(0xFFFFC72C),
                         fontSize: 10.sp,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
@@ -118,7 +125,7 @@ class ReferralTicketCard extends ConsumerWidget {
                   (index) => Expanded(
                     child: Container(
                       height: 1.5.h,
-                      color: index % 2 == 0 ? Colors.white60 : Colors.transparent,
+                      color: index % 2 == 0 ? Colors.black38 : Colors.transparent,
                     ),
                   ),
                 ),
@@ -128,11 +135,11 @@ class ReferralTicketCard extends ConsumerWidget {
               Column(
                 children: [
                   Text(
-                    'YOU & YOUR FRIEND GET',
+                    'YOU & YOUR FRIEND GET'.tr,
                     style: TextStyle(
-                      color: Colors.white70,
+                      color: Colors.black54,
                       fontSize: 10.sp,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       letterSpacing: 1.2,
                     ),
                   ),
@@ -140,16 +147,16 @@ class ReferralTicketCard extends ConsumerWidget {
                   Text(
                     rewardStr,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontSize: 34.sp,
-                      fontWeight: FontWeight.w900,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                   SizedBox(height: 2.h),
                   Text(
-                    'On 1st successful order',
+                    'On 1st successful order'.tr,
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.9),
+                      color: Colors.black87,
                       fontSize: 11.sp,
                     ),
                   ),
@@ -167,20 +174,20 @@ class ReferralTicketCard extends ConsumerWidget {
                 child: Column(
                   children: [
                     Text(
-                      'REFERRAL CODE',
+                      'REFERRAL CODE'.tr,
                       style: TextStyle(
                         color: Colors.grey.shade600,
                         fontSize: 9.sp,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     SizedBox(height: 2.h),
                     Text(
                       code,
                       style: TextStyle(
-                        color: const Color(0xFFFF7A00),
+                        color: const Color(0xFF121212),
                         fontSize: 16.sp,
-                        fontWeight: FontWeight.w900,
+                        fontWeight: FontWeight.w700,
                         letterSpacing: 1.5,
                       ),
                     ),

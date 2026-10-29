@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:superapp_user/core/utils/haptics.dart';
@@ -112,7 +113,7 @@ class _VariantPickerSheetState extends ConsumerState<VariantPickerSheet> {
                     widget.food.name,
                     style: TextStyle(
                       fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       color: textColor,
                     ),
                   ),
@@ -129,14 +130,14 @@ class _VariantPickerSheetState extends ConsumerState<VariantPickerSheet> {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               children: [
                 if (widget.food.variants.isNotEmpty) ...[
-                  _sectionTitle('Choose a size', textColor, required: true),
+                  _sectionTitle('Choose a size'.tr, textColor, required: true),
                   ...widget.food.variants.map(
                     (v) => _variantTile(v, textColor, secondaryColor),
                   ),
                   const SizedBox(height: 8),
                 ],
                 if (addons.isNotEmpty) ...[
-                  _sectionTitle('Add extras', textColor),
+                  _sectionTitle('Add extras'.tr, textColor),
                   ...addons.map((a) => _addonTile(a, textColor, secondaryColor)),
                 ],
                 const SizedBox(height: 12),
@@ -169,11 +170,11 @@ class _VariantPickerSheetState extends ConsumerState<VariantPickerSheet> {
                   );
                 },
                 child: Text(
-                  'Add item • ₹${total.toStringAsFixed(0)}',
+                  'Add item • ₹{price}'.trArgs({'price': total.toStringAsFixed(0)}),
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: Color(0xFF121212),
                     fontSize: 15,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
@@ -191,16 +192,16 @@ class _VariantPickerSheetState extends ConsumerState<VariantPickerSheet> {
         children: [
           Text(
             text,
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: color),
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: color),
           ),
           if (required) ...[
             const SizedBox(width: 6),
             Text(
-              'Required',
+              'Required'.tr,
               style: TextStyle(
                 fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: AppColors.primary,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFFE5A600),
               ),
             ),
           ],
@@ -232,7 +233,7 @@ class _VariantPickerSheetState extends ConsumerState<VariantPickerSheet> {
                 v.name,
                 style: TextStyle(
                   fontSize: 14.5,
-                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                   color: textColor,
                 ),
               ),
@@ -252,7 +253,7 @@ class _VariantPickerSheetState extends ConsumerState<VariantPickerSheet> {
               '₹${v.price.toStringAsFixed(0)}',
               style: TextStyle(
                 fontSize: 14,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
                 color: textColor,
               ),
             ),
@@ -294,7 +295,7 @@ class _VariantPickerSheetState extends ConsumerState<VariantPickerSheet> {
                     a.name,
                     style: TextStyle(
                       fontSize: 14.5,
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                       color: textColor,
                     ),
                   ),
@@ -312,7 +313,7 @@ class _VariantPickerSheetState extends ConsumerState<VariantPickerSheet> {
               '+₹${a.price.toStringAsFixed(0)}',
               style: TextStyle(
                 fontSize: 14,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
                 color: textColor,
               ),
             ),

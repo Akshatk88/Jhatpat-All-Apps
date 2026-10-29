@@ -1,10 +1,15 @@
+import 'package:superapp_user/core/i18n/tr.dart';
+
 /// Typed failures surfaced to the presentation layer.
 ///
 /// The UI never sees a DioException — [ApiClient] maps transport and HTTP
 /// errors onto these so screens can branch on type, not on status codes.
 abstract class Failure implements Exception {
-  final String message;
-  const Failure(this.message);
+  final String _message;
+  const Failure(String message) : _message = message;
+
+  /// Shown to the user; app-authored defaults read in the current language.
+  String get message => _message.tr;
 
   @override
   String toString() => '$runtimeType: $message';

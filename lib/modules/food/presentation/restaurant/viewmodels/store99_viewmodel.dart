@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/modules/food/data/models/restaurant_model.dart';
 import 'package:superapp_user/modules/food/application/providers/store99_providers.dart';
 import 'package:superapp_user/modules/food/data/services/store99_service.dart';
@@ -51,7 +52,7 @@ class Store99ViewModel extends Notifier<Store99State> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Failed to load 99 Store products. Please try again.',
+        errorMessage: 'Failed to load 99 Store products. Please try again.'.tr,
       );
     }
   }
@@ -84,7 +85,7 @@ class Store99ViewModel extends Notifier<Store99State> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Failed to filter by cuisine.',
+        errorMessage: 'Failed to filter by cuisine.'.tr,
       );
     }
   }

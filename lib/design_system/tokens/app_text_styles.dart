@@ -8,22 +8,22 @@ class AppTextStyles {
   // ==================== HEADINGS ====================
   static const TextStyle h1 = TextStyle(
     fontSize: 28,
-    fontWeight: FontWeight.bold,
+    fontWeight: FontWeight.w600,
   );
   
   static const TextStyle h2 = TextStyle(
     fontSize: 24,
-    fontWeight: FontWeight.w700,
+    fontWeight: FontWeight.w600,
   );
   
   static const TextStyle h3 = TextStyle(
     fontSize: 20,
-    fontWeight: FontWeight.w600,
+    fontWeight: FontWeight.w500,
   );
 
   static const TextStyle h4 = TextStyle(
     fontSize: 18,
-    fontWeight: FontWeight.w600,
+    fontWeight: FontWeight.w500,
   );
 
   // ==================== BODY TEXT ====================
@@ -45,7 +45,7 @@ class AppTextStyles {
   // ==================== COMPONENTS ====================
   static const TextStyle button = TextStyle(
     fontSize: 16,
-    fontWeight: FontWeight.w600,
+    fontWeight: FontWeight.w500,
     letterSpacing: 0.5,
   );
 

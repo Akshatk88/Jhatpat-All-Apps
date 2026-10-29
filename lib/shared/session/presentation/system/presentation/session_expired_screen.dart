@@ -1,3 +1,4 @@
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -13,9 +14,9 @@ class SessionExpiredScreen extends ConsumerWidget {
       canPop: false,
       child: SystemStatusView(
         icon: Icons.lock_clock_rounded,
-        title: 'Session expired',
-        message: 'Your session has expired for security reasons. Please log in again to continue.',
-        primaryActionLabel: 'Log in again',
+        title: 'Session expired'.tr,
+        message: 'Your session has expired for security reasons. Please log in again to continue.'.tr,
+        primaryActionLabel: 'Log in again'.tr,
         onPrimaryAction: () async {
           await ref.read(authControllerProvider.notifier).logout();
           if (context.mounted) context.go('/auth/phone');

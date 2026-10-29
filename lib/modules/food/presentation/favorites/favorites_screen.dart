@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -114,21 +115,21 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen>
                         color: AppColors.primary,
                         borderRadius: BorderRadius.circular(24.r),
                       ),
-                      labelColor: Colors.white,
+                      labelColor: const Color(0xFF121212),
                       unselectedLabelColor: secondaryColor,
                       labelStyle: TextStyle(
                         fontSize: 13.sp,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                       ),
                       unselectedLabelStyle: TextStyle(
                         fontSize: 13.sp,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                       ),
                       indicatorSize: TabBarIndicatorSize.tab,
                       dividerColor: Colors.transparent,
                       tabs: [
-                        Tab(text: 'Restaurants (${favRestaurants.length})'),
-                        Tab(text: 'Dishes (${favFoods.length})'),
+                        Tab(text: 'Restaurants ({count})'.trArgs({'count': favRestaurants.length})),
+                        Tab(text: 'Dishes ({count})'.trArgs({'count': favFoods.length})),
                       ],
                     ),
                   ),
@@ -141,10 +142,10 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen>
                 children: [
                   // Restaurants Tab
                   favRestaurants.isEmpty
-                      ? const EmptyStateWidget(
-                          title: 'No favorite restaurants',
+                      ? EmptyStateWidget(
+                          title: 'No favorite restaurants'.tr,
                           subtitle:
-                              'Tap the heart on any restaurant to save it here for quick access later.',
+                              'Tap the heart on any restaurant to save it here for quick access later.'.tr,
                           icon: Icons.favorite_border_rounded,
                         )
                       : ListView(
@@ -168,10 +169,10 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen>
 
                   // Dishes Tab
                   favFoods.isEmpty
-                      ? const EmptyStateWidget(
-                          title: 'No favorite dishes',
+                      ? EmptyStateWidget(
+                          title: 'No favorite dishes'.tr,
                           subtitle:
-                              'Tap the heart on any food item to save it here for fast ordering.',
+                              'Tap the heart on any food item to save it here for fast ordering.'.tr,
                           icon: Icons.fastfood_rounded,
                         )
                       : ListView.separated(
@@ -215,10 +216,10 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Favorites',
+                'Favorites'.tr,
                 style: TextStyle(
                   fontSize: 26.sp,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   color: textColor,
                 ),
               ),
@@ -226,13 +227,13 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen>
               Row(
                 children: [
                   Text(
-                    'Your saved favorites',
+                    'Your saved favorites'.tr,
                     style: TextStyle(fontSize: 13.sp, color: secondaryColor),
                   ),
                   const SizedBox(width: 6),
                   const Icon(
                     Icons.favorite_rounded,
-                    color: Color(0xFFFF7A00),
+                    color: Color(0xFFFFB800),
                     size: 14,
                   ),
                   const SizedBox(width: 3),
@@ -240,8 +241,8 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen>
                     '$count',
                     style: TextStyle(
                       fontSize: 13.sp,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFFFF7A00),
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFFE5A600),
                     ),
                   ),
                 ],
@@ -257,7 +258,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.cardDark : const Color(0xFFFDF3E7),
+        color: isDark ? AppColors.cardDark : const Color(0xFFFFF8E1),
         borderRadius: BorderRadius.circular(16.r),
       ),
       child: Row(
@@ -271,7 +272,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen>
             ),
             child: const Icon(
               Icons.favorite_rounded,
-              color: Color(0xFFFF7A00),
+              color: Color(0xFFFFB800),
               size: 20,
             ),
           ),
@@ -281,16 +282,16 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Quick re-orders made easy',
+                  'Quick re-orders made easy'.tr,
                   style: TextStyle(
                     fontSize: 14.sp,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: textColor,
                   ),
                 ),
                 SizedBox(height: 2.h),
                 Text(
-                  'Everything you love, all in one place.',
+                  'Everything you love, all in one place.'.tr,
                   style: TextStyle(
                     fontSize: 12.sp,
                     color: AppColors.textSecondaryLight,
@@ -372,7 +373,7 @@ class _FavoriteRestaurantCard extends StatelessWidget {
                       ),
                       child: const Icon(
                         Icons.favorite_rounded,
-                        color: Color(0xFFFF7A00),
+                        color: Color(0xFFFFB800),
                         size: 20,
                       ),
                     ),
@@ -392,7 +393,7 @@ class _FavoriteRestaurantCard extends StatelessWidget {
                           restaurant.name,
                           style: TextStyle(
                             fontSize: 16.sp,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: textColor,
                           ),
                         ),
@@ -421,7 +422,7 @@ class _FavoriteRestaurantCard extends StatelessWidget {
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 12.sp,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                         const SizedBox(width: 2),
@@ -511,7 +512,7 @@ class _FavoriteFoodCard extends StatelessWidget {
                             food.name,
                             style: TextStyle(
                               fontSize: 15.sp,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w600,
                               color: textColor,
                             ),
                             maxLines: 1,
@@ -525,8 +526,8 @@ class _FavoriteFoodCard extends StatelessWidget {
                       '₹${food.price.toStringAsFixed(0)}',
                       style: TextStyle(
                         fontSize: 14.sp,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFFE5A600),
                       ),
                     ),
                     if (food.description.isNotEmpty) ...[
@@ -551,7 +552,7 @@ class _FavoriteFoodCard extends StatelessWidget {
                   padding: const EdgeInsets.all(8),
                   child: const Icon(
                     Icons.favorite_rounded,
-                    color: Color(0xFFFF7A00),
+                    color: Color(0xFFFFB800),
                     size: 22,
                   ),
                 ),

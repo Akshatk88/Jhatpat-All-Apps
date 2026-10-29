@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appName => 'Suvio';
+  String get appName => 'JhatPat';
 
   @override
   String exitMessage(Object user) {

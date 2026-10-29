@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:superapp_user/modules/food/data/models/food_model.dart';
@@ -116,7 +117,7 @@ class _ReplaceCartDialog extends StatelessWidget {
               width: 56,
               height: 56,
               decoration: const BoxDecoration(
-                color: Color(0xFFFFF3E8),
+                color: Color(0xFFFFF8E1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -127,18 +128,16 @@ class _ReplaceCartDialog extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Replace Cart?',
+              'Replace Cart?'.tr,
               style: TextStyle(
                 fontSize: 18,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
                 color: textColor,
               ),
             ),
             const SizedBox(height: 10),
             Text(
-              'Your cart contains items from another restaurant.\n\n'
-              'Would you like to clear your current cart and add items '
-              'from this restaurant instead?',
+              'Your cart contains items from another restaurant.\n\nWould you like to clear your current cart and add items from this restaurant instead?'.tr,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13.5,
@@ -164,9 +163,9 @@ class _ReplaceCartDialog extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      'Cancel',
+                      'Cancel'.tr,
                       style: TextStyle(
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                         color: secondaryColor,
                       ),
                     ),
@@ -184,11 +183,11 @@ class _ReplaceCartDialog extends StatelessWidget {
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    child: const Text(
-                      'Replace Cart',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                    child: Text(
+                      'Replace Cart'.tr,
+                      style: const TextStyle(
+                        color: Color(0xFF121212),
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),

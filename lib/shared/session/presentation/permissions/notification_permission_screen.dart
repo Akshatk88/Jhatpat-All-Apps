@@ -1,3 +1,4 @@
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/app/routing/app_route_names.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -42,25 +43,25 @@ class _NotificationPermissionScreenState extends State<NotificationPermissionScr
               ),
               const SizedBox(height: 32),
               Text(
-                'Stay in the loop',
+                'Stay in the loop'.tr,
                 style: Theme.of(context).textTheme.headlineLarge,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
               Text(
-                'Get real-time updates on your ride, driver arrival, offers and important account alerts.',
+                'Get real-time updates on your ride, driver arrival, offers and important account alerts.'.tr,
                 style: Theme.of(context).textTheme.bodyMedium,
                 textAlign: TextAlign.center,
               ),
               const Spacer(),
               TaxiPrimaryButton(
-                label: 'Enable notifications',
+                label: 'Enable notifications'.tr,
                 isLoading: _requesting,
                 onPressed: _allow,
               ),
               const SizedBox(height: 12),
               TaxiSecondaryButton(
-                label: 'Not now',
+                label: 'Not now'.tr,
                 onPressed: () => context.go(AppRoutePaths.splash),
               ),
               const SizedBox(height: 24),

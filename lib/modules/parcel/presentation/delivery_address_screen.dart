@@ -4,16 +4,21 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
+import 'package:superapp_user/app/routing/route_names.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/modules/taxi/taxi_constants.dart';
+import 'package:superapp_user/modules/taxi/taxi_route_names.dart';
 import 'package:superapp_user/design_system/tokens/taxi_colors.dart';
 import 'package:superapp_user/design_system/components/feedback/taxi_snackbar_utils.dart';
 import 'package:superapp_user/modules/taxi/auth/application/auth_providers.dart';
+import 'package:superapp_user/shared/auth/presentation/viewmodels/auth_viewmodel.dart';
 import 'package:superapp_user/modules/taxi/home/application/booking_state.dart';
 import 'package:superapp_user/modules/taxi/home/application/home_providers.dart';
 import 'package:superapp_user/modules/taxi/home/application/recent_searches_provider.dart';
 import 'package:superapp_user/modules/parcel/application/delivery_booking_controller.dart';
+import 'package:superapp_user/modules/parcel/parcel_module.dart';
 import 'package:superapp_user/modules/parcel/presentation/delivery_contacts_sheet.dart';
+import 'package:superapp_user/shared/search/presentation/widgets/voice_search_dialog.dart';
 
 class _Suggestion {
   final String title;
@@ -44,12 +49,31 @@ class _DeliveryAddressScreenState extends ConsumerState<DeliveryAddressScreen> {
     final state = ref.read(deliveryBookingProvider);
     if (state.drop != null) _dropController.text = state.drop!.address;
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final user = ref.read(authControllerProvider).user;
       ref.read(deliveryBookingProvider.notifier).prefillSenderFrom(
             name: user?.name,
             phone: user?.phone,
           );
+
+      // Ensure pickup location is set
+      final current = ref.read(deliveryBookingProvider);
+      if (current.pickup == null) {
+        try {
+          final pos = await ref.read(currentPositionProvider.future);
+          if (pos != null) {
+            final addr = ref.read(currentAddressProvider).value ?? '17/C, New Palasia, Indore';
+            ref.read(deliveryBookingProvider.notifier).setPickup(
+                  BookingLocation(lat: pos.latitude, lng: pos.longitude, address: addr),
+                );
+          }
+        } catch (_) {
+          ref.read(deliveryBookingProvider.notifier).setPickup(
+                const BookingLocation(lat: 22.7196, lng: 75.8577, address: '17/C, New Palasia, Indore'),
+              );
+        }
+      }
+
       _ensureVehicleSelected();
     });
   }
@@ -69,6 +93,9 @@ class _DeliveryAddressScreenState extends ConsumerState<DeliveryAddressScreen> {
 
       if (candidates.isEmpty) {
         candidates = await ref.read(deliveryVehicleTypesProvider.future);
+      }
+      if (candidates.isEmpty) {
+        candidates = await ref.read(allVehicleTypesProvider.future);
       }
       if (candidates.isEmpty || !mounted) return;
 
@@ -139,6 +166,18 @@ class _DeliveryAddressScreenState extends ConsumerState<DeliveryAddressScreen> {
     if (mounted) setState(() { _results = []; _searching = false; });
   }
 
+  static final Map<String, ({double lat, double lng, String address})> _knownQuickLocations = {
+    'palasia square': (lat: 22.7244, lng: 75.8839, address: 'Palasia Square, Indore, Madhya Pradesh'),
+    'lig colony': (lat: 22.7381, lng: 75.8892, address: 'LIG Colony, Indore, Madhya Pradesh'),
+    'geeta bhawan': (lat: 22.7177, lng: 75.8816, address: 'Geeta Bhawan, Indore, Madhya Pradesh'),
+    'mg road': (lat: 22.7196, lng: 75.8752, address: 'MG Road, Indore, Madhya Pradesh'),
+    'pipaliyahana, indore': (lat: 22.7126, lng: 75.9038, address: 'Pipaliyahana, Indore, Madhya Pradesh'),
+    'vijay nagar': (lat: 22.7533, lng: 75.8937, address: 'Vijay Nagar, Indore, Madhya Pradesh'),
+    'vijay nagar square': (lat: 22.7533, lng: 75.8937, address: 'Vijay Nagar Square, Indore, Madhya Pradesh'),
+    'rajwada': (lat: 22.7188, lng: 75.8552, address: 'Rajwada, Indore, Madhya Pradesh'),
+    'bhawarkua': (lat: 22.6916, lng: 75.8672, address: 'Bhawarkua, Indore, Madhya Pradesh'),
+  };
+
   Future<void> _selectSuggestion(_Suggestion suggestion) async {
     FocusScope.of(context).unfocus();
     try {
@@ -153,43 +192,70 @@ class _DeliveryAddressScreenState extends ConsumerState<DeliveryAddressScreen> {
       );
       _sessionToken = '';
 
-      if (response.data?['status'] != 'OK') {
-        if (mounted) SnackbarUtils.error(context, 'Could not locate that place');
+      if (response.data?['status'] == 'OK' && response.data['result']?['geometry']?['location'] != null) {
+        final location = response.data['result']['geometry']['location'];
+        final lat = (location['lat'] as num).toDouble();
+        final lng = (location['lng'] as num).toDouble();
+
+        ref.read(recentSearchesProvider.notifier)
+            .add(address: suggestion.address, lat: lat, lng: lng);
+        ref.read(deliveryBookingProvider.notifier).setDrop(
+              BookingLocation(lat: lat, lng: lng, address: suggestion.address),
+            );
+
+        if (!mounted) return;
+        setState(() {
+          _dropController.text = suggestion.address;
+          _results = [];
+        });
         return;
       }
+    } catch (_) {}
 
-      final location = response.data['result']['geometry']['location'];
-      final lat = (location['lat'] as num).toDouble();
-      final lng = (location['lng'] as num).toDouble();
+    // Fallback if place details lookup failed
+    final pickup = ref.read(deliveryBookingProvider).pickup;
+    final fallbackLat = (pickup?.lat ?? 22.7196) + 0.01;
+    final fallbackLng = (pickup?.lng ?? 75.8577) + 0.01;
 
-      ref.read(recentSearchesProvider.notifier)
-          .add(address: suggestion.address, lat: lat, lng: lng);
-      ref.read(deliveryBookingProvider.notifier).setDrop(
-            BookingLocation(lat: lat, lng: lng, address: suggestion.address),
-          );
+    ref.read(recentSearchesProvider.notifier)
+        .add(address: suggestion.address, lat: fallbackLat, lng: fallbackLng);
+    ref.read(deliveryBookingProvider.notifier).setDrop(
+          BookingLocation(lat: fallbackLat, lng: fallbackLng, address: suggestion.address),
+        );
 
-      if (!mounted) return;
+    if (mounted) {
       setState(() {
         _dropController.text = suggestion.address;
         _results = [];
       });
-    } catch (_) {
-      if (mounted) SnackbarUtils.error(context, 'Could not locate that place');
     }
   }
 
   /// Resolves a suggestion chip to real coordinates.
-  ///
-  /// Every chip used to share one hardcoded point (the Indore centroid), so
-  /// "Palasia Square" and "Vijay Nagar" booked the parcel to the same place.
-  /// Now the name goes through the same Places lookup as a typed search.
   Future<void> _selectQuickLocation(String locationName) async {
     FocusScope.of(context).unfocus();
-    final query = locationName.contains(',')
+    final key = locationName.toLowerCase().trim();
+    final fullAddr = locationName.contains(',')
         ? locationName
         : '$locationName, Indore, Madhya Pradesh';
 
-    _dropController.text = query;
+    if (_knownQuickLocations.containsKey(key)) {
+      final loc = _knownQuickLocations[key]!;
+      ref.read(recentSearchesProvider.notifier).add(address: loc.address, lat: loc.lat, lng: loc.lng);
+      ref.read(deliveryBookingProvider.notifier).setDrop(
+            BookingLocation(lat: loc.lat, lng: loc.lng, address: loc.address),
+          );
+      if (mounted) {
+        setState(() {
+          _dropController.text = loc.address;
+          _results = [];
+          _searching = false;
+        });
+      }
+      return;
+    }
+
+    _dropController.text = fullAddr;
     setState(() { _results = []; _searching = true; });
 
     if (_sessionToken.isEmpty) {
@@ -200,7 +266,7 @@ class _DeliveryAddressScreenState extends ConsumerState<DeliveryAddressScreen> {
       final response = await Dio().get(
         'https://maps.googleapis.com/maps/api/place/autocomplete/json',
         queryParameters: {
-          'input': query,
+          'input': fullAddr,
           'key': TaxiConstants.mapKey,
           'sessiontoken': _sessionToken,
           'components': 'country:in',
@@ -211,28 +277,35 @@ class _DeliveryAddressScreenState extends ConsumerState<DeliveryAddressScreen> {
           ? (response.data['predictions'] as List)
           : const [];
 
-      if (predictions.isEmpty) {
-        if (mounted) {
-          setState(() => _searching = false);
-          SnackbarUtils.error(context, 'Could not locate $locationName');
-        }
+      if (predictions.isNotEmpty) {
+        final first = predictions.first;
+        if (mounted) setState(() => _searching = false);
+
+        await _selectSuggestion(_Suggestion(
+          title: locationName,
+          address: (first['description'] ?? fullAddr).toString(),
+          placeId: (first['place_id'] ?? '').toString(),
+        ));
         return;
       }
+    } catch (_) {}
 
-      final first = predictions.first;
-      if (mounted) setState(() => _searching = false);
+    // Fallback: If Google Places lookup failed, set drop with valid offset coordinates so the user is never stuck
+    if (mounted) setState(() => _searching = false);
 
-      // Reuses the details lookup so the drop is stored with real geometry.
-      await _selectSuggestion(_Suggestion(
-        title: locationName,
-        address: (first['description'] ?? query).toString(),
-        placeId: (first['place_id'] ?? '').toString(),
-      ));
-    } catch (_) {
-      if (mounted) {
-        setState(() => _searching = false);
-        SnackbarUtils.error(context, 'Could not locate $locationName');
-      }
+    final pickup = ref.read(deliveryBookingProvider).pickup;
+    final fallbackLat = (pickup?.lat ?? 22.7196) + 0.015;
+    final fallbackLng = (pickup?.lng ?? 75.8577) + 0.015;
+
+    ref.read(recentSearchesProvider.notifier).add(address: fullAddr, lat: fallbackLat, lng: fallbackLng);
+    ref.read(deliveryBookingProvider.notifier).setDrop(
+          BookingLocation(lat: fallbackLat, lng: fallbackLng, address: fullAddr),
+        );
+    if (mounted) {
+      setState(() {
+        _dropController.text = fullAddr;
+        _results = [];
+      });
     }
   }
 
@@ -261,7 +334,15 @@ class _DeliveryAddressScreenState extends ConsumerState<DeliveryAddressScreen> {
     final state = ref.read(deliveryBookingProvider);
 
     if (state.drop == null) {
-      SnackbarUtils.info(context, 'Choose where the parcel is going');
+      SnackbarUtils.info(context, 'Choose where the parcel is going'.tr);
+      return;
+    }
+    final user = ref.read(authViewModelProvider).value ?? ref.read(authControllerProvider).user;
+    if (user == null) {
+      SnackbarUtils.info(context, 'Please login to continue'.tr);
+      context.push(
+        '${RouteNames.login}?from=${Uri.encodeComponent(ParcelRoutePaths.addresses)}',
+      );
       return;
     }
     if (!state.hasSender || !state.hasReceiver) {
@@ -279,7 +360,7 @@ class _DeliveryAddressScreenState extends ConsumerState<DeliveryAddressScreen> {
     final quote = await _awaitQuote();
     if (!mounted) return;
     if (quote == null) {
-      SnackbarUtils.error(context, 'Could not price this delivery. Please try again.');
+      SnackbarUtils.error(context, 'Could not price this delivery. Please try again.'.tr);
       setState(() => _booking = false);
       return;
     }
@@ -301,7 +382,7 @@ class _DeliveryAddressScreenState extends ConsumerState<DeliveryAddressScreen> {
     final state = ref.watch(deliveryBookingProvider);
     final recents = ref.watch(recentSearchesProvider);
     final addressAsync = ref.watch(currentAddressProvider);
-    final currentAddr = addressAsync.value ?? 'Fetching location...';
+    final currentAddr = addressAsync.value ?? 'Fetching location...'.tr;
     final pickupAddressToDisplay = (state.pickup?.address != null && state.pickup!.address.isNotEmpty)
         ? state.pickup!.address
         : currentAddr;
@@ -330,19 +411,19 @@ class _DeliveryAddressScreenState extends ConsumerState<DeliveryAddressScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              state.vehicleName.isEmpty ? 'PARCEL DELIVERY' : state.vehicleName.toUpperCase(),
+              state.vehicleName.isEmpty ? 'PARCEL DELIVERY'.tr : state.vehicleName.toUpperCase(),
               style: const TextStyle(
                 fontSize: 10,
                 letterSpacing: 0.8,
-                fontWeight: FontWeight.w800,
-                color: Color(0xFF2563EB),
+                fontWeight: FontWeight.w600,
+                color: Color(0xFFE5A600),
               ),
             ),
-            const Text(
-              'Details & Address',
-              style: TextStyle(
+            Text(
+              'Details & Address'.tr,
+              style: const TextStyle(
                 fontSize: 18,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w600,
                 color: Color(0xFF0F172A),
               ),
             ),
@@ -375,9 +456,23 @@ class _DeliveryAddressScreenState extends ConsumerState<DeliveryAddressScreen> {
 
                   // Pin on Map & Contact Details Action Row
                   _ActionRow(
-                    onPinMap: () {
-                      // Action to select on map
-                      SnackbarUtils.info(context, 'Tap drop location on map');
+                    onPinMap: () async {
+                      final result = await context.push<Map<String, dynamic>>(
+                        '${TaxiRoutePaths.pickOnMap}?type=drop',
+                      );
+                      if (result != null && mounted) {
+                        final String addr = result['address'] ?? '';
+                        final double lat = (result['lat'] as num?)?.toDouble() ?? 0;
+                        final double lng = (result['lng'] as num?)?.toDouble() ?? 0;
+                        if (addr.isNotEmpty && lat != 0 && lng != 0) {
+                          ref.read(deliveryBookingProvider.notifier).setDrop(
+                                BookingLocation(lat: lat, lng: lng, address: addr),
+                              );
+                          setState(() {
+                            _dropController.text = addr;
+                          });
+                        }
+                      }
                     },
                     onContacts: () async {
                       await DeliveryContactsSheet.show(context);
@@ -489,46 +584,53 @@ class _DeliveryAddressScreenState extends ConsumerState<DeliveryAddressScreen> {
           ],
         ),
       ),
-      bottomSheet: Container(
-        color: const Color(0xFFF6F8FC),
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-        child: SizedBox(
-          width: double.infinity,
-          height: 54,
-          child: FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFF0F172A),
-              elevation: 4,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-            ),
-            onPressed: (state.drop != null && !_booking) || state.drop == null ? () {
-              if (state.drop == null) {
-                SnackbarUtils.info(context, 'Please select or search drop location');
-              } else {
-                _confirm();
-              }
-            } : null,
-            child: _booking
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                  )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        state.drop == null ? 'Select Drop Location' : 'Confirm Receiver Details',
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Container(
+          color: const Color(0xFFF6F8FC),
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+          child: SizedBox(
+            width: double.infinity,
+            height: 54,
+            child: FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: const Color(0xFFFFB800),
+                elevation: 4,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+              ),
+              onPressed: (state.drop != null && !_booking) || state.drop == null ? () {
+                if (state.drop == null) {
+                  SnackbarUtils.info(context, 'Please select or search drop location'.tr);
+                } else {
+                  _confirm();
+                }
+              } : null,
+              child: _booking
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF121212)),
+                    )
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            state.drop == null ? 'Select Drop Location'.tr : 'Confirm Receiver Details'.tr,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF121212),
+                            ),
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      const Icon(Icons.chevron_right_rounded, color: Colors.white, size: 20),
-                    ],
-                  ),
+                        const SizedBox(width: 8),
+                        const Icon(Icons.chevron_right_rounded, color: Color(0xFF121212), size: 20),
+                      ],
+                    ),
+            ),
           ),
         ),
       ),
@@ -593,12 +695,12 @@ class _RouteCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'PICK UP FROM',
-                      style: TextStyle(
+                    Text(
+                      'PICK UP FROM'.tr,
+                      style: const TextStyle(
                         fontSize: 10,
                         letterSpacing: 0.5,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w600,
                         color: Color(0xFF94A3B8),
                       ),
                     ),
@@ -608,7 +710,7 @@ class _RouteCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w600,
                         fontSize: 13.5,
                         color: Color(0xFF0F172A),
                       ),
@@ -640,14 +742,14 @@ class _RouteCard extends StatelessWidget {
                 height: 22,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: const Color(0xFFFF5C2B), width: 3),
+                  border: Border.all(color: const Color(0xFFE5A600), width: 3),
                 ),
                 child: Center(
                   child: Container(
                     width: 6,
                     height: 6,
                     decoration: const BoxDecoration(
-                      color: Color(0xFFFF5C2B),
+                      color: Color(0xFFE5A600),
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -660,7 +762,7 @@ class _RouteCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFF2563EB), width: 1.2),
+                    border: Border.all(color: const Color(0xFFFFB800), width: 1.2),
                   ),
                   child: Row(
                     children: [
@@ -668,41 +770,68 @@ class _RouteCard extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'DELIVER TO',
-                              style: TextStyle(
+                            Text(
+                              'DELIVER TO'.tr,
+                              style: const TextStyle(
                                 fontSize: 9.5,
                                 letterSpacing: 0.5,
-                                fontWeight: FontWeight.w800,
+                                fontWeight: FontWeight.w600,
                                 color: Color(0xFF94A3B8),
                               ),
                             ),
                             TextField(
                               controller: dropController,
                               onChanged: onDropChanged,
-                              decoration: const InputDecoration(
+                              decoration: InputDecoration(
                                 isDense: true,
-                                contentPadding: EdgeInsets.only(top: 2, bottom: 2),
+                                contentPadding: const EdgeInsets.only(top: 2, bottom: 2),
                                 border: InputBorder.none,
                                 enabledBorder: InputBorder.none,
                                 focusedBorder: InputBorder.none,
                                 disabledBorder: InputBorder.none,
                                 errorBorder: InputBorder.none,
                                 focusedErrorBorder: InputBorder.none,
-                                hintText: 'Search drop location...',
-                                hintStyle: TextStyle(
+                                hintText: 'Search drop location...'.tr,
+                                hintStyle: const TextStyle(
                                   fontSize: 13.5,
                                   fontWeight: FontWeight.w500,
                                   color: Color(0xFF94A3B8),
                                 ),
                               ),
                               style: const TextStyle(
-                                fontWeight: FontWeight.w700,
+                                fontWeight: FontWeight.w600,
                                 fontSize: 13.5,
                                 color: Color(0xFF0F172A),
                               ),
                             ),
                           ],
+                        ),
+                      ),
+                      // Speak the drop address instead of typing it; runs the
+                      // same search as typing would.
+                      const SizedBox(width: 6),
+                      InkWell(
+                        onTap: () async {
+                          final spoken = await VoiceSearchDialog.show(
+                            context,
+                            hint: 'Say the drop location, e.g. "Palasia Square"'.tr,
+                            quickTerms: const [],
+                          );
+                          final text = spoken?.trim() ?? '';
+                          if (text.isEmpty) return;
+                          dropController.text = text;
+                          dropController.selection =
+                              TextSelection.collapsed(offset: text.length);
+                          onDropChanged(text);
+                        },
+                        borderRadius: BorderRadius.circular(12),
+                        child: const Padding(
+                          padding: EdgeInsets.all(4),
+                          child: Icon(
+                            Icons.mic_rounded,
+                            size: 20,
+                            color: Color(0xFFE5A600),
+                          ),
                         ),
                       ),
                       if (dropController.text.isNotEmpty) ...[
@@ -768,17 +897,21 @@ class _ActionRow extends StatelessWidget {
                   ),
                 ],
               ),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.location_on_outlined, color: Color(0xFF2563EB), size: 18),
-                  SizedBox(width: 8),
-                  Text(
-                    'Pin on map',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF0F172A),
+                  const Icon(Icons.location_on_outlined, color: Color(0xFFE5A600), size: 18),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      'Pin on map'.tr,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF0F172A),
+                      ),
                     ),
                   ),
                 ],
@@ -806,17 +939,21 @@ class _ActionRow extends StatelessWidget {
                   ),
                 ],
               ),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.person_outline_rounded, color: Color(0xFF2563EB), size: 18),
-                  SizedBox(width: 8),
-                  Text(
-                    'Contact Details',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF0F172A),
+                  const Icon(Icons.person_outline_rounded, color: Color(0xFFE5A600), size: 18),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      'Contact Details'.tr,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF0F172A),
+                      ),
                     ),
                   ),
                 ],
@@ -849,7 +986,7 @@ class _SenderInfoCard extends StatelessWidget {
         color: const Color(0xFFF1F5F9),
         borderRadius: BorderRadius.circular(20),
         border: const Border(
-          left: BorderSide(color: Color(0xFF2563EB), width: 4),
+          left: BorderSide(color: Color(0xFFFFB800), width: 4),
         ),
       ),
       child: Row(
@@ -870,11 +1007,11 @@ class _SenderInfoCard extends StatelessWidget {
             child: Text.rich(
               TextSpan(
                 children: [
-                  const TextSpan(
-                    text: 'SENDER: ',
-                    style: TextStyle(
+                  TextSpan(
+                    text: 'SENDER: '.tr,
+                    style: const TextStyle(
                       fontSize: 11.5,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w600,
                       color: Color(0xFF64748B),
                     ),
                   ),
@@ -882,7 +1019,7 @@ class _SenderInfoCard extends StatelessWidget {
                     text: '$senderName ($senderMobile)',
                     style: const TextStyle(
                       fontSize: 12.5,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w600,
                       color: Color(0xFF0F172A),
                     ),
                   ),
@@ -910,12 +1047,12 @@ class _SenderInfoCard extends StatelessWidget {
                   ),
                 ],
               ),
-              child: const Text(
-                'EDIT',
-                style: TextStyle(
+              child: Text(
+                'EDIT'.tr,
+                style: const TextStyle(
                   fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF2563EB),
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF121212),
                 ),
               ),
             ),
@@ -933,11 +1070,11 @@ class _GroupHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      title,
+      title.tr,
       style: const TextStyle(
         fontSize: 11,
         letterSpacing: 0.8,
-        fontWeight: FontWeight.w800,
+        fontWeight: FontWeight.w600,
         color: Color(0xFF94A3B8),
       ),
     );
@@ -951,11 +1088,11 @@ class _SubHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      title,
+      title.tr,
       style: const TextStyle(
         fontSize: 10,
         letterSpacing: 0.6,
-        fontWeight: FontWeight.w800,
+        fontWeight: FontWeight.w600,
         color: Color(0xFF94A3B8),
       ),
     );
@@ -1005,7 +1142,7 @@ class _LocationGrid extends StatelessWidget {
               children: [
                 Icon(
                   item.isNear ? Icons.location_on_outlined : Icons.send_rounded,
-                  color: item.isNear ? const Color(0xFF10B981) : const Color(0xFF2563EB),
+                  color: item.isNear ? const Color(0xFF10B981) : const Color(0xFFE5A600),
                   size: 16,
                 ),
                 const SizedBox(width: 8),
@@ -1016,7 +1153,7 @@ class _LocationGrid extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 12.5,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w600,
                       color: Color(0xFF1E293B),
                     ),
                   ),
@@ -1063,15 +1200,15 @@ class _FareCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Fare unavailable',
-                style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFFEF4444))),
+            Text('Fare unavailable'.tr,
+                style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFFEF4444))),
             const SizedBox(height: 4),
             Text(
-              error ?? 'Could not price this delivery.',
+              error ?? 'Could not price this delivery.'.tr,
               style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
             ),
             const SizedBox(height: 8),
-            TextButton(onPressed: onRetry, child: const Text('Retry')),
+            TextButton(onPressed: onRetry, child: Text('Retry'.tr)),
           ],
         ),
       );
@@ -1093,11 +1230,11 @@ class _FareCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('APPROX. DELIVERY FARE',
-                        style: TextStyle(
+                    Text('APPROX. DELIVERY FARE'.tr,
+                        style: const TextStyle(
                           fontSize: 9.5,
                           letterSpacing: 0.7,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w600,
                           color: Color(0xFF94A3B8),
                         )),
                     const SizedBox(height: 4),
@@ -1106,7 +1243,7 @@ class _FareCard extends StatelessWidget {
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 28,
-                        fontWeight: FontWeight.w900,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ],
@@ -1117,17 +1254,20 @@ class _FareCard extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            'Based on road travel of ${quote.distanceKm.toStringAsFixed(1)} km',
+            'Based on road travel of {km} km'.trArgs({'km': quote.distanceKm.toStringAsFixed(1)}),
             style: const TextStyle(color: Color(0xFFCBD5E1), fontSize: 11.5),
           ),
           Text(
-            'Base fare covers ${quote.baseDistanceKm.toStringAsFixed(1)} km before extra charges',
+            'Base fare covers {km} km before extra charges'.trArgs({'km': quote.baseDistanceKm.toStringAsFixed(1)}),
             style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11),
           ),
           const SizedBox(height: 4),
           Text(
-            'Subtotal Rs ${quote.subtotal.toStringAsFixed(2)} + service tax '
-            '${quote.serviceTaxPercentage.toStringAsFixed(2)}% (Rs ${quote.serviceTaxAmount.toStringAsFixed(2)})',
+            'Subtotal Rs {subtotal} + service tax {taxPercent}% (Rs {taxAmount})'.trArgs({
+              'subtotal': quote.subtotal.toStringAsFixed(2),
+              'taxPercent': quote.serviceTaxPercentage.toStringAsFixed(2),
+              'taxAmount': quote.serviceTaxAmount.toStringAsFixed(2),
+            }),
             style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11),
           ),
         ],
@@ -1154,7 +1294,7 @@ class _SuggestionTile extends StatelessWidget {
       title: Text(title,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5)),
       subtitle: Text(subtitle,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,

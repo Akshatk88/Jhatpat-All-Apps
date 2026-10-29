@@ -11,7 +11,14 @@ enum ModuleId {
   food,
   taxi,
   parcel,
-  rental;
+
+  /// Home services — the Service-Provider vertical (`/api/v1/sp/*`).
+  ///
+  /// Named `services` rather than `sp` to match the name the shipped admin
+  /// panel already uses for this vertical ("Services" tab, gated on
+  /// `servicesAccess.includes('serviceProvider')`), and because `/services/…`
+  /// reads as a product in a deep link where `/sp/…` reads as an acronym.
+  services;
 
   /// Tolerant parse for push payloads and deep links, which may carry
   /// nothing, an unknown module, or a value from a newer app version.

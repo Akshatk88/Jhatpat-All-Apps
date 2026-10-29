@@ -12,6 +12,7 @@ import 'package:superapp_user/design_system/tokens/app_colors.dart';
 /// [AppColors]' original hardcoded values exactly, so selecting it (or never
 /// changing the theme at all) looks pixel-identical to before this feature.
 enum AppThemeColor {
+  yellow('Yellow', Color(0xFFFFB800), Color(0xFFFFC700), '🟡'),
   orange('Orange', Color(0xFFFF7A00), Color(0xFFFF8A1D), '🟠'),
   green('Green', Color(0xFF2ECC71), Color(0xFF43D881), '🟢'),
   blue('Blue', Color(0xFF3B82F6), Color(0xFF5B95F8), '🔵'),
@@ -41,28 +42,28 @@ final themeColorProvider =
 class ThemeColorNotifier extends Notifier<AppThemeColor> {
   static const _key = 'app_theme_color';
 
+  /// The app ships one brand theme: Jhatpat yellow.
+  ///
+  /// This used to load a user-picked colour from prefs *after* the first frame,
+  /// so the app opened yellow and then flipped to e.g. orange a moment later —
+  /// and screens built before vs after the flip disagreed (Profile showed both).
+  /// The picker is gone; any stale saved choice is cleared and ignored.
   @override
   AppThemeColor build() {
-    unawaited(_load());
-    return AppThemeColor.orange;
+    AppColors.primary = AppThemeColor.yellow.color;
+    AppColors.primaryButton = AppThemeColor.yellow.buttonColor;
+    unawaited(_clearSavedChoice());
+    return AppThemeColor.yellow;
   }
 
-  Future<void> _load() async {
+  Future<void> _clearSavedChoice() async {
     final prefs = await SharedPreferences.getInstance();
-    final saved = prefs.getString(_key);
-    if (saved == null) return;
-    for (final option in AppThemeColor.values) {
-      if (option.name == saved) {
-        _apply(option);
-        return;
-      }
-    }
+    await prefs.remove(_key);
   }
 
+  /// Kept for API compatibility; the brand colour is fixed.
   Future<void> setColor(AppThemeColor color) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_key, color.name);
-    _apply(color);
+    _apply(AppThemeColor.yellow);
   }
 
   void _apply(AppThemeColor color) {

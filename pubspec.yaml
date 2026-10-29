@@ -1,8 +1,8 @@
 name: superapp_user
-description: "Suvio Super App — food, rides, parcel and rental in one application."
+description: "JhatPat Super App — food, rides, parcel and rental in one application."
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 1.0.0+2
 
 environment:
   # Taxi's floor was higher than food's (^3.11.4); the merged app takes the
@@ -77,12 +77,15 @@ dependencies:
   share_plus: ^13.3.0
   intl: ^0.20.2
   uuid: ^4.6.0
+  confetti: ^0.8.0
+  flutter_tts: ^4.2.5
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.4
 
 # Deleted vs. the two source pubspecs (14 packages, all with zero imports):
 #   food: freezed_annotation, json_annotation, freezed, json_serializable,
@@ -92,9 +95,25 @@ dev_dependencies:
 
 flutter_launcher_icons:
   android: "ic_launcher"
-  ios: true
-  image_path: "assets/images/app_icon.png"
+  ios: true 
+  image_path: "assets/images/jhatpat_logo_v2.png"
   min_sdk_android: 21
+  adaptive_icon_background: "#FFC803"
+  # Launchers mask adaptive icons to a circle/squircle showing only the middle
+  # ~66%, so the foreground is a pre-padded copy of the logo (no extra inset)
+  # that keeps the wordmark inside that safe zone.
+  adaptive_icon_foreground: "assets/images/jhatpat_icon_fg_v2.png"
+  adaptive_icon_foreground_inset: 0
+
+flutter_native_splash:
+  color: "#FFC803"
+  image: "assets/images/jhatpat_splash_v2.png"
+  android_12:
+    # Android 12+ masks the splash icon to a circle (~2/3 of the canvas), so
+    # this variant pads the logo to keep the wordmark inside the safe zone.
+    image: "assets/images/jhatpat_splash12_v2.png"
+    icon_background_color: "#FFC803"
+  web: false
 
 flutter:
   generate: true
@@ -104,7 +123,6 @@ flutter:
   # app shipped 17 MB of assets. Enumerate directories; see Ch. 17 for the
   # WebP pass that takes the combined bundle from 29 MB to ~4.4 MB.
   assets:
-    - assets/
     - assets/images/
     # Ride-side vehicle art. These are only a *fallback*: the vehicle list
     # prefers the image the admin uploads against each vehicle type. They

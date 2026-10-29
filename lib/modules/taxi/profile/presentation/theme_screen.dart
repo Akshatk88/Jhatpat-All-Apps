@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:superapp_user/design_system/theme/taxi_theme_provider.dart';
 import 'package:superapp_user/design_system/components/ride/custom_app_bar.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 class ThemeScreen extends ConsumerWidget {
   const ThemeScreen({super.key});
@@ -17,14 +18,14 @@ class ThemeScreen extends ConsumerWidget {
         groupValue: mode,
         onChanged: (v) => ref.read(themeModeProvider.notifier).setThemeMode(v!),
         secondary: Icon(icon),
-        title: Text(title),
-        subtitle: Text(subtitle),
+        title: Text(title.tr),
+        subtitle: Text(subtitle.tr),
         selected: selected,
       );
     }
 
     return Scaffold(
-      appBar: const CustomAppBar(title: 'App theme'),
+      appBar: CustomAppBar(title: 'App theme'.tr),
       body: ListView(
         children: [
           option(ThemeMode.system, Icons.brightness_auto_rounded, 'System default',

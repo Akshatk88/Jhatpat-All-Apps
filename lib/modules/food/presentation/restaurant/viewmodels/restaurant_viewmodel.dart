@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:superapp_user/modules/food/data/models/food_model.dart';
 import 'package:superapp_user/modules/food/data/models/restaurant_model.dart';
@@ -49,7 +50,7 @@ class RestaurantViewModel extends Notifier<RestaurantState> {
       } else {
         state = state.copyWith(
           isLoading: false,
-          errorMessage: response.message ?? 'Failed to load restaurant menu.',
+          errorMessage: response.message ?? 'Failed to load restaurant menu.'.tr,
         );
       }
     } catch (e) {

@@ -32,8 +32,8 @@ class TaxiWalletRepository {
   Future<List<WalletTransactionModel>> getTransactions() async {
     final data = await api.get(ApiConstants.wallet);
     final map = data is Map ? Map<String, dynamic>.from(data) : <String, dynamic>{};
-    final results = (map['transactions'] ?? map['results'] ?? []) as List;
-    return results.map((e) => WalletTransactionModel.fromJson(Map<String, dynamic>.from(e))).toList();
+    final results = (map['recentTransactions'] ?? map['transactions'] ?? map['results']) as List? ?? const [];
+    return results.whereType<Map>().map((e) => WalletTransactionModel.fromJson(Map<String, dynamic>.from(e))).toList();
   }
 
   Future<WalletOrderResult> createTopupOrder(double amount) async {

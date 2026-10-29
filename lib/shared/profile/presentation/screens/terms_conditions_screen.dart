@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
@@ -16,7 +17,7 @@ class TermsConditionsScreen extends StatelessWidget {
         await launchUrl(launchUri);
       } else {
         if (context.mounted) {
-          AppSnackbar.info(context, 'Calling $phoneNumber...');
+          AppSnackbar.info(context, 'Calling {phone}...'.trArgs({'phone': phoneNumber}));
         }
       }
     } catch (_) {}
@@ -27,14 +28,14 @@ class TermsConditionsScreen extends StatelessWidget {
     final Uri launchUri = Uri(
       scheme: 'mailto',
       path: emailAddress,
-      //queryParameters: {'subject': 'Terms & Conditions Inquiry - Suvio App'},
+      //queryParameters: {'subject': 'Terms & Conditions Inquiry - Jhatpat App'},
     );
     try {
       if (await canLaunchUrl(launchUri)) {
         await launchUrl(launchUri);
       } else {
         if (context.mounted) {
-          AppSnackbar.info(context, 'Opening mail to $emailAddress...');
+          AppSnackbar.info(context, 'Opening mail to {email}...'.trArgs({'email': emailAddress}));
         }
       }
     } catch (_) {}
@@ -76,7 +77,7 @@ class TermsConditionsScreen extends StatelessWidget {
                 title,
                 style: TextStyle(
                   fontSize: 17.sp,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   color: textColor,
                 ),
               ),
@@ -85,8 +86,8 @@ class TermsConditionsScreen extends StatelessWidget {
                 summary,
                 style: TextStyle(
                   fontSize: 13.sp,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primary,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFFE5A600),
                   height: 1.3,
                 ),
               ),
@@ -107,12 +108,12 @@ class TermsConditionsScreen extends StatelessWidget {
                   onPressed: () => Navigator.pop(ctx),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
+                    foregroundColor: Colors.black,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12.r),
                     ),
                   ),
-                  child: const Text('Understand & Close', style: TextStyle(fontWeight: FontWeight.bold)),
+                  child: Text('Understand & Close'.tr, style: const TextStyle(fontWeight: FontWeight.w600)),
                 ),
               ),
             ],
@@ -145,11 +146,11 @@ class TermsConditionsScreen extends StatelessWidget {
           },
         ),
         title: Text(
-          'Terms and Conditions',
+          'Terms and Conditions'.tr,
           style: TextStyle(
             color: textColor,
             fontSize: 18.sp,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),
@@ -183,13 +184,13 @@ class TermsConditionsScreen extends StatelessWidget {
                     children: [
                       Icon(
                         Icons.verified_user_rounded,
-                        color: const Color(0xFFFF6D00),
+                        color: const Color(0xFFFFB800),
                         size: 15.sp,
                       ),
                       SizedBox(width: 5.w),
                       Flexible(
                         child: Text(
-                          'By using Suvio, you agree to these Terms and Conditions.',
+                          'By using JhatPat, you agree to these Terms and Conditions.'.tr,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 11.5.sp,
@@ -202,7 +203,7 @@ class TermsConditionsScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 3.h),
                   Text(
-                    'Thank you for choosing Suvio!',
+                    'Thank you for choosing JhatPat!'.tr,
                     style: TextStyle(
                       fontSize: 11.sp,
                       color: secondaryTextColor,
@@ -219,17 +220,17 @@ class TermsConditionsScreen extends StatelessWidget {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
+                        foregroundColor: Colors.black,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24.r),
                         ),
                       ),
                       child: Text(
-                        'Close',
+                        'Close'.tr,
                         style: TextStyle(
                           fontSize: 15.sp,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
@@ -254,17 +255,17 @@ class TermsConditionsScreen extends StatelessWidget {
           end: Alignment.bottomRight,
           colors: isDark
               ? [
-                  const Color(0xFF231A14),
-                  const Color(0xFF1E1A16),
+                  const Color(0xFF1E1E1E),
+                  const Color(0xFF181818),
                 ]
               : [
-                  const Color(0xFFFFFBF5),
-                  const Color(0xFFFFF4EA),
+                  const Color(0xFFFFFDF5),
+                  const Color(0xFFFFF8E1),
                 ],
         ),
         borderRadius: BorderRadius.circular(20.r),
         border: Border.all(
-          color: isDark ? const Color(0xFF3D2B1F) : const Color(0xFFFFE5D0),
+          color: isDark ? const Color(0xFF333333) : const Color(0xFFFFE8A3),
           width: 1,
         ),
         boxShadow: [
@@ -286,16 +287,16 @@ class TermsConditionsScreen extends StatelessWidget {
                   text: TextSpan(
                     style: TextStyle(
                       fontSize: 22.sp,
-                      fontWeight: FontWeight.w900,
+                      fontWeight: FontWeight.w700,
                       height: 1.2,
                     ),
                     children: [
                       TextSpan(
-                        text: 'Terms &\n',
-                        style: TextStyle(color: AppColors.primary),
+                        text: 'Terms &\n'.tr,
+                        style: TextStyle(color: const Color(0xFFE5A600)),
                       ),
                       TextSpan(
-                        text: 'Conditions',
+                        text: 'Conditions'.tr,
                         style: TextStyle(color: textColor),
                       ),
                     ],
@@ -319,12 +320,12 @@ class TermsConditionsScreen extends StatelessWidget {
                       height: 1.35,
                     ),
                     children: [
-                      TextSpan(text: 'Please read these terms carefully before using the '),
+                      TextSpan(text: 'Please read these terms carefully before using the '.tr),
                       TextSpan(
-                        text: 'Suvio',
-                        style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary),
+                        text: 'JhatPat',
+                        style: TextStyle(fontWeight: FontWeight.w600, color: const Color(0xFFE5A600)),
                       ),
-                      TextSpan(text: ' app.'),
+                      TextSpan(text: ' app.'.tr),
                     ],
                   ),
                 ),
@@ -357,14 +358,14 @@ class TermsConditionsScreen extends StatelessWidget {
       {
         'icon': Icons.description_outlined,
         'title': '1. Acceptance of Terms',
-        'subtitle': 'By accessing or using the Suvio app, you agree to be bound by these Terms and Conditions.',
-        'fullText': 'By creating an account, browsing menus, or placing an order on Suvio, you acknowledge that you have read, understood, and agreed to abide by all operating rules and policies stated herein.',
+        'subtitle': 'By accessing or using the JhatPat app, you agree to be bound by these Terms and Conditions.',
+        'fullText': 'By creating an account, browsing menus, or placing an order on JhatPat, you acknowledge that you have read, understood, and agreed to abide by all operating rules and policies stated herein.',
       },
       {
         'icon': Icons.person_outline_rounded,
         'title': '2. Use of the App',
         'subtitle': 'You agree to use the app only for lawful purposes and in accordance with these terms.',
-        'fullText': 'You must be at least 18 years old or under parental supervision to use Suvio services. Accounts registered using false information or automated bots are subject to immediate termination.',
+        'fullText': 'You must be at least 18 years old or under parental supervision to use JhatPat services. Accounts registered using false information or automated bots are subject to immediate termination.',
       },
       {
         'icon': Icons.shopping_bag_outlined,
@@ -382,13 +383,13 @@ class TermsConditionsScreen extends StatelessWidget {
         'icon': Icons.replay_rounded,
         'title': '5. Cancellations & Refunds',
         'subtitle': 'Orders once placed cannot be cancelled. Refunds are issued only in eligible cases as per our Refund Policy.',
-        'fullText': 'Because restaurant partners begin food preparation immediately upon order confirmation, placed orders cannot be cancelled. In cases of missing items or damaged packages, refunds are credited to Suvio Wallet within 24 hours.',
+        'fullText': 'Because restaurant partners begin food preparation immediately upon order confirmation, placed orders cannot be cancelled. In cases of missing items or damaged packages, refunds are credited to JhatPat Wallet within 24 hours.',
       },
       {
         'icon': Icons.shield_outlined,
         'title': '6. User Responsibilities',
         'subtitle': 'You are responsible for providing accurate information and maintaining the confidentiality of your account.',
-        'fullText': 'You must maintain accurate delivery addresses, valid phone numbers, and secure OTP access credentials. Suvio is not responsible for misdeliveries caused by incorrect address coordinates.',
+        'fullText': 'You must maintain accurate delivery addresses, valid phone numbers, and secure OTP access credentials. JhatPat is not responsible for misdeliveries caused by incorrect address coordinates.',
       },
       {
         'icon': Icons.block_rounded,
@@ -400,7 +401,7 @@ class TermsConditionsScreen extends StatelessWidget {
         'icon': Icons.info_outline_rounded,
         'title': '8. Changes to Terms',
         'subtitle': 'We may update these terms at any time. Changes will be posted on this page with the updated date.',
-        'fullText': 'Suvio reserves the right to modify service fees, delivery charges, or operating guidelines at any time. Continued usage constitutes binding acceptance of modified terms.',
+        'fullText': 'JhatPat reserves the right to modify service fees, delivery charges, or operating guidelines at any time. Continued usage constitutes binding acceptance of modified terms.',
       },
       {
         'icon': Icons.gavel_rounded,
@@ -434,9 +435,9 @@ class TermsConditionsScreen extends StatelessWidget {
           return InkWell(
             onTap: () => _showTermsDetailModal(
               context,
-              item['title'] as String,
-              item['subtitle'] as String,
-              item['fullText'] as String,
+              (item['title'] as String).tr,
+              (item['subtitle'] as String).tr,
+              (item['fullText'] as String).tr,
             ),
             borderRadius: BorderRadius.vertical(
               top: index == 0 ? Radius.circular(16.r) : Radius.zero,
@@ -452,12 +453,12 @@ class TermsConditionsScreen extends StatelessWidget {
                       Container(
                         padding: EdgeInsets.all(8.r),
                         decoration: const BoxDecoration(
-                          color: Color(0xFFFFF3E0),
+                          color: Color(0xFFFFF8E1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           item['icon'] as IconData,
-                          color: const Color(0xFFFF6D00),
+                          color: const Color(0xFFFFB800),
                           size: 18.sp,
                         ),
                       ),
@@ -467,16 +468,16 @@ class TermsConditionsScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              item['title'] as String,
+                              (item['title'] as String).tr,
                               style: TextStyle(
                                 fontSize: 13.5.sp,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w600,
                                 color: textColor,
                               ),
                             ),
                             SizedBox(height: 3.h),
                             Text(
-                              item['subtitle'] as String,
+                              (item['subtitle'] as String).tr,
                               style: TextStyle(
                                 fontSize: 11.sp,
                                 color: secondaryTextColor,
@@ -519,10 +520,10 @@ class TermsConditionsScreen extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(12.r),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF231A14) : const Color(0xFFFFFBF5),
+        color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFFFFDF5),
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: isDark ? const Color(0xFF3D2B1F) : const Color(0xFFFFE5D0),
+          color: isDark ? const Color(0xFF333333) : const Color(0xFFFFE8A3),
           width: 1,
         ),
       ),
@@ -534,7 +535,7 @@ class TermsConditionsScreen extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(6.r),
                 decoration: const BoxDecoration(
-                  color: Color(0xFFFFECE0),
+                  color: Color(0xFFFFF0C2),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -544,26 +545,28 @@ class TermsConditionsScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(width: 8.w),
-              Column(
+              Expanded(
+                child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Need Help?',
+                    'Need Help?'.tr,
                     style: TextStyle(
                       fontSize: 13.sp,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       color: textColor,
                     ),
                   ),
                   SizedBox(height: 1.h),
                   Text(
-                    'If you have any questions, feel free to contact us.',
+                    'If you have any questions, feel free to contact us.'.tr,
                     style: TextStyle(
                       fontSize: 10.5.sp,
                       color: secondaryTextColor,
                     ),
                   ),
                 ],
+                ),
               ),
             ],
           ),
@@ -594,7 +597,7 @@ class TermsConditionsScreen extends StatelessWidget {
                           Container(
                             padding: EdgeInsets.all(6.r),
                             decoration: const BoxDecoration(
-                              color: Color(0xFFFFECE0),
+                              color: Color(0xFFFFF0C2),
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
@@ -609,10 +612,10 @@ class TermsConditionsScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Phone',
+                                  'Phone'.tr,
                                   style: TextStyle(
                                     fontSize: 11.5.sp,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.w600,
                                     color: textColor,
                                   ),
                                 ),
@@ -653,7 +656,7 @@ class TermsConditionsScreen extends StatelessWidget {
                           Container(
                             padding: EdgeInsets.all(6.r),
                             decoration: const BoxDecoration(
-                              color: Color(0xFFFFECE0),
+                              color: Color(0xFFFFF0C2),
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
@@ -668,10 +671,10 @@ class TermsConditionsScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Email',
+                                  'Email'.tr,
                                   style: TextStyle(
                                     fontSize: 11.5.sp,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.w600,
                                     color: textColor,
                                   ),
                                 ),

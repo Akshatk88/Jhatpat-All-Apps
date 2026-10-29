@@ -3,13 +3,16 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:superapp_user/core/maps/vehicle_marker_icons.dart';
 import 'package:superapp_user/modules/taxi/application/taxi_core_providers.dart';
 import 'package:superapp_user/modules/taxi/ride/application/ride_providers.dart';
+import 'package:superapp_user/modules/taxi/home/data/models/set_price_model.dart';
 import 'package:superapp_user/modules/taxi/home/data/models/vehicle_type_model.dart';
 import 'package:superapp_user/modules/taxi/home/application/booking_state.dart';
 import 'package:superapp_user/modules/taxi/home/application/fare_calculator.dart';
 import 'package:superapp_user/modules/taxi/home/application/home_providers.dart';
 import 'package:superapp_user/modules/taxi/home/application/ride_search_controller.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 /// Average city-traffic speed assumed for client-side ETA estimation only.
 const double _assumedSpeedKmph = 25;
@@ -30,26 +33,68 @@ class BookingController extends Notifier<BookingState> {
     //
     // The vehicle list is the screen's reason to exist; prices are an
     // enrichment. Losing the enrichment must not lose the screen.
-    final vehicleTypes = await _guard(repo.getVehicleTypes, 'vehicle types');
+    // 1. The device copy from last time, at once — prices show instantly
+    //    instead of after the 10–20 s catalogue download.
+    final cachedTypes = await repo.cachedVehicleTypes();
+    final cachedPrices = await repo.cachedSetPrices();
+    if (cachedTypes != null && cachedTypes.isNotEmpty) {
+      _applyCatalog(cachedTypes, cachedPrices);
+    }
+
+    // 2. Fresh copies, both downloads at the same time (they used to run one
+    //    after the other). Each is guarded, so one failing keeps the other.
+    final results = await Future.wait([
+      _guard(repo.getVehicleTypes, 'vehicle types'),
+      _guard(repo.getSetPrices, 'fare table'),
+    ]);
+    final vehicleTypes = results[0] as List<VehicleTypeModel>?;
+    final setPrices = results[1] as List<SetPriceModel>?;
+
     if (vehicleTypes == null) {
-      state = state.copyWith(
-        error: 'Could not load vehicles. Check your connection and try again.',
-      );
+      if (state.vehicleTypes.isEmpty) {
+        state = state.copyWith(
+          error: 'Could not load vehicles. Check your connection and try again.'.tr,
+        );
+      }
       return;
     }
+    _applyCatalog(vehicleTypes, setPrices ?? cachedPrices);
+    unawaited(_loadDriverEtas());
+    unawaited(_loadServerQuotes());
+  }
+
+  /// Puts a vehicle list and price table on screen, keeping the rider's pick.
+  void _applyCatalog(
+    List<VehicleTypeModel> vehicleTypes,
+    List<SetPriceModel>? setPrices,
+  ) {
+    // Cheapest class first (bike → auto → cab) so the default pick is the
+    // budget option; the screen re-orders by the real fare once it is known.
+    final ordered = [...vehicleTypes]
+      ..sort((a, b) => vehicleClassRank(a).compareTo(vehicleClassRank(b)));
+
+    final previous = state.selectedVehicle;
+    final kept = previous == null
+        ? null
+        : ordered.where((v) => v.id == previous.id).firstOrNull;
 
     state = state.copyWith(
-      vehicleTypes: vehicleTypes,
-      selectedVehicle: vehicleTypes.isNotEmpty ? vehicleTypes.first : null,
+      vehicleTypes: ordered,
+      selectedVehicle: kept ?? (ordered.isNotEmpty ? ordered.first : null),
+      setPrices: setPrices,
     );
 
-    final setPrices = await _guard(repo.getSetPrices, 'fare table');
-    if (setPrices != null) {
-      state = state.copyWith(setPrices: setPrices);
+    // The default pick must be a vehicle the admin has priced; an unpriced
+    // one is refused by the server at booking.
+    final selected = state.selectedVehicle;
+    if (setPrices != null && selected != null && state.isUnpriced(selected.id)) {
+      final priced =
+          state.vehicleTypes.where((v) => !state.isUnpriced(v.id)).toList();
+      if (priced.isNotEmpty) {
+        state = state.copyWith(selectedVehicle: priced.first);
+      }
     }
-
     _recalculateFare();
-    unawaited(_loadDriverEtas());
   }
 
   /// Runs [fetch], returning null instead of throwing so one failed call
@@ -168,8 +213,12 @@ class BookingController extends Notifier<BookingState> {
     state = state.copyWith(
       distanceMeters: totalDistanceMeters,
       durationSeconds: durationSeconds,
+      // Old quotes belong to the old route.
+      quotedFares: const {},
+      quoteUnavailable: const {},
     );
     _recalculateFare();
+    unawaited(_loadServerQuotes());
   }
 
   void _recalculateFare() {
@@ -180,7 +229,48 @@ class BookingController extends Notifier<BookingState> {
     state = state.copyWith(fareBreakdown: breakdown);
   }
 
+  /// The vehicle list as the rider sees it: lowest fare first. Vehicles
+  /// without a fare yet (route or price table still loading) fall back to
+  /// class order — bike, auto, then cabs — and go after the priced ones.
+  List<VehicleTypeModel> vehiclesByPrice() {
+    final fares = {
+      for (final v in state.vehicleTypes) v.id: fareForVehicle(v)?.total,
+    };
+    return [...state.vehicleTypes]..sort((a, b) {
+        final fa = fares[a.id];
+        final fb = fares[b.id];
+        if (fa != null && fb != null && fa != fb) return fa.compareTo(fb);
+        if (fa != null && fb == null) return -1;
+        if (fa == null && fb != null) return 1;
+        return vehicleClassRank(a).compareTo(vehicleClassRank(b));
+      });
+  }
+
+  /// 0 bike / scooter (incl. bike lite), 1 auto, 2 cab, 3 bigger cabs.
+  static int vehicleClassRank(VehicleTypeModel v) {
+    final s = '${v.iconType} ${v.name}'.toLowerCase();
+    if (s.contains('bike') || s.contains('moto') || s.contains('scooty') ||
+        s.contains('scooter') || s.contains('2 wheeler') ||
+        s.contains('two wheeler')) {
+      return 0;
+    }
+    if (s.contains('auto') || s.contains('rickshaw') || s.contains('e-rick')) {
+      return 1;
+    }
+    if (s.contains('suv') || s.contains('xl') || s.contains('premium') ||
+        s.contains('luxury') || s.contains('innova')) {
+      return 3;
+    }
+    return 2;
+  }
+
   FareBreakdown? fareForVehicle(VehicleTypeModel vehicle) {
+    // The server quote is the exact charge (road distance, platform fee,
+    // surge, rounding). The local estimate only fills in while it loads.
+    final quoted = state.quotedFares[vehicle.id];
+    if (quoted != null) return quoted;
+    if (state.quoteUnavailable.contains(vehicle.id)) return null;
+
     final distanceMeters = state.distanceMeters;
     final durationSeconds = state.durationSeconds;
     if (distanceMeters == null || durationSeconds == null) return null;
@@ -195,13 +285,67 @@ class BookingController extends Notifier<BookingState> {
     );
   }
 
+  int _quoteRequest = 0;
+
+  /// Asks the server for every vehicle's fare on the current route. Stale
+  /// answers (route changed meanwhile) are dropped; on failure the local
+  /// estimate stays on screen.
+  Future<void> _loadServerQuotes() async {
+    final pickup = state.pickup;
+    final drop = state.drop;
+    final ids = state.vehicleTypes.map((v) => v.id).where((id) => id.isNotEmpty).toList();
+    if (pickup == null || drop == null || ids.isEmpty) return;
+    final request = ++_quoteRequest;
+    try {
+      final rows = await ref.read(homeRepositoryProvider).getRideQuotes(
+        pickup: [pickup.lng, pickup.lat],
+        drop: [drop.lng, drop.lat],
+        stops: [for (final s in state.stops) [s.lng, s.lat]],
+        vehicleTypeIds: ids,
+      );
+      if (request != _quoteRequest) return;
+      final fares = <String, FareBreakdown>{};
+      final unavailable = <String>{};
+      double? meters;
+      double? minutes;
+      for (final row in rows) {
+        final id = (row['vehicleTypeId'] ?? '').toString();
+        final fare = row['fare'];
+        final breakdown = row['available'] == true && fare is Map
+            ? FareBreakdown.fromQuote(Map<String, dynamic>.from(fare))
+            : null;
+        if (breakdown == null) {
+          unavailable.add(id);
+          continue;
+        }
+        fares[id] = breakdown;
+        meters ??= double.tryParse('${row['measuredDistanceMeters'] ?? ''}');
+        minutes ??= double.tryParse('${row['measuredDurationMinutes'] ?? ''}');
+      }
+      state = state.copyWith(
+        quotedFares: fares,
+        quoteUnavailable: unavailable,
+        distanceMeters: meters,
+        durationSeconds: minutes == null ? null : minutes * 60,
+      );
+      final selected = state.selectedVehicle;
+      if (selected != null && state.isUnpriced(selected.id)) {
+        final priced = vehiclesByPrice().where((v) => !state.isUnpriced(v.id));
+        if (priced.isNotEmpty) state = state.copyWith(selectedVehicle: priced.first);
+      }
+      _recalculateFare();
+    } catch (e) {
+      if (kDebugMode) debugPrint('[booking] fare quote failed: $e');
+    }
+  }
+
   Future<bool> confirmBooking() async {
     final pickup = state.pickup;
     final drop = state.drop;
     final vehicle = state.selectedVehicle;
     final fare = state.fareBreakdown;
     if (pickup == null || drop == null || vehicle == null || fare == null) {
-      state = state.copyWith(error: 'Please select pickup, drop and a ride type');
+      state = state.copyWith(error: 'Please select pickup, drop and a ride type'.tr);
       return false;
     }
 
@@ -229,6 +373,10 @@ class BookingController extends Notifier<BookingState> {
             estimatedDistanceMeters: state.distanceMeters ?? 0,
             estimatedDurationMinutes: (state.durationSeconds ?? 0) / 60,
             vehicleTypeId: vehicle.id,
+            vehicleIconType: VehicleMarkerIcons.familyFor(
+              iconType: vehicle.iconType,
+              vehicleType: vehicle.name,
+            ),
             paymentMethod: state.paymentMethod,
             promoCode: state.promoCode,
             scheduledAt: state.scheduledAt,

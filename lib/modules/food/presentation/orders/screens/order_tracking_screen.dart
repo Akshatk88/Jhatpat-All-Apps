@@ -1,14 +1,20 @@
+import 'package:superapp_user/design_system/components/feedback/cancel_reason_sheet.dart';
 import 'package:superapp_user/design_system/components/layout/app_refresh_indicator.dart';
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:superapp_user/core/i18n/tr.dart';
+import 'package:superapp_user/core/maps/geo_math.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
 import 'package:superapp_user/modules/food/data/models/order_model.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
@@ -19,7 +25,9 @@ import 'package:superapp_user/design_system/components/media/smart_image.dart';
 import 'package:superapp_user/modules/food/presentation/coupons/viewmodels/coupons_viewmodel.dart';
 import 'package:superapp_user/modules/food/presentation/home/viewmodels/banners_viewmodel.dart';
 import 'package:superapp_user/app/routing/route_names.dart';
+import 'package:superapp_user/modules/food/data/models/chat_model.dart';
 import 'package:superapp_user/modules/food/presentation/orders/viewmodels/active_order_viewmodel.dart';
+import 'package:superapp_user/modules/food/presentation/orders/viewmodels/order_conversations_viewmodel.dart';
 import 'package:superapp_user/modules/food/presentation/orders/viewmodels/order_tracking_viewmodel.dart';
 import 'package:superapp_user/modules/food/presentation/orders/widgets/live_tracking_map.dart';
 
@@ -74,12 +82,12 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
           if (order.isCancelled) {
             final reason = order.cancellationReason.isNotEmpty
                 ? order.cancellationReason
-                : 'Order has been cancelled.';
+                : 'Order has been cancelled.'.tr;
             AppSnackbar.error(context, reason, duration: const Duration(seconds: 4));
           } else if (order.isDelivered || order.orderStatus == 'completed') {
             AppSnackbar.success(
               context,
-              '🎉 Order Delivered! Enjoy your meal.',
+              '🎉 Order Delivered! Enjoy your meal.'.tr,
               duration: const Duration(seconds: 4),
             );
             context.go('/orders/delivered/${order.id}');
@@ -113,10 +121,10 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
     final showOrangeHeader = !state.isLoading && order != null;
 
     final overlayStyle = showOrangeHeader
-        ? SystemUiOverlayStyle.light.copyWith(
+        ? SystemUiOverlayStyle.dark.copyWith(
             statusBarColor: Colors.transparent,
-            statusBarIconBrightness: Brightness.light,
-            statusBarBrightness: Brightness.dark,
+            statusBarIconBrightness: Brightness.dark,
+            statusBarBrightness: Brightness.light,
           )
         : (isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark);
 
@@ -133,7 +141,7 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
                 height: MediaQuery.of(context).padding.top,
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Color(0xFFFF7A00), Color(0xFFFF5200)],
+                    colors: [Color(0xFFFFB800), Color(0xFFFFC700)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -174,6 +182,10 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
                                           statusLabel: order.statusLabel,
                                           onCall: () => _dial(order.deliveryPartner!.phone),
                                           onChat: () => _openChat(order),
+                                          unread: riderUnreadCount(
+                                            ref.watch(orderConversationsProvider(order.id)).value ??
+                                                const <ChatConversation>[],
+                                          ),
                                         ),
                                       const _SafetyCard(),
                                       _DeliveryDetailsCard(order: order),
@@ -199,34 +211,22 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
 
   Future<void> _confirmCancel() async {
     Haptics.medium();
-    final reason = TextEditingController();
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Cancel order?'),
-        content: TextField(
-          controller: reason,
-          decoration: const InputDecoration(labelText: 'Reason (optional)', border: OutlineInputBorder()),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Keep order')),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF6464)),
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Cancel order', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
+    final reason = await askCancelReason(
+      context,
+      title: 'Cancel order?',
+      reasons: CancelReasons.food,
+      confirmLabel: 'Cancel order',
+      keepLabel: 'Keep order',
     );
-    if (confirmed != true || !mounted) return;
+    if (reason == null || !mounted) return;
 
-    final err = await ref.read(orderTrackingProvider.notifier).cancel(reason: reason.text.trim());
+    final err = await ref.read(orderTrackingProvider.notifier).cancel(reason: reason);
     if (!mounted) return;
     if (err != null) {
       AppSnackbar.error(context, err);
     } else {
-      AppSnackbar.success(context, 'Order cancelled.');
+      AppSnackbar.success(context, 'Order cancelled.'.tr);
+      _goBack();
     }
   }
 
@@ -239,7 +239,7 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
       extra: ChatArgs(
         orderId: order.id,
         peerId: partner.id,
-        peerName: partner.name.isEmpty ? 'Delivery partner' : partner.name,
+        peerName: partner.name.isEmpty ? 'Delivery partner'.tr : partner.name,
       ),
     );
   }
@@ -250,7 +250,7 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     } else if (mounted) {
-      AppSnackbar.error(context, 'Could not open the dialer.');
+      AppSnackbar.error(context, 'Could not open the dialer.'.tr);
     }
   }
 
@@ -258,10 +258,12 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
     Haptics.light();
     final id = order.orderNumber.isNotEmpty ? order.orderNumber : order.id;
     final parts = [
-      'My Suvio order${order.restaurantName.isEmpty ? '' : ' from ${order.restaurantName}'}',
-      if (order.statusLabel.isNotEmpty) 'Status: ${order.statusLabel}',
+      order.restaurantName.isEmpty
+          ? 'My JhatPat order'.tr
+          : 'My JhatPat order from {name}'.trArgs({'name': order.restaurantName}),
+      if (order.statusLabel.isNotEmpty) 'Status: {status}'.trArgs({'status': order.statusLabel.tr}),
       if (order.etaLabel != null) order.etaLabel!,
-      if (id.isNotEmpty) 'Order $id',
+      if (id.isNotEmpty) 'Order {id}'.trArgs({'id': id}),
     ];
     SharePlus.instance.share(ShareParams(text: parts.join('\n')));
   }
@@ -282,17 +284,65 @@ class _TrackingHeader extends StatelessWidget {
     required this.onShare,
   });
 
+  /// Remaining time/distance along the current route from the rider's live
+  /// position, recomputed on every state change so it counts down as they move.
+  /// Null until a route and a real rider fix exist (then etaLabel is used).
+  ({int mins, double km, DateTime arrival})? get _liveEta {
+    final pts = state.routePoints;
+    final lat = state.riderLat;
+    final lng = state.riderLng;
+    if (pts.length < 2 || lat == null || lng == null || !state.hasRiderFix) return null;
+    if (state.routeTarget == null) return null;
+
+    final route = [for (final p in pts) LatLng(p.latitude, p.longitude)];
+    final rider = LatLng(lat, lng);
+    var bestIdx = 0;
+    var bestDist = double.infinity;
+    var bestPoint = route.first;
+    for (var i = 0; i < route.length - 1; i++) {
+      final hit = GeoMath.projectOnSegment(rider, route[i], route[i + 1]);
+      final d = GeoMath.distance(rider, hit.point);
+      if (d < bestDist) {
+        bestDist = d;
+        bestIdx = i;
+        bestPoint = hit.point;
+      }
+    }
+    final meters =
+        GeoMath.distance(bestPoint, route[bestIdx + 1]) + GeoMath.pathLength(route, bestIdx + 1);
+
+    // Router pace for this leg; 20 km/h when the response lacked either figure.
+    final mins = state.routeDurationMins;
+    final km = state.routeDistanceKm;
+    final secPerMeter = (mins != null && km != null && mins > 0 && km > 0)
+        ? (mins * 60) / (km * 1000)
+        : 3.6 / 20;
+    final seconds = meters * secPerMeter;
+    return (
+      mins: math.max(1, (seconds / 60).ceil()),
+      km: meters / 1000,
+      arrival: DateTime.now().add(Duration(seconds: seconds.round())),
+    );
+  }
+
   String get _displayStatusText {
-    if (order.isDelivered) return 'Delivered';
-    if (order.isCancelled) return order.statusLabel;
+    if (order.isDelivered) return 'Delivered'.tr;
+    if (order.isCancelled) return order.statusLabel.tr;
+    final live = _liveEta;
+    if (live != null) {
+      return (state.routeTarget == 'restaurant'
+              ? 'Rider reaching restaurant in {min} min'
+              : 'Delivery in {min} min')
+          .trArgs({'min': live.mins});
+    }
     final eta = order.etaLabel;
     if (eta != null && eta != 'Calculating...') {
-      return '$eta • On Time';
+      return '{eta} • On Time'.trArgs({'eta': eta});
     }
     if (order.isAwaitingAcceptance || order.dispatchStatus == 'searching') {
-      return 'Waiting for delivery partner';
+      return 'Waiting for delivery partner'.tr;
     }
-    return order.statusLabel;
+    return order.statusLabel.tr;
   }
 
   @override
@@ -303,7 +353,7 @@ class _TrackingHeader extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFFFF7A00), Color(0xFFFF5200)],
+          colors: [Color(0xFFFFB800), Color(0xFFFFC700)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -319,11 +369,11 @@ class _TrackingHeader extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: Text(
-                    order.restaurantName.isEmpty ? 'Your order' : order.restaurantName,
+                    order.restaurantName.isEmpty ? 'Your order'.tr : order.restaurantName,
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
+                    style: const TextStyle(color: Color(0xFF121212), fontSize: 15, fontWeight: FontWeight.w500),
                   ),
                 ),
               ),
@@ -341,9 +391,9 @@ class _TrackingHeader extends StatelessWidget {
                 Text(
                   _displayStatusText,
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: Color(0xFF121212),
                     fontSize: 22,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w600,
                     height: 1.2,
                   ),
                 ),
@@ -351,6 +401,20 @@ class _TrackingHeader extends StatelessWidget {
               ],
             ),
           ),
+          if (order.isActive && _liveEta != null) ...[
+            const SizedBox(height: 4),
+            Text(
+              '{km} km away · Arrives {time}'.trArgs({
+                'km': _liveEta!.km.toStringAsFixed(1),
+                'time': DateFormat('h:mm a').format(_liveEta!.arrival),
+              }),
+              style: const TextStyle(
+                color: Color(0xFF3F3F46),
+                fontSize: 13.5,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -377,7 +441,7 @@ class _DeliveryGifWidget extends StatelessWidget {
             errorBuilder: (context, error, stackTrace) {
               return const Icon(
                 Icons.directions_bike_rounded,
-                color: Colors.white,
+                color: Color(0xFF121212),
                 size: 42,
               );
             },
@@ -406,7 +470,7 @@ class _CircleButton extends StatelessWidget {
           color: Colors.transparent,
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, color: Colors.white, size: 20),
+        child: Icon(icon, color: const Color(0xFF121212), size: 20),
       ),
     );
   }
@@ -520,11 +584,11 @@ class _MapSection extends StatelessWidget {
                                   children: [
                                     Text(
                                       liveOrder.statusLabel.isNotEmpty
-                                          ? liveOrder.statusLabel
-                                          : 'Tracking Delivery Partner',
+                                          ? liveOrder.statusLabel.tr
+                                          : 'Tracking Delivery Partner'.tr,
                                       style: TextStyle(
                                         fontSize: 16,
-                                        fontWeight: FontWeight.bold,
+                                        fontWeight: FontWeight.w600,
                                         color: isDark ? Colors.white : AppColors.textPrimaryLight,
                                       ),
                                       maxLines: 1,
@@ -532,11 +596,11 @@ class _MapSection extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
-                                      liveOrder.etaLabel ?? 'Live tracking active',
+                                      liveOrder.etaLabel?.tr ?? 'Live tracking active'.tr,
                                       style: TextStyle(
                                         fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColors.primary,
+                                        fontWeight: FontWeight.w500,
+                                        color: const Color(0xFFE5A600),
                                       ),
                                     ),
                                   ],
@@ -615,20 +679,20 @@ class _MapSection extends StatelessWidget {
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            liveOrder.deliveryPartner?.name ?? 'Delivery Partner',
+                                            liveOrder.deliveryPartner?.name ?? 'Delivery Partner'.tr,
                                             style: TextStyle(
                                               fontSize: 14,
-                                              fontWeight: FontWeight.bold,
+                                              fontWeight: FontWeight.w600,
                                               color: isDark ? Colors.white : AppColors.textPrimaryLight,
                                             ),
                                           ),
                                           const SizedBox(height: 2),
                                           Text(
-                                            'On the way to your delivery address',
+                                            'On the way to your delivery address'.tr,
                                             style: TextStyle(
                                               fontSize: 11.5,
-                                              color: AppColors.primary,
-                                              fontWeight: FontWeight.w600,
+                                              color: const Color(0xFFE5A600),
+                                              fontWeight: FontWeight.w500,
                                             ),
                                           ),
                                         ],
@@ -697,10 +761,10 @@ class _MapSection extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: Colors.white24, width: 1),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      SizedBox(
+                      const SizedBox(
                         width: 10,
                         height: 10,
                         child: CircularProgressIndicator(
@@ -708,13 +772,13 @@ class _MapSection extends StatelessWidget {
                           valueColor: AlwaysStoppedAnimation(Colors.white),
                         ),
                       ),
-                      SizedBox(width: 6),
+                      const SizedBox(width: 6),
                       Text(
-                        'Locating your rider',
-                        style: TextStyle(
+                        'Locating your rider'.tr,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 11,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
@@ -732,19 +796,19 @@ class _MapSection extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: Colors.white24, width: 1),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Expand Map',
-                      style: TextStyle(
+                      'Expand Map'.tr,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 11,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    SizedBox(width: 4),
-                    Icon(
+                    const SizedBox(width: 4),
+                    const Icon(
                       Icons.open_in_full_rounded,
                       color: Colors.white,
                       size: 12,
@@ -802,16 +866,16 @@ class _DropOtpCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('DELIVERY OTP', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.primary)),
-                SizedBox(height: 3),
-                Text('Share this code with your delivery partner', style: TextStyle(fontSize: 12.5)),
+                Text('DELIVERY OTP'.tr, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFFE5A600))),
+                const SizedBox(height: 3),
+                Text('Share this code with your delivery partner'.tr, style: const TextStyle(fontSize: 12.5)),
               ],
             ),
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
             decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(12)),
-            child: Text(otp, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800, letterSpacing: 3)),
+            child: Text(otp, style: const TextStyle(color: Color(0xFF121212), fontSize: 20, fontWeight: FontWeight.w600, letterSpacing: 3)),
           ),
         ],
       ),
@@ -943,10 +1007,10 @@ class _CouponCards extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(c.discountText, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                      Text(c.discountText, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
                       if (c.code.isNotEmpty) ...[
                         const SizedBox(height: 2),
-                        Text('Code ${c.code}', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+                        Text('Code {code}'.trArgs({'code': c.code}), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
                       ],
                     ],
                   ),
@@ -966,11 +1030,15 @@ class _DeliveryPartnerCard extends StatelessWidget {
   final VoidCallback onCall;
   final VoidCallback onChat;
 
+  /// Unread messages from the rider, shown on the chat button.
+  final int unread;
+
   const _DeliveryPartnerCard({
     required this.partner,
     required this.statusLabel,
     required this.onCall,
     required this.onChat,
+    this.unread = 0,
   });
 
   @override
@@ -1000,8 +1068,10 @@ class _DeliveryPartnerCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      partner.name.isEmpty ? 'Delivery partner' : partner.name,
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.5, color: textColor),
+                      partner.name.isEmpty ? 'Delivery partner'.tr : partner.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15.5, color: textColor),
                     ),
                     const SizedBox(height: 3),
                     Row(
@@ -1009,16 +1079,23 @@ class _DeliveryPartnerCard extends StatelessWidget {
                         if (partner.rating > 0) ...[
                           const Icon(Icons.star_rounded, color: Color(0xFF1FA855), size: 15),
                           const SizedBox(width: 2),
-                          Text(partner.rating.toStringAsFixed(1), style: TextStyle(fontSize: 12.5, color: secondary, fontWeight: FontWeight.w600)),
+                          Text(partner.rating.toStringAsFixed(1), style: TextStyle(fontSize: 12.5, color: secondary, fontWeight: FontWeight.w500)),
                         ],
                         if (partner.totalRatings > 0) ...[
                           const SizedBox(width: 8),
-                          Text('${partner.totalRatings} ratings', style: TextStyle(fontSize: 12.5, color: secondary)),
+                          Flexible(
+                            child: Text(
+                              '{count} ratings'.trArgs({'count': partner.totalRatings}),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontSize: 12.5, color: secondary),
+                            ),
+                          ),
                         ],
                       ],
                     ),
                     const SizedBox(height: 2),
-                    Text(statusLabel, style: TextStyle(fontSize: 12.5, color: AppColors.primary, fontWeight: FontWeight.w600)),
+                    Text(statusLabel.tr, style: TextStyle(fontSize: 12.5, color: AppColors.primary, fontWeight: FontWeight.w500)),
                   ],
                 ),
               ),
@@ -1039,21 +1116,46 @@ class _DeliveryPartnerCard extends StatelessWidget {
                   ),
                 ),
               const SizedBox(width: 8),
-              // Chat has no backend yet (BACKEND_CHANGES P1.5) — the button
-              // stays visible per spec but surfaces a pending notice.
-              InkWell(
-                onTap: onChat,
-                borderRadius: BorderRadius.circular(22),
-                child: Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: secondary.withValues(alpha: 0.12),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: secondary.withValues(alpha: 0.3)),
+              // Opens the order chat with the assigned rider (/food/chat).
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  InkWell(
+                    onTap: onChat,
+                    borderRadius: BorderRadius.circular(22),
+                    child: Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: secondary.withValues(alpha: 0.12),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: secondary.withValues(alpha: 0.3)),
+                      ),
+                      child: Icon(Icons.chat_bubble_outline_rounded, color: secondary, size: 19),
+                    ),
                   ),
-                  child: Icon(Icons.chat_bubble_outline_rounded, color: secondary, size: 19),
-                ),
+                  if (unread > 0)
+                    Positioned(
+                      top: -3,
+                      right: -3,
+                      child: IgnorePointer(
+                        child: Container(
+                          constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFEF4444),
+                            borderRadius: BorderRadius.circular(9),
+                            border: Border.all(color: Colors.white, width: 1.5),
+                          ),
+                          child: Text(
+                            unread > 9 ? '9+' : '$unread',
+                            style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ],
           ),
@@ -1068,13 +1170,13 @@ class _DeliveryPartnerCard extends StatelessWidget {
                 child: partner.hasVehicleInfo
                     ? Text(
                         [partner.vehicleType, partner.vehicleNumber].where((s) => s.isNotEmpty).join(' · '),
-                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: textColor),
+                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: textColor),
                       )
                     : Row(
                         children: [
-                          Text('Vehicle info', style: TextStyle(fontSize: 13, color: secondary)),
+                          Text('Vehicle info'.tr, style: TextStyle(fontSize: 13, color: secondary)),
                           const SizedBox(width: 6),
-                          const _PendingBadge(),
+                          const Flexible(child: _PendingBadge()),
                         ],
                       ),
               ),
@@ -1101,9 +1203,9 @@ class _PendingBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Colors.amber.withValues(alpha: 0.4)),
       ),
-      child: const Text(
-        'Backend implementation pending',
-        style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF9A6B00)),
+      child: Text(
+        'Backend implementation pending'.tr,
+        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w500, color: Color(0xFF9A6B00)),
       ),
     );
   }
@@ -1125,7 +1227,7 @@ class _CancelButton extends StatelessWidget {
         ),
         onPressed: onCancel,
         icon: const Icon(Icons.close_rounded, color: Color(0xFFFF6464), size: 18),
-        label: const Text('Cancel order', style: TextStyle(color: Color(0xFFFF6464), fontWeight: FontWeight.bold)),
+        label: Text('Cancel order'.tr, style: const TextStyle(color: Color(0xFFFF6464), fontWeight: FontWeight.w600)),
       ),
     );
   }
@@ -1145,7 +1247,7 @@ class _SafetyCard extends StatelessWidget {
           const Icon(Icons.verified_user_outlined, color: Color(0xFF1FA855), size: 22),
           const SizedBox(width: 12),
           Expanded(
-            child: Text('Your order is protected with Suvio delivery safety.', style: TextStyle(fontSize: 13, color: secondary)),
+            child: Text('Your order is protected with JhatPat delivery safety.'.tr, style: TextStyle(fontSize: 13, color: secondary)),
           ),
         ],
       ),
@@ -1177,7 +1279,7 @@ class _DeliveryDetailsCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Delivery details', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: textColor)),
+          Text('Delivery details'.tr, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: textColor)),
           const SizedBox(height: 12),
           ...rows,
         ],
@@ -1197,9 +1299,9 @@ class _DeliveryDetailsCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: TextStyle(fontSize: 11.5, color: secondary)),
+                Text(label.tr, style: TextStyle(fontSize: 11.5, color: secondary)),
                 const SizedBox(height: 2),
-                Text(value, style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600, color: textColor)),
+                Text(value, style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w500, color: textColor)),
               ],
             ),
           ),
@@ -1226,9 +1328,18 @@ class _OrderSummaryCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Order summary', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: textColor)),
-              if (order.orderNumber.isNotEmpty)
-                Text('#${order.orderNumber}', style: TextStyle(fontSize: 12, color: secondary)),
+              Text('Order summary'.tr, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: textColor)),
+              if (order.orderNumber.isNotEmpty) ...[
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    '#${order.orderNumber}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 12, color: secondary),
+                  ),
+                ),
+              ],
             ],
           ),
           const SizedBox(height: 12),
@@ -1237,7 +1348,7 @@ class _OrderSummaryCard extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 8),
               child: Row(
                 children: [
-                  Text('${item.quantity}×', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary, fontSize: 13)),
+                  Text('${item.quantity}×', style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.primary, fontSize: 13)),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -1256,13 +1367,13 @@ class _OrderSummaryCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Total paid', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textColor)),
-              Text('₹${order.total.toStringAsFixed(0)}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppColors.primary)),
+              Text('Total paid'.tr, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: textColor)),
+              Text('₹${order.total.toStringAsFixed(0)}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: const Color(0xFFE5A600))),
             ],
           ),
           if (order.paymentMethod.isNotEmpty) ...[
             const SizedBox(height: 6),
-            Text('Paid via ${_paymentLabel(order.paymentMethod)}', style: TextStyle(fontSize: 12, color: secondary)),
+            Text('Paid via {method}'.trArgs({'method': _paymentLabel(order.paymentMethod)}), style: TextStyle(fontSize: 12, color: secondary)),
           ],
         ],
       ),
@@ -1272,13 +1383,13 @@ class _OrderSummaryCard extends StatelessWidget {
   String _paymentLabel(String method) {
     switch (method) {
       case 'cash':
-        return 'Cash on Delivery';
+        return 'Cash on Delivery'.tr;
       case 'razorpay':
-        return 'UPI / Card';
+        return 'Online (Card/NetBanking)'.tr;
       case 'razorpay_qr':
-        return 'Pay on delivery (QR)';
+        return 'Pay on delivery (QR)'.tr;
       case 'wallet':
-        return 'Suvio Wallet';
+        return 'JhatPat Wallet'.tr;
       default:
         return method;
     }
@@ -1306,7 +1417,7 @@ class _StatusTimelineCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(order.statusLabel, style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
+                  Text(order.statusLabel.tr, style: TextStyle(fontWeight: FontWeight.w600, color: textColor)),
                   if (order.cancellationReason.isNotEmpty)
                     Text(order.cancellationReason, style: TextStyle(fontSize: 12.5, color: secondary)),
                 ],
@@ -1322,7 +1433,7 @@ class _StatusTimelineCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Order status', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: textColor)),
+          Text('Order status'.tr, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: textColor)),
           const SizedBox(height: 14),
           for (var i = 0; i < stages.length; i++)
             _StageRow(stage: stages[i], isLast: i == stages.length - 1, textColor: textColor, secondary: secondary),
@@ -1369,10 +1480,10 @@ class _StageRow extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    stage.label,
+                    stage.label.tr,
                     style: TextStyle(
                       fontSize: 13.5,
-                      fontWeight: stage.isCurrent ? FontWeight.bold : FontWeight.w500,
+                      fontWeight: stage.isCurrent ? FontWeight.w600 : FontWeight.w500,
                       color: reached ? textColor : secondary,
                     ),
                   ),
@@ -1414,12 +1525,12 @@ class _ErrorState extends StatelessWidget {
           const Spacer(),
           const Icon(Icons.error_outline_rounded, size: 48, color: Colors.grey),
           const SizedBox(height: 12),
-          Text(message ?? 'Could not load your order.', textAlign: TextAlign.center),
+          Text(message ?? 'Could not load your order.'.tr, textAlign: TextAlign.center),
           const SizedBox(height: 16),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
             onPressed: onRetry,
-            child: const Text('Retry', style: TextStyle(color: Colors.white)),
+            child: Text('Retry'.tr, style: const TextStyle(color: Color(0xFF121212))),
           ),
           const Spacer(),
         ],

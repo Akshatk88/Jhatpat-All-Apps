@@ -6,6 +6,7 @@ import 'package:superapp_user/design_system/components/ride/app_text_field.dart'
 import 'package:superapp_user/design_system/components/ride/custom_app_bar.dart';
 import 'package:superapp_user/design_system/components/ride/primary_button.dart';
 import 'package:superapp_user/modules/taxi/support/application/support_providers.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 class SosScreen extends ConsumerStatefulWidget {
   final String? rideId;
@@ -23,11 +24,27 @@ class _SosScreenState extends ConsumerState<SosScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Emergency SOS'),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: _sent ? _buildSentState(context) : _buildForm(context),
-      ),
+      appBar: CustomAppBar(title: 'Emergency SOS'.tr),
+      body: _sent
+          ? Padding(
+              padding: const EdgeInsets.all(20),
+              child: _buildSentState(context),
+            )
+          // Scrollable so the keyboard can't push the SOS button into a
+          // bottom overflow; min-height keeps the Spacer layout when it fits.
+          : LayoutBuilder(
+              builder: (context, constraints) => SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: IntrinsicHeight(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: _buildForm(context),
+                    ),
+                  ),
+                ),
+              ),
+            ),
     );
   }
 
@@ -47,7 +64,9 @@ class _SosScreenState extends ConsumerState<SosScreen> {
               const SizedBox(width: 14),
               Expanded(
                 child: Text(
-                  'This alerts our safety team with your live location${widget.rideId != null ? ' and current trip' : ''}. Use only in a genuine emergency.',
+                  widget.rideId != null
+                      ? 'This alerts our safety team with your live location and current trip. Use only in a genuine emergency.'.tr
+                      : 'This alerts our safety team with your live location. Use only in a genuine emergency.'.tr,
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ),
@@ -57,13 +76,13 @@ class _SosScreenState extends ConsumerState<SosScreen> {
         const SizedBox(height: 24),
         AppTextField(
           controller: _notesController,
-          label: 'What is happening? (optional)',
-          hint: 'Add any details for our safety team',
+          label: 'What is happening? (optional)'.tr,
+          hint: 'Add any details for our safety team'.tr,
           maxLines: 4,
         ),
         const Spacer(),
         TaxiPrimaryButton(
-          label: _sending ? 'Sending alert…' : 'Send SOS alert',
+          label: _sending ? 'Sending alert…'.tr : 'Send SOS alert'.tr,
           isLoading: _sending,
           onPressed: _sending ? null : _sendSos,
         ),
@@ -83,15 +102,15 @@ class _SosScreenState extends ConsumerState<SosScreen> {
             child: const Icon(Icons.check_rounded, color: Colors.white, size: 44),
           ),
           const SizedBox(height: 20),
-          Text('Alert sent', style: Theme.of(context).textTheme.headlineSmall),
+          Text('Alert sent'.tr, style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 8),
           Text(
-            'Our safety team has been notified with your location and will reach out shortly.',
+            'Our safety team has been notified with your location and will reach out shortly.'.tr,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: 24),
-          TextButton(onPressed: () => Navigator.of(context).maybePop(), child: const Text('Go back')),
+          TextButton(onPressed: () => Navigator.of(context).maybePop(), child: Text('Go back'.tr)),
         ],
       ),
     );
@@ -119,7 +138,7 @@ class _SosScreenState extends ConsumerState<SosScreen> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not send alert. Please call emergency services directly if needed.')),
+          SnackBar(content: Text('Could not send alert. Please call emergency services directly if needed.'.tr)),
         );
       }
     } finally {

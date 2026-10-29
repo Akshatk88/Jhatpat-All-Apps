@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -62,10 +63,10 @@ class HomeFilterScreen extends ConsumerWidget {
           onPressed: () => context.backOr(),
         ),
         title: Text(
-          args.title,
+          args.title.tr,
           style: TextStyle(
             color: textColor,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
             fontSize: 17.sp,
           ),
         ),
@@ -146,7 +147,7 @@ class HomeFilterScreen extends ConsumerWidget {
                 gradient: LinearGradient(
                   colors: [
                     AppColors.primary.withValues(alpha: 0.15),
-                    const Color(0xFFFF9E80).withValues(alpha: 0.08),
+                    const Color(0xFFFFC700).withValues(alpha: 0.08),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -172,11 +173,11 @@ class HomeFilterScreen extends ConsumerWidget {
 
             // Heading
             Text(
-              isNearYou ? 'No restaurants nearby' : args.title,
+              isNearYou ? 'No restaurants nearby'.tr : args.title.tr,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 20.sp,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
                 color: textColor,
                 letterSpacing: -0.3,
               ),
@@ -186,8 +187,8 @@ class HomeFilterScreen extends ConsumerWidget {
             // Subtitle
             Text(
               isNearYou
-                  ? "We couldn't find any restaurants delivering to your current location. Try changing your delivery address or check back later."
-                  : args.emptyMessage,
+                  ? "We couldn't find any restaurants delivering to your current location. Try changing your delivery address or check back later.".tr
+                  : args.emptyMessage.tr,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13.5.sp,
@@ -208,10 +209,10 @@ class HomeFilterScreen extends ConsumerWidget {
                 },
                 icon: Icon(Icons.location_on_rounded, size: 20.sp, color: Colors.white),
                 label: Text(
-                  'Change Address',
+                  'Change Address'.tr,
                   style: TextStyle(
                     fontSize: 15.sp,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: Colors.white,
                   ),
                 ),
@@ -238,11 +239,11 @@ class HomeFilterScreen extends ConsumerWidget {
               },
               icon: Icon(Icons.refresh_rounded, size: 18.sp, color: AppColors.primary),
               label: Text(
-                'Refresh',
+                'Refresh'.tr,
                 style: TextStyle(
                   fontSize: 14.sp,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primary,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFFE5A600),
                 ),
               ),
             ),
@@ -285,17 +286,17 @@ class HomeFilterScreen extends ConsumerWidget {
             ),
             SizedBox(height: 24.h),
             Text(
-              "Couldn't load nearby restaurants",
+              "Couldn't load nearby restaurants".tr,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 19.sp,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
                 color: textColor,
               ),
             ),
             SizedBox(height: 10.h),
             Text(
-              'Please check your connection and location settings and try again.',
+              'Please check your connection and location settings and try again.'.tr,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13.5.sp,
@@ -321,11 +322,11 @@ class HomeFilterScreen extends ConsumerWidget {
                 ),
               ),
               child: Text(
-                'Try Again',
+                'Try Again'.tr,
                 style: TextStyle(
                   fontSize: 14.5.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF121212),
                 ),
               ),
             ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/design_system/tokens/taxi_colors.dart';
 import 'package:superapp_user/core/utils/taxi_formatters.dart';
 import 'package:superapp_user/design_system/components/ride/loading_widget.dart';
@@ -27,7 +28,7 @@ class RideDetailScreen extends ConsumerWidget {
     final borderColor = isDark ? TaxiColors.darkBorder : TaxiColors.lightBorder;
     final dividerColor = isDark ? TaxiColors.darkBorder : const Color(0xFFF1F5F9);
     final iconBoxBg = isDark ? TaxiColors.darkSurface : const Color(0xFFF8FAFC);
-    final highlightBg = isDark ? const Color(0xFF2A1B14) : const Color(0xFFFFF7ED);
+    final highlightBg = isDark ? const Color(0xFF2A2412) : const Color(0xFFFFF8E1);
     final statusBg = isDark ? const Color(0xFF064E3B) : const Color(0xFFDCFCE7);
     final statusText = isDark ? const Color(0xFF4ADE80) : const Color(0xFF15803D);
 
@@ -37,16 +38,20 @@ class RideDetailScreen extends ConsumerWidget {
         backgroundColor: cardBgColor,
         elevation: 0,
         scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: textPrimary),
-          onPressed: () => context.pop(),
+        leading: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () => context.pop(),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Icon(Icons.arrow_back, color: textPrimary),
+          ),
         ),
         title: Text(
-          'Ride Details',
+          'Ride Details'.tr,
           style: TextStyle(
             color: textPrimary,
             fontSize: 18,
-            fontWeight: FontWeight.w900,
+            fontWeight: FontWeight.w700,
           ),
         ),
         actions: [
@@ -63,11 +68,11 @@ class RideDetailScreen extends ConsumerWidget {
                   Icon(Icons.check_circle_rounded, size: 14, color: statusText),
                   const SizedBox(width: 4),
                   Text(
-                    'Completed',
+                    'Completed'.tr,
                     style: TextStyle(
                       color: statusText,
                       fontSize: 12,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
@@ -79,10 +84,10 @@ class RideDetailScreen extends ConsumerWidget {
       body: rideAsync.when(
         data: (ride) {
           final completedDate = ride.completedAt ?? ride.acceptedAt ?? DateTime.now();
-          final pickup = ride.pickupAddress.isNotEmpty ? ride.pickupAddress : 'Unknown location';
+          final pickup = ride.pickupAddress.isNotEmpty ? ride.pickupAddress : 'Unknown location'.tr;
           final drop = ride.dropAddress.isNotEmpty
               ? ride.dropAddress
-              : 'Unknown location';
+              : 'Unknown location'.tr;
           final distanceKm = (ride.estimatedDistanceMeters > 0)
               ? (ride.estimatedDistanceMeters / 1000).toStringAsFixed(1)
               : '0.0';
@@ -117,7 +122,7 @@ class RideDetailScreen extends ConsumerWidget {
                             : null,
                         child: (ride.driver?.profileImage == null ||
                                 ride.driver!.profileImage.isEmpty)
-                            ? const Icon(Icons.person_rounded, color: Color(0xFFFF5200), size: 26)
+                            ? const Icon(Icons.person_rounded, color: Color(0xFFE5A600), size: 26)
                             : null,
                       ),
                       const SizedBox(width: 14),
@@ -128,10 +133,10 @@ class RideDetailScreen extends ConsumerWidget {
                             Text(
                               ride.driver?.name.isNotEmpty == true
                                   ? ride.driver!.name
-                                  : 'Captain Assigned',
+                                  : 'Captain Assigned'.tr,
                               style: TextStyle(
                                 fontSize: 15,
-                                fontWeight: FontWeight.w900,
+                                fontWeight: FontWeight.w700,
                                 color: textPrimary,
                               ),
                             ),
@@ -141,20 +146,24 @@ class RideDetailScreen extends ConsumerWidget {
                                 const Icon(Icons.star_rounded, size: 15, color: Color(0xFFF59E0B)),
                                 const SizedBox(width: 3),
                                 Text(
-                                  (ride.driver?.rating ?? 4.8).toStringAsFixed(1),
+                                  (ride.driver?.rating ?? 0) > 0 ? ride.driver!.rating.toStringAsFixed(1) : 'New'.tr,
                                   style: TextStyle(
                                     fontSize: 12,
-                                    fontWeight: FontWeight.w800,
+                                    fontWeight: FontWeight.w600,
                                     color: textPrimary,
                                   ),
                                 ),
                                 const SizedBox(width: 8),
-                                Text(
-                                  '• ${ride.vehicleType ?? 'Taxi'}',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: textSecondary,
+                                Flexible(
+                                  child: Text(
+                                    '• ${ride.vehicleType ?? 'Taxi'.tr}',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      color: textSecondary,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -183,7 +192,7 @@ class RideDetailScreen extends ConsumerWidget {
                         '${Formatters.date(completedDate)} • ${Formatters.time(completedDate)}',
                         style: TextStyle(
                           fontSize: 12.5,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w500,
                           color: textSecondary,
                         ),
                       ),
@@ -206,7 +215,7 @@ class RideDetailScreen extends ConsumerWidget {
                               pickup,
                               style: TextStyle(
                                 fontSize: 14,
-                                fontWeight: FontWeight.w800,
+                                fontWeight: FontWeight.w600,
                                 color: textPrimary,
                               ),
                               maxLines: 1,
@@ -234,7 +243,7 @@ class RideDetailScreen extends ConsumerWidget {
                             width: 10,
                             height: 10,
                             decoration: const BoxDecoration(
-                              color: Color(0xFFFF5200),
+                              color: Color(0xFFE5A600),
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -244,7 +253,7 @@ class RideDetailScreen extends ConsumerWidget {
                               drop,
                               style: TextStyle(
                                 fontSize: 14,
-                                fontWeight: FontWeight.w800,
+                                fontWeight: FontWeight.w600,
                                 color: textPrimary,
                               ),
                               maxLines: 1,
@@ -277,18 +286,18 @@ class RideDetailScreen extends ConsumerWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      '$distanceKm km',
+                                      '{km} km'.trArgs({'km': distanceKm}),
                                       style: TextStyle(
                                         fontSize: 14,
-                                        fontWeight: FontWeight.w900,
+                                        fontWeight: FontWeight.w700,
                                         color: textPrimary,
                                       ),
                                     ),
                                     Text(
-                                      'Distance',
+                                      'Distance'.tr,
                                       style: TextStyle(
                                         fontSize: 11,
-                                        fontWeight: FontWeight.w600,
+                                        fontWeight: FontWeight.w500,
                                         color: textSecondary,
                                       ),
                                     ),
@@ -307,25 +316,25 @@ class RideDetailScreen extends ConsumerWidget {
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: const Icon(Icons.access_time_rounded,
-                                      size: 20, color: Color(0xFFFF5200)),
+                                      size: 20, color: Color(0xFFE5A600)),
                                 ),
                                 const SizedBox(width: 10),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      '$durationMin min',
+                                      '{mins} min'.trArgs({'mins': durationMin}),
                                       style: TextStyle(
                                         fontSize: 14,
-                                        fontWeight: FontWeight.w900,
+                                        fontWeight: FontWeight.w700,
                                         color: textPrimary,
                                       ),
                                     ),
                                     Text(
-                                      'Duration',
+                                      'Duration'.tr,
                                       style: TextStyle(
                                         fontSize: 11,
-                                        fontWeight: FontWeight.w600,
+                                        fontWeight: FontWeight.w500,
                                         color: textSecondary,
                                       ),
                                     ),
@@ -343,10 +352,10 @@ class RideDetailScreen extends ConsumerWidget {
 
                 // --- FARE BREAKDOWN SECTION ---
                 Text(
-                  'Fare Breakdown',
+                  'Fare Breakdown'.tr,
                   style: TextStyle(
                     fontSize: 15,
-                    fontWeight: FontWeight.w900,
+                    fontWeight: FontWeight.w700,
                     color: textPrimary,
                   ),
                 ),
@@ -372,10 +381,10 @@ class RideDetailScreen extends ConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Total Fare',
+                              'Total Fare'.tr,
                               style: TextStyle(
                                 fontSize: 14,
-                                fontWeight: FontWeight.w800,
+                                fontWeight: FontWeight.w600,
                                 color: textPrimary,
                               ),
                             ),
@@ -383,8 +392,8 @@ class RideDetailScreen extends ConsumerWidget {
                               '₹${totalFare.toStringAsFixed(2)}',
                               style: const TextStyle(
                                 fontSize: 20,
-                                fontWeight: FontWeight.w900,
-                                color: Color(0xFFFF5200),
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFFE5A600),
                               ),
                             ),
                           ],
@@ -396,12 +405,12 @@ class RideDetailScreen extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Base fare',
-                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: textSecondary),
+                            'Base fare'.tr,
+                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: textSecondary),
                           ),
                           Text(
                             '₹${baseFare.toStringAsFixed(2)}',
-                            style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: textPrimary),
+                            style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600, color: textPrimary),
                           ),
                         ],
                       ),
@@ -410,12 +419,12 @@ class RideDetailScreen extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Tip',
-                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: textSecondary),
+                            'Tip'.tr,
+                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: textSecondary),
                           ),
                           Text(
                             '₹0.00',
-                            style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: textPrimary),
+                            style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600, color: textPrimary),
                           ),
                         ],
                       ),
@@ -427,14 +436,14 @@ class RideDetailScreen extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Paid Amount',
-                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: textPrimary),
+                            'Paid Amount'.tr,
+                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: textPrimary),
                           ),
                           Text(
                             '₹${totalFare.toStringAsFixed(2)}',
                             style: const TextStyle(
                               fontSize: 18,
-                              fontWeight: FontWeight.w900,
+                              fontWeight: FontWeight.w700,
                               color: Color(0xFF10B981),
                             ),
                           ),
@@ -447,10 +456,10 @@ class RideDetailScreen extends ConsumerWidget {
 
                 // --- PAYMENT METHOD SECTION ---
                 Text(
-                  'Payment Method',
+                  'Payment Method'.tr,
                   style: TextStyle(
                     fontSize: 15,
-                    fontWeight: FontWeight.w900,
+                    fontWeight: FontWeight.w700,
                     color: textPrimary,
                   ),
                 ),
@@ -476,7 +485,7 @@ class RideDetailScreen extends ConsumerWidget {
                           'C',
                           style: TextStyle(
                             color: isDark ? textPrimary : cardBgColor,
-                            fontWeight: FontWeight.w900,
+                            fontWeight: FontWeight.w700,
                             fontSize: 14,
                           ),
                         ),
@@ -484,10 +493,10 @@ class RideDetailScreen extends ConsumerWidget {
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          'Cash',
+                          'Cash'.tr,
                           style: TextStyle(
                             fontSize: 15,
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w600,
                             color: textPrimary,
                           ),
                         ),
@@ -499,10 +508,10 @@ class RideDetailScreen extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          'Paid',
+                          'Paid'.tr,
                           style: TextStyle(
                             fontSize: 12,
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w600,
                             color: statusText,
                           ),
                         ),
@@ -534,7 +543,7 @@ class RideDetailScreen extends ConsumerWidget {
                             child: const Icon(
                               Icons.headset_mic_outlined,
                               size: 22,
-                              color: Color(0xFFFF5200),
+                              color: Color(0xFFE5A600),
                             ),
                           ),
                           const SizedBox(width: 14),
@@ -543,19 +552,19 @@ class RideDetailScreen extends ConsumerWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Need help?',
+                                  'Need help?'.tr,
                                   style: TextStyle(
                                     fontSize: 15,
-                                    fontWeight: FontWeight.w900,
+                                    fontWeight: FontWeight.w700,
                                     color: textPrimary,
                                   ),
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'Get help with this trip',
+                                  'Get help with this trip'.tr,
                                   style: TextStyle(
                                     fontSize: 12.5,
-                                    fontWeight: FontWeight.w600,
+                                    fontWeight: FontWeight.w500,
                                     color: textSecondary,
                                   ),
                                 ),
@@ -572,12 +581,12 @@ class RideDetailScreen extends ConsumerWidget {
                       const SizedBox(height: 12),
                       InkWell(
                         onTap: () => context.push('/taxi/support'),
-                        child: const Text(
-                          'Contact Support',
+                        child: Text(
+                          'Contact Support'.tr,
                           style: TextStyle(
                             fontSize: 13.5,
-                            fontWeight: FontWeight.w900,
-                            color: Color(0xFFFF5200),
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFFE5A600),
                           ),
                         ),
                       ),
@@ -588,8 +597,8 @@ class RideDetailScreen extends ConsumerWidget {
             ),
           );
         },
-        loading: () => const LoadingWidget(message: 'Loading ride details…'),
-        error: (err, stack) => const Center(child: Text('Could not load ride details')),
+        loading: () => LoadingWidget(message: 'Loading ride details…'.tr),
+        error: (err, stack) => Center(child: Text('Could not load ride details'.tr)),
       ),
     );
   }

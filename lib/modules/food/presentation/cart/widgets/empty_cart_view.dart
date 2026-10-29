@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -39,10 +40,10 @@ class EmptyCartView extends ConsumerWidget {
 
               // 2. Title
               Text(
-                'Your cart is empty',
+                'Your cart is empty'.tr,
                 style: TextStyle(
                   fontSize: 22.sp,
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.w600,
                   color: textColor,
                   letterSpacing: -0.3,
                 ),
@@ -53,7 +54,7 @@ class EmptyCartView extends ConsumerWidget {
 
               // 3. Subtitle
               Text(
-                'Looks like you haven\'t added anything\nto your cart yet.',
+                'Looks like you haven\'t added anything\nto your cart yet.'.tr,
                 style: TextStyle(
                   fontSize: 13.5.sp,
                   color: secondaryColor,
@@ -83,11 +84,11 @@ class EmptyCartView extends ConsumerWidget {
                     ),
                   ),
                   child: Text(
-                    'Start Shopping',
+                    'Start Shopping'.tr,
                     style: TextStyle(
                       fontSize: 15.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF121212),
                     ),
                   ),
                 ),
@@ -99,10 +100,10 @@ class EmptyCartView extends ConsumerWidget {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Explore popular categories',
+                  'Explore popular categories'.tr,
                   style: TextStyle(
                     fontSize: 15.sp,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: textColor,
                   ),
                 ),
@@ -162,12 +163,12 @@ class EmptyCartView extends ConsumerWidget {
                   decoration: BoxDecoration(
                     color: isDark
                         ? const Color(0xFF2A221B)
-                        : const Color(0xFFFFF5EE),
+                        : const Color(0xFFFFFBEB),
                     borderRadius: BorderRadius.circular(16.r),
                     border: Border.all(
                       color: isDark
                           ? const Color(0xFF4A3525)
-                          : const Color(0xFFFFE6D5),
+                          : const Color(0xFFFFE8A3),
                       width: 1,
                     ),
                   ),
@@ -179,13 +180,13 @@ class EmptyCartView extends ConsumerWidget {
                         decoration: BoxDecoration(
                           color: isDark
                               ? const Color(0xFF3D2B1F)
-                              : const Color(0xFFFFEBDC),
+                              : const Color(0xFFFFF8E1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           Icons.percent_rounded,
                           size: 18.sp,
-                          color: const Color(0xFFFF5200),
+                          color: const Color(0xFFFFB800),
                         ),
                       ),
                       SizedBox(width: 12.w),
@@ -195,16 +196,16 @@ class EmptyCartView extends ConsumerWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              'Exclusive offers!',
+                              'Exclusive offers!'.tr,
                               style: TextStyle(
                                 fontSize: 13.5.sp,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w600,
                                 color: textColor,
                               ),
                             ),
                             SizedBox(height: 2.h),
                             Text(
-                              'Grab the best deals and save more.',
+                              'Grab the best deals and save more.'.tr,
                               style: TextStyle(
                                 fontSize: 11.5.sp,
                                 color: secondaryColor,
@@ -217,7 +218,7 @@ class EmptyCartView extends ConsumerWidget {
                       Icon(
                         Icons.chevron_right_rounded,
                         size: 20.sp,
-                        color: const Color(0xFFFF5200),
+                        color: const Color(0xFFE5A600),
                       ),
                     ],
                   ),
@@ -287,10 +288,10 @@ class EmptyCartView extends ConsumerWidget {
             ),
             SizedBox(height: 8.h),
             Text(
-              title,
+              title.tr,
               style: TextStyle(
                 fontSize: 11.5.sp,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w500,
                 color: isDark ? Colors.white : const Color(0xFF0F172A),
               ),
               textAlign: TextAlign.center,
@@ -317,8 +318,8 @@ class _BasketIllustrationPainter extends CustomPainter {
     final bgPaint = Paint()
       ..shader = RadialGradient(
         colors: [
-          const Color(0xFFFFF0E6),
-          const Color(0xFFFFF4EC).withValues(alpha: 0.7),
+          const Color(0xFFFFF8E1),
+          const Color(0xFFFFFBEB).withValues(alpha: 0.7),
           Colors.transparent,
         ],
         stops: const [0.0, 0.65, 1.0],
@@ -327,7 +328,7 @@ class _BasketIllustrationPainter extends CustomPainter {
 
     // Ambient sparkle lines & dots
     final sparklePaint = Paint()
-      ..color = const Color(0xFFFF9E7A)
+      ..color = const Color(0xFFFFD54F)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5;
 
@@ -345,7 +346,7 @@ class _BasketIllustrationPainter extends CustomPainter {
 
     // Radiating sunburst lines top
     final rayPaint = Paint()
-      ..color = const Color(0xFFFF7A00)
+      ..color = const Color(0xFFE5A600)
       ..strokeWidth = 2
       ..strokeCap = StrokeCap.round;
     canvas.drawLine(Offset(center.dx - 18, center.dy - 65), Offset(center.dx - 10, center.dy - 55), rayPaint);
@@ -388,7 +389,7 @@ class _BasketIllustrationPainter extends CustomPainter {
     );
 
     final basketPaint = Paint()
-      ..color = const Color(0xFFFF6A00)
+      ..color = const Color(0xFFFFB800)
       ..style = PaintingStyle.fill;
     canvas.drawRRect(basketRect, basketPaint);
 
@@ -398,7 +399,7 @@ class _BasketIllustrationPainter extends CustomPainter {
       const Radius.circular(5),
     );
     final rimPaint = Paint()
-      ..color = const Color(0xFFFF8533)
+      ..color = const Color(0xFFFFC700)
       ..style = PaintingStyle.fill;
     canvas.drawRRect(rimRect, rimPaint);
 

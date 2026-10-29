@@ -55,10 +55,27 @@ class SocketService {
   Stream<OrderSocketMessage> get orderEvents => _orderController.stream;
   Stream<ChatSocketMessage> get chatMessages => _chatMessageController.stream;
   Stream<ChatSocketMessage> get chatTyping => _chatTypingController.stream;
+
+  /// Fires on every (re)connect. Anything delivered while the socket was down
+  /// is gone, so open chats re-fetch their history on this.
+  Stream<void> get onConnected => _connectedController.stream;
+  final _connectedController = StreamController<void>.broadcast();
+
   bool get isConnected => _socket?.connected ?? false;
 
+  String? _token;
+  Future<String?> Function()? _tokenReader;
+  Timer? _authRetry;
+
   /// Connects (or reconnects, if the token changed) once for the app.
-  void connect(String accessToken) {
+  ///
+  /// [tokenReader] is consulted on every handshake: access tokens are
+  /// short-lived and refreshed by the REST client, and a reconnect replaying
+  /// the original token is refused by the server — leaving chat and tracking
+  /// deaf for the rest of the session.
+  void connect(String accessToken, {Future<String?> Function()? tokenReader}) {
+    _token = accessToken;
+    if (tokenReader != null) _tokenReader = tokenReader;
     if (_socket != null) return;
 
     try {
@@ -68,7 +85,7 @@ class SocketService {
             // Keep 'polling' first — some networks block the initial
             // websocket upgrade handshake.
             .setTransports(['polling', 'websocket'])
-            .setAuth({'token': accessToken})
+            .setAuthFn(_resolveAuth)
             .disableAutoConnect()
             .enableReconnection()
             .setReconnectionAttempts(1 << 30)
@@ -84,6 +101,17 @@ class SocketService {
         for (final id in _trackedOrderIds) {
           socket.emit('join-tracking', id);
         }
+        if (!_connectedController.isClosed) _connectedController.add(null);
+      });
+      // The server refusing the handshake (expired token) is not retried by
+      // the client on its own; try again with whatever token is stored now.
+      socket.onConnectError((e) {
+        final text = '$e';
+        if (!text.contains('AUTH') && !text.toLowerCase().contains('token')) return;
+        _authRetry?.cancel();
+        _authRetry = Timer(const Duration(seconds: 5), () {
+          if (identical(_socket, socket) && !socket.connected) socket.connect();
+        });
       });
       socket.onReconnect((_) {
         _log('reconnected');
@@ -108,6 +136,27 @@ class SocketService {
       // Polling covers us; never surface a socket failure to the UI.
       _log('socket unavailable: $e');
     }
+  }
+
+  void _resolveAuth(void Function(Map auth) callback) {
+    final reader = _tokenReader;
+    if (reader == null) {
+      callback({'token': _token ?? ''});
+      return;
+    }
+    reader().then((fresh) {
+      if (fresh != null && fresh.isNotEmpty) _token = fresh;
+      callback({'token': _token ?? ''});
+    }).catchError((Object _) {
+      callback({'token': _token ?? ''});
+    });
+  }
+
+  /// Brings a dropped socket back up (e.g. on app resume). Safe to repeat.
+  void ensureConnected() {
+    final socket = _socket;
+    if (socket == null || socket.connected) return;
+    socket.connect();
   }
 
   /// Joins `tracking:<orderId>` — the server verifies the order actually
@@ -152,6 +201,9 @@ class SocketService {
   void disconnect() {
     final socket = _socket;
     _socket = null;
+    _authRetry?.cancel();
+    _tokenReader = null;
+    _token = null;
     _trackedOrderIds.clear();
     if (socket == null) return;
     try {
@@ -166,6 +218,7 @@ class SocketService {
     _orderController.close();
     _chatMessageController.close();
     _chatTypingController.close();
+    _connectedController.close();
   }
 
   void _log(String msg) {

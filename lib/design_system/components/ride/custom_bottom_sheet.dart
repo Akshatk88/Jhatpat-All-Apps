@@ -30,6 +30,9 @@ class CustomBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Container(
+      // Lifts the sheet above the keyboard so its form fields stay visible;
+      // the scroll view below absorbs whatever height that leaves.
+      margin: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
       decoration: BoxDecoration(
         color: scheme.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
@@ -37,27 +40,31 @@ class CustomBottomSheet extends StatelessWidget {
       padding: padding,
       child: SafeArea(
         top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 44,
-                height: 5,
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: scheme.outlineVariant,
-                  borderRadius: BorderRadius.circular(10),
+        // Scrolls instead of overflowing when the content (payment options,
+        // forms) is taller than the screen: small phones, large font scale.
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 44,
+                  height: 5,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: scheme.outlineVariant,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
               ),
-            ),
-            if (title != null) ...[
-              Text(title!, style: Theme.of(context).textTheme.titleLarge),
-              const SizedBox(height: 16),
+              if (title != null) ...[
+                Text(title!, style: Theme.of(context).textTheme.titleLarge),
+                const SizedBox(height: 16),
+              ],
+              child,
             ],
-            child,
-          ],
+          ),
         ),
       ),
     );

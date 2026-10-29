@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:superapp_user/core/i18n/tr.dart';
+
 import 'package:superapp_user/design_system/tokens/taxi_colors.dart';
 import 'package:superapp_user/modules/parcel/application/delivery_booking_controller.dart';
 
@@ -74,11 +76,11 @@ class _DeliveryContactsSheetState extends ConsumerState<DeliveryContactsSheet> {
     final receiverPhone = _receiverPhone.text.trim();
 
     if (senderName.isEmpty || senderPhone.length < 10) {
-      setState(() => _error = 'Enter the sender name and a 10-digit mobile number');
+      setState(() => _error = 'Enter the sender name and a 10-digit mobile number'.tr);
       return;
     }
     if (receiverName.isEmpty || receiverPhone.length < 10) {
-      setState(() => _error = 'Enter the receiver name and a 10-digit mobile number');
+      setState(() => _error = 'Enter the receiver name and a 10-digit mobile number'.tr);
       return;
     }
 
@@ -93,26 +95,32 @@ class _DeliveryContactsSheetState extends ConsumerState<DeliveryContactsSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 18,
-        right: 18,
-        top: 16,
-        bottom: 18 + MediaQuery.of(context).viewInsets.bottom,
-      ),
-      child: SingleChildScrollView(
+    final viewInsetsBottom = MediaQuery.of(context).viewInsets.bottom;
+    final paddingBottom = MediaQuery.of(context).padding.bottom;
+    final extraBottom = viewInsetsBottom > 0 ? viewInsetsBottom : paddingBottom;
+
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: 18,
+          right: 18,
+          top: 16,
+          bottom: 18 + extraBottom,
+        ),
+        child: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                const Text(
-                  'BOOKING DETAILS',
-                  style: TextStyle(
+                Text(
+                  'BOOKING DETAILS'.tr,
+                  style: const TextStyle(
                     fontSize: 9.5,
                     letterSpacing: 0.7,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w600,
                     color: Color(0xFF94A3B8),
                   ),
                 ),
@@ -123,18 +131,18 @@ class _DeliveryContactsSheetState extends ConsumerState<DeliveryContactsSheet> {
                 ),
               ],
             ),
-            const Text(
-              'Sender & receiver',
-              style: TextStyle(fontSize: 19, fontWeight: FontWeight.w800),
+            Text(
+              'Sender & receiver'.tr,
+              style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 18),
             const _SectionLabel(icon: Icons.person_outline, label: 'Sender', color: TaxiColors.primary),
             const SizedBox(height: 8),
-            _Field(controller: _senderName, hint: 'Sender name'),
+            _Field(controller: _senderName, hint: 'Sender name'.tr),
             const SizedBox(height: 10),
-            const Text('MOBILE NUMBER', style: _labelStyle),
+            Text('MOBILE NUMBER'.tr, style: _labelStyle),
             const SizedBox(height: 6),
-            _Field(controller: _senderPhone, hint: '10-digit mobile number', phone: true),
+            _Field(controller: _senderPhone, hint: '10-digit mobile number'.tr, phone: true),
             const SizedBox(height: 20),
             const _SectionLabel(icon: Icons.location_on_outlined, label: 'Receiver', color: Color(0xFFEF4444)),
             const SizedBox(height: 8),
@@ -155,14 +163,14 @@ class _DeliveryContactsSheetState extends ConsumerState<DeliveryContactsSheet> {
                       color: TaxiColors.primary,
                     ),
                     const SizedBox(width: 10),
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Same as Sender',
-                              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
-                          Text("Use sender's name and mobile for receiver",
-                              style: TextStyle(fontSize: 11, color: Color(0xFF64748B))),
+                          Text('Same as Sender'.tr,
+                              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                          Text("Use sender's name and mobile for receiver".tr,
+                              style: const TextStyle(fontSize: 11, color: Color(0xFF64748B))),
                         ],
                       ),
                     ),
@@ -171,13 +179,13 @@ class _DeliveryContactsSheetState extends ConsumerState<DeliveryContactsSheet> {
               ),
             ),
             const SizedBox(height: 10),
-            _Field(controller: _receiverName, hint: 'Receiver name', enabled: !_sameAsSender),
+            _Field(controller: _receiverName, hint: 'Receiver name'.tr, enabled: !_sameAsSender),
             const SizedBox(height: 10),
-            const Text('MOBILE NUMBER', style: _labelStyle),
+            Text('MOBILE NUMBER'.tr, style: _labelStyle),
             const SizedBox(height: 6),
             _Field(
               controller: _receiverPhone,
-              hint: '10-digit mobile number',
+              hint: '10-digit mobile number'.tr,
               phone: true,
               enabled: !_sameAsSender,
             ),
@@ -190,17 +198,18 @@ class _DeliveryContactsSheetState extends ConsumerState<DeliveryContactsSheet> {
               width: double.infinity,
               child: FilledButton(
                 style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFF0F172A),
+                  backgroundColor: const Color(0xFFFFB800),
+                  foregroundColor: const Color(0xFF121212),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 ),
                 onPressed: _save,
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('Save Details', style: TextStyle(fontWeight: FontWeight.w800)),
-                    SizedBox(width: 6),
-                    Icon(Icons.chevron_right, size: 18),
+                    Text('Save Details'.tr, style: const TextStyle(fontWeight: FontWeight.w600)),
+                    const SizedBox(width: 6),
+                    const Icon(Icons.chevron_right, size: 18),
                   ],
                 ),
               ),
@@ -208,6 +217,7 @@ class _DeliveryContactsSheetState extends ConsumerState<DeliveryContactsSheet> {
           ],
         ),
       ),
+    ),
     );
   }
 }
@@ -215,7 +225,7 @@ class _DeliveryContactsSheetState extends ConsumerState<DeliveryContactsSheet> {
 const _labelStyle = TextStyle(
   fontSize: 9.5,
   letterSpacing: 0.7,
-  fontWeight: FontWeight.w800,
+  fontWeight: FontWeight.w600,
   color: Color(0xFF94A3B8),
 );
 
@@ -231,7 +241,7 @@ class _SectionLabel extends StatelessWidget {
       children: [
         Icon(icon, size: 17, color: color),
         const SizedBox(width: 8),
-        Text(label, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14)),
+        Text(label.tr, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
       ],
     );
   }

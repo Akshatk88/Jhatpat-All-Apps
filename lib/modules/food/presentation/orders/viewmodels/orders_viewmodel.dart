@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/core/error/failures.dart';
 import 'package:superapp_user/modules/food/data/models/order_model.dart';
 import 'package:superapp_user/modules/food/application/providers/order_providers.dart';
@@ -102,7 +103,14 @@ class OrdersViewModel extends Notifier<OrdersState> {
 
     // Orders are per-account: reload on login, clear on logout.
     ref.listen(authViewModelProvider, (previous, next) {
-      if (previous?.value?.id == next.value?.id) return;
+      if (previous?.value?.id == next.value?.id) {
+        // Auth settled as signed-out without the id changing (null -> null):
+        // drop the initial spinner instead of waiting forever.
+        if (next.value == null && !next.isLoading && state.isLoading) {
+          state = const OrdersState();
+        }
+        return;
+      }
       if (next.value == null) {
         state = const OrdersState();
       } else {
@@ -121,7 +129,9 @@ class OrdersViewModel extends Notifier<OrdersState> {
     } else {
       _orderLog('build() — no user yet, waiting for auth listener');
     }
-    return const OrdersState(isLoading: true);
+    final auth = ref.read(authViewModelProvider);
+    // Signed out and auth already resolved: nothing will ever load, so no spinner.
+    return OrdersState(isLoading: auth.value != null || auth.isLoading);
   }
 
   Future<void> refresh({bool isRefresh = false}) async {
@@ -152,7 +162,7 @@ class OrdersViewModel extends Notifier<OrdersState> {
       _orderLog('Refresh failed (unexpected): $e');
       state = state.copyWith(
         isLoading: false,
-        error: 'Could not load your orders.',
+        error: 'Could not load your orders.'.tr,
       );
     }
   }
@@ -177,7 +187,7 @@ class OrdersViewModel extends Notifier<OrdersState> {
     } catch (_) {
       state = state.copyWith(
         isLoadingMore: false,
-        error: 'Could not load more orders.',
+        error: 'Could not load more orders.'.tr,
       );
     }
   }
@@ -194,7 +204,7 @@ class OrdersViewModel extends Notifier<OrdersState> {
     } on Failure catch (f) {
       return f.message;
     } catch (_) {
-      return 'Could not cancel this order.';
+      return 'Could not cancel this order.'.tr;
     }
   }
 
@@ -225,7 +235,7 @@ class OrdersViewModel extends Notifier<OrdersState> {
     } on Failure catch (f) {
       return f.message;
     } catch (_) {
-      return 'Could not submit your rating.';
+      return 'Could not submit your rating.'.tr;
     }
   }
 }

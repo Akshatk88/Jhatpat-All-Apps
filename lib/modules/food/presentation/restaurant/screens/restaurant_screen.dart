@@ -1,4 +1,5 @@
 import 'dart:developer' as developer;
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -170,9 +171,9 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
     // Reached only via a restaurant card, so this is defensive rather than a
     // real state — but it must not fabricate a placeholder restaurant.
     if (currentRestaurant == null) {
-      return const Scaffold(
+      return Scaffold(
         backgroundColor: Colors.white,
-        body: Center(child: Text('Restaurant unavailable')),
+        body: Center(child: Text('Restaurant unavailable'.tr)),
       );
     }
 
@@ -191,7 +192,7 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
+      value: SystemUiOverlayStyle.dark.copyWith(
         statusBarColor: Colors.transparent,
       ),
       child: Scaffold(
@@ -347,7 +348,7 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
                     context.go(RouteNames.home);
                   }
                 },
-                child: Icon(Icons.arrow_back, color: Colors.white, size: 24.sp),
+                child: Icon(Icons.arrow_back, color: const Color(0xFF121212), size: 24.sp),
               ),
               Row(
                 children: [
@@ -363,7 +364,7 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
                     },
                     child: Icon(
                       Icons.share_outlined,
-                      color: Colors.white,
+                      color: const Color(0xFF121212),
                       size: 24.sp,
                     ),
                   ),
@@ -379,7 +380,7 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
                       isFavorite ? Icons.favorite : Icons.favorite_border,
                       color: isFavorite
                           ? const Color(0xFFFF4B72)
-                          : Colors.white,
+                          : const Color(0xFF121212),
                       size: 24.sp,
                     ),
                   ),
@@ -416,11 +417,11 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
                       ),
                       SizedBox(width: 4.w),
                       Text(
-                        'Featured',
+                        'Featured'.tr,
                         style: TextStyle(
-                          color: AppColors.primary,
+                          color: const Color(0xFFE5A600),
                           fontSize: 11.sp,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
@@ -438,7 +439,7 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
                             restaurant.name,
                             style: TextStyle(
                               fontSize: 18.sp,
-                              fontWeight: FontWeight.w800,
+                              fontWeight: FontWeight.w600,
                               color: isDark
                                   ? Colors.white
                                   : const Color(0xFF1E1E1E),
@@ -479,7 +480,7 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 13.sp,
-                                    fontWeight: FontWeight.w800,
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
                                 SizedBox(width: 2.w),
@@ -494,7 +495,7 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
                           if (restaurant.reviewCount > 0) ...[
                             SizedBox(height: 4.h),
                             Text(
-                              '${restaurant.reviewCount} ratings',
+                              '{count} ratings'.trArgs({'count': restaurant.reviewCount}),
                               style: TextStyle(
                                 fontSize: 9.sp,
                                 color: isDark
@@ -539,10 +540,10 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                'This restaurant is currently closed.',
+                                'This restaurant is currently closed.'.tr,
                                 style: TextStyle(
                                   fontSize: 12.sp,
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w600,
                                   color: isDark
                                       ? const Color(0xFFFDBA74)
                                       : const Color(0xFF7C2D12),
@@ -550,7 +551,7 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
                               ),
                               SizedBox(height: 2.h),
                               Text(
-                                'It will accept orders once it reopens.',
+                                'It will accept orders once it reopens.'.tr,
                                 style: TextStyle(
                                   fontSize: 11.sp,
                                   fontWeight: FontWeight.w500,
@@ -596,7 +597,7 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
                           restaurant.offerBadges.first,
                           style: TextStyle(
                             fontSize: 14.sp,
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w600,
                             color: isDark
                                 ? Colors.white
                                 : const Color(0xFF1E1E1E),
@@ -673,10 +674,10 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
                   color: isDark
                       ? AppColors.textPrimaryDark
                       : AppColors.textPrimaryLight,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w500,
                 ),
                 decoration: InputDecoration(
-                  hintText: 'Search for dishes in ${restaurant.name}',
+                  hintText: 'Search for dishes in {name}'.trArgs({'name': restaurant.name}),
                   hintStyle: TextStyle(
                     fontSize: 13.5.sp,
                     color: (isDark
@@ -729,12 +730,12 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
               child: Container(
                 padding: EdgeInsets.all(7.r),
                 decoration: const BoxDecoration(
-                  color: Color(0xFFFFF3E0),
+                  color: Color(0xFFFFF8E1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.mic_rounded,
-                  color: const Color(0xFFFF6D00),
+                  color: const Color(0xFFE5A600),
                   size: 20.sp,
                 ),
               ),
@@ -776,7 +777,7 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
             Expanded(
               child: _buildSegmentSegment(
                 context: context,
-                label: 'All',
+                label: 'All'.tr,
                 isSelected: selectedIndex == 0,
                 icon: null,
                 onTap: () {
@@ -789,7 +790,7 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
             Expanded(
               child: _buildSegmentSegment(
                 context: context,
-                label: 'Veg',
+                label: 'Veg'.tr,
                 isSelected: selectedIndex == 1,
                 icon: _buildVegIcon(size: 10),
                 onTap: () {
@@ -802,7 +803,7 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
             Expanded(
               child: _buildSegmentSegment(
                 context: context,
-                label: 'Non-Veg',
+                label: 'Non-Veg'.tr,
                 isSelected: selectedIndex == 2,
                 icon: _buildNonVegIcon(size: 10),
                 onTap: () {
@@ -855,7 +856,7 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
               label,
               style: TextStyle(
                 fontSize: 12.sp,
-                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 color: isSelected
                     ? _priceGreen
                     : (isDark ? AppColors.textSecondaryDark : Colors.grey[700]),
@@ -923,10 +924,10 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
                 ),
               ),
               child: Text(
-                category.name,
+                category.name.tr,
                 style: TextStyle(
                   fontSize: 13.sp,
-                  fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
+                  fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
                   color: isActive
                       ? Colors.white
                       : (isDark
@@ -963,7 +964,7 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 40.h),
           child: Text(
-            'No dishes match your filters.',
+            'No dishes match your filters.'.tr,
             style: TextStyle(
               fontSize: 14.sp,
               color: isDark ? AppColors.textSecondaryDark : Colors.grey[600],
@@ -983,22 +984,27 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  category.name,
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w800,
-                    color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                Flexible(
+                  child: Text(
+                    category.name.tr,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                    ),
                   ),
                 ),
+                SizedBox(width: 8.w),
                 Text(
-                  '${grouped[category.id]!.length} items',
+                  '{count} items'.trArgs({'count': grouped[category.id]!.length}),
                   style: TextStyle(
                     fontSize: 12.sp,
                     color: isDark
                         ? AppColors.textSecondaryDark
                         : Colors.grey[600],
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
@@ -1023,7 +1029,7 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 40.h),
           child: Text(
-            'No dishes match your filters.',
+            'No dishes match your filters.'.tr,
             style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]),
           ),
         ),
@@ -1037,8 +1043,9 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
         physics: const NeverScrollableScrollPhysics(),
         padding: EdgeInsets.zero,
         itemCount: dishes.length,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
+        // Two dishes per row on phones, more on tablets / desktop.
+        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 260,
           crossAxisSpacing: 16.w,
           mainAxisSpacing: 24.h,
           childAspectRatio: 0.58,
@@ -1117,7 +1124,7 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
                         style: TextStyle(
                           fontSize: 9.sp,
                           color: _priceGreen,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
@@ -1134,7 +1141,7 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 13.sp,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
                 color: isDark ? Colors.white : const Color(0xFF1E1E1E),
                 height: 1.2,
               ),
@@ -1148,7 +1155,7 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
                 '₹${dish.price.toStringAsFixed(0)}',
                 style: TextStyle(
                   fontSize: 13.sp,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                   color: isDark ? Colors.white : const Color(0xFF1E1E1E),
                 ),
               ),
@@ -1203,11 +1210,11 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
                   key: const ValueKey('add'),
                   onTap: () => _handleFirstAddToCart(dish),
                   child: Text(
-                    'ADD',
+                    'ADD'.tr,
                     style: TextStyle(
                       color: _priceGreen,
                       fontSize: 13.sp,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 )
@@ -1236,7 +1243,7 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
                       style: TextStyle(
                         color: _priceGreen,
                         fontSize: 13.sp,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     SizedBox(width: 6.w),
@@ -1283,17 +1290,17 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
               'assets/images/menuicon.png',
               width: 20.sp,
               height: 20.sp,
-              color: Colors.white,
+              color: const Color(0xFF121212),
               errorBuilder: (context, error, stackTrace) =>
-                  Icon(Icons.restaurant_menu, color: Colors.white, size: 20.sp),
+                  Icon(Icons.restaurant_menu, color: const Color(0xFF121212), size: 20.sp),
             ),
             SizedBox(height: 2.h),
             Text(
-              'MENU',
+              'MENU'.tr,
               style: TextStyle(
-                color: Colors.white,
+                color: const Color(0xFF121212),
                 fontSize: 8.sp,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w600,
                 letterSpacing: 0.5,
               ),
             ),
@@ -1339,10 +1346,10 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Menu Categories',
+                    'Menu Categories'.tr,
                     style: TextStyle(
                       fontSize: 18.sp,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w600,
                       color: isDark ? Colors.white : const Color(0xFF1E1E1E),
                     ),
                   ),
@@ -1370,10 +1377,10 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
                     return ListTile(
                       contentPadding: EdgeInsets.symmetric(vertical: 4.h),
                       title: Text(
-                        category.name,
+                        category.name.tr,
                         style: TextStyle(
                           fontSize: 15.sp,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                           color: isDark
                               ? Colors.white
                               : const Color(0xFF1E1E1E),
@@ -1392,8 +1399,8 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
                           '${category.itemCount}',
                           style: TextStyle(
                             fontSize: 12.sp,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFFE5A600),
                           ),
                         ),
                       ),
@@ -1429,9 +1436,9 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
           Text(
             '%',
             style: TextStyle(
-              color: Colors.white,
+              color: const Color(0xFF121212),
               fontSize: 16.sp,
-              fontWeight: FontWeight.w900,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ],

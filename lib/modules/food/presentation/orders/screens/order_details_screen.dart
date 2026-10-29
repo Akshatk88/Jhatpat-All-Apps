@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:superapp_user/design_system/components/feedback/cancel_reason_sheet.dart';
 import 'package:superapp_user/app/routing/back_navigation.dart';
 
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
 import 'package:superapp_user/modules/food/data/models/order_model.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
@@ -24,61 +26,24 @@ class OrderDetailsScreen extends ConsumerWidget {
 
   const OrderDetailsScreen({super.key, required this.orderId});
 
-  void _showCancelDialog(BuildContext context, WidgetRef ref) {
-    final reasonController = TextEditingController();
-    showDialog<void>(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: const Text('Cancel Order'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('Are you sure you want to cancel this order?'),
-              const SizedBox(height: 12),
-              TextField(
-                controller: reasonController,
-                decoration: const InputDecoration(
-                  labelText: 'Reason for cancellation (optional)',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('NO, KEEP ORDER'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.redAccent,
-              ),
-              onPressed: () async {
-                Navigator.pop(dialogContext);
-                final err = await ref
-                    .read(ordersViewModelProvider.notifier)
-                    .cancelOrder(orderId, reason: reasonController.text);
-                if (context.mounted) {
-                  if (err != null) {
-                    AppSnackbar.error(context, err);
-                  } else {
-                    AppSnackbar.success(
-                      context,
-                      'Order cancelled successfully.',
-                    );
-                  }
-                }
-              },
-              child: const Text(
-                'CANCEL ORDER',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          ],
-        );
-      },
+  Future<void> _showCancelDialog(BuildContext context, WidgetRef ref) async {
+    final reason = await askCancelReason(
+      context,
+      title: 'Cancel order?',
+      reasons: CancelReasons.food,
+      confirmLabel: 'Cancel order',
+      keepLabel: 'Keep order',
     );
+    if (reason == null) return;
+    final err = await ref
+        .read(ordersViewModelProvider.notifier)
+        .cancelOrder(orderId, reason: reason);
+    if (!context.mounted) return;
+    if (err != null) {
+      AppSnackbar.error(context, err);
+    } else {
+      AppSnackbar.success(context, 'Order cancelled successfully.'.tr);
+    }
   }
 
   Future<void> _handleReorder(BuildContext context, WidgetRef ref, OrderModel order) async {
@@ -140,7 +105,7 @@ class OrderDetailsScreen extends ConsumerWidget {
           ),
           body: Center(
             child: Text(
-              'Could not load order details.',
+              'Could not load order details.'.tr,
               style: TextStyle(color: isDark ? Colors.white : AppColors.textPrimaryLight),
             ),
           ),
@@ -204,9 +169,9 @@ class OrderDetailsScreen extends ConsumerWidget {
                                   padding: const EdgeInsets.symmetric(vertical: 12),
                                 ),
                                 onPressed: () => _showCancelDialog(context, ref),
-                                child: const Text(
-                                  'CANCEL',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                child: Text(
+                                  'CANCEL'.tr,
+                                  style: const TextStyle(fontWeight: FontWeight.w600),
                                 ),
                               ),
                             ),
@@ -223,11 +188,11 @@ class OrderDetailsScreen extends ConsumerWidget {
                                 Haptics.medium();
                                 context.push('/orders/track/${order.id}');
                               },
-                              child: const Text(
-                                'TRACK LIVE',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
+                              child: Text(
+                                'TRACK LIVE'.tr,
+                                style: const TextStyle(
+                                  color: Color(0xFF121212),
+                                  fontWeight: FontWeight.w600,
                                   fontSize: 15,
                                 ),
                               ),
@@ -241,11 +206,11 @@ class OrderDetailsScreen extends ConsumerWidget {
                         child: TextButton(
                           onPressed: () => _handleReorder(context, ref, order),
                           child: Text(
-                            'REORDER',
+                            'REORDER'.tr,
                             style: TextStyle(
-                              color: AppColors.primary,
+                              color: const Color(0xFFE5A600),
                               fontSize: 16,
-                              fontWeight: FontWeight.w800,
+                              fontWeight: FontWeight.w600,
                               letterSpacing: 0.8,
                             ),
                           ),

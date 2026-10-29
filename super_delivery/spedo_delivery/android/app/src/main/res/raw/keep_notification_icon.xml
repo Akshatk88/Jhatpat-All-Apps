@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The notification icon is looked up by name at runtime (geolocator /
+     flutter_local_notifications), and the order alert tone by URI string
+     (android.resource://…/raw/tujh_bin1), so release resource shrinking
+     cannot see either and would strip them. -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/ic_stat_jhatpat,@raw/tujh_bin1" />

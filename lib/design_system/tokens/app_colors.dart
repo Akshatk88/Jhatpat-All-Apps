@@ -6,8 +6,8 @@ class AppColors {
   // an app theme color, so every one of the hundreds of `AppColors.primary`
   // read sites app-wide picks up the new value on the next rebuild without
   // each of them needing to watch a provider individually.
-  static Color primary = const Color(0xFFFF7A00);
-  static Color primaryButton = const Color(0xFFFF8A1D);
+  static Color primary = const Color(0xFFFFB800);
+  static Color primaryButton = const Color(0xFFFFC700);
 
   // ==================== DARK THEME COLORS ====================
   static const Color backgroundDark = Color(0xFF121212);

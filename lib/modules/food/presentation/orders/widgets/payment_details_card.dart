@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:intl/intl.dart';
 import 'package:superapp_user/modules/food/data/models/order_model.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
@@ -40,10 +41,10 @@ class PaymentDetailsCard extends StatelessWidget {
               Icon(Icons.payment_rounded, color: textColor, size: 20),
               const SizedBox(width: 8),
               Text(
-                'Payment Details',
+                'Payment Details'.tr,
                 style: TextStyle(
                   fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   color: textColor,
                 ),
               ),
@@ -98,7 +99,7 @@ class PaymentDetailsCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            label,
+            label.tr,
             style: TextStyle(
               fontSize: 13,
               color: labelColor,
@@ -111,7 +112,7 @@ class PaymentDetailsCard extends StatelessWidget {
               textAlign: TextAlign.right,
               style: TextStyle(
                 fontSize: 13,
-                fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
+                fontWeight: isBold ? FontWeight.w600 : FontWeight.w500,
                 color: valColor,
               ),
             ),

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:superapp_user/app/routing/back_navigation.dart';
+import 'package:superapp_user/app/routing/route_names.dart';
+import 'package:superapp_user/shared/support/presentation/chat/screens/chat_screen.dart';
 
 import 'package:superapp_user/modules/food/data/models/order_model.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
@@ -31,12 +34,12 @@ class OrderDetailsHeader extends StatelessWidget implements PreferredSizeWidget 
 
     // Item count string (e.g. "1 Item" or "2 Items")
     final totalItems = order.items.fold<int>(0, (sum, i) => sum + i.quantity);
-    final itemsCountText = totalItems == 1 ? '1 Item' : '$totalItems Items';
+    final itemsCountText = totalItems == 1 ? '1 Item'.tr : '{count} Items'.trArgs({'count': totalItems});
 
     // Amount text e.g. "₹103"
     final amountText = '₹${order.total.toStringAsFixed(0)}';
 
-    final subtitleText = '$statusText , $itemsCountText , $amountText';
+    final subtitleText = '${statusText.tr} , $itemsCountText , $amountText';
 
     return AppBar(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.surfaceLight,
@@ -54,11 +57,11 @@ class OrderDetailsHeader extends StatelessWidget implements PreferredSizeWidget 
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'ORDER #${order.orderNumber.isNotEmpty ? order.orderNumber : order.id}',
+            'ORDER #{id}'.trArgs({'id': order.orderNumber.isNotEmpty ? order.orderNumber : order.id}),
             style: TextStyle(
               color: primaryTextColor,
               fontSize: 15,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w600,
               letterSpacing: 0.5,
             ),
             maxLines: 1,
@@ -82,14 +85,24 @@ class OrderDetailsHeader extends StatelessWidget implements PreferredSizeWidget 
         TextButton(
           onPressed: onHelpPressed ??
               () {
-                context.push('/chat');
+                // A support thread tied to this order, so it also shows under
+                // the order's conversation threads. ('/chat' redirects and
+                // drops the order context.)
+                context.push(
+                  RouteNames.chat,
+                  extra: ChatArgs(
+                    orderId: order.id,
+                    peerName: 'Support'.tr,
+                    peerRole: 'ADMIN',
+                  ),
+                );
               },
           child: Text(
-            'HELP',
+            'HELP'.tr,
             style: TextStyle(
-              color: AppColors.primary,
+              color: const Color(0xFFE5A600),
               fontSize: 14,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w600,
               letterSpacing: 0.5,
             ),
           ),

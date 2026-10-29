@@ -33,9 +33,14 @@ class AuthController extends Notifier<AuthState> {
     // Connect the ride socket whenever the session becomes valid, and drop it
     // on logout. Previously this lived in a bootstrap() that nothing calls any
     // more, which left every consumer stuck on AuthStatus.unknown.
+    // fireImmediately: this controller is usually first built long after the
+    // session was restored (by whichever ride screen reads it first). Without
+    // it the listener never fires, the ride socket is never opened, and every
+    // socket-only feature (sending chat, live status) silently fails while
+    // polling hides it.
     ref.listen(authViewModelProvider, (_, next) {
-      _syncSocket(next.value);
-    });
+      Future.microtask(() => _syncSocket(next.value));
+    }, fireImmediately: true);
 
     final async = ref.watch(authViewModelProvider);
     return switch (async) {
@@ -75,9 +80,12 @@ class AuthController extends Notifier<AuthState> {
       socket.disconnect();
       return;
     }
-    final token = await ref.read(tokenStorageProvider).accessToken;
+    final storage = ref.read(tokenStorageProvider);
+    final token = await storage.accessToken;
     if (token == null || token.isEmpty) return;
-    socket.connect(token);
+    // Every (re)connect re-reads the stored token, which the REST client keeps
+    // refreshed — the first token expires long before a ride (and its chat) ends.
+    socket.connect(token, tokenReader: () => storage.accessToken);
     // Arm dispatch listeners immediately: `rideAccepted` can land within a
     // second of a ride being created, and a listener bound at screen-mount
     // time would lose the race.

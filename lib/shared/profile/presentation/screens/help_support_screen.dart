@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -21,12 +22,12 @@ class HelpSupportScreen extends StatelessWidget {
         await launchUrl(launchUri);
       } else {
         if (context.mounted) {
-          AppSnackbar.error(context, 'Could not launch dialer for $phoneNumber');
+          AppSnackbar.error(context, 'Could not launch dialer for {phone}'.trArgs({'phone': phoneNumber}));
         }
       }
     } catch (e) {
       if (context.mounted) {
-        AppSnackbar.info(context, 'Calling $phoneNumber...');
+        AppSnackbar.info(context, 'Calling {phone}...'.trArgs({'phone': phoneNumber}));
       }
     }
   }
@@ -36,19 +37,19 @@ class HelpSupportScreen extends StatelessWidget {
     final Uri launchUri = Uri(
       scheme: 'mailto',
       path: emailAddress,
-      queryParameters: {'subject': 'Support Request - Suvio App'},
+      queryParameters: {'subject': 'Support Request - JhatPat App'},
     );
     try {
       if (await canLaunchUrl(launchUri)) {
         await launchUrl(launchUri);
       } else {
         if (context.mounted) {
-          AppSnackbar.error(context, 'Could not open email client for $emailAddress');
+          AppSnackbar.error(context, 'Could not open email client for {email}'.trArgs({'email': emailAddress}));
         }
       }
     } catch (e) {
       if (context.mounted) {
-        AppSnackbar.info(context, 'Opening mail to $emailAddress...');
+        AppSnackbar.info(context, 'Opening mail to {email}...'.trArgs({'email': emailAddress}));
       }
     }
   }
@@ -89,7 +90,7 @@ class HelpSupportScreen extends StatelessWidget {
                 title,
                 style: TextStyle(
                   fontSize: 18.sp,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   color: textColor,
                 ),
               ),
@@ -110,12 +111,12 @@ class HelpSupportScreen extends StatelessWidget {
                   onPressed: () => Navigator.pop(ctx),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
+                    foregroundColor: Colors.black,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12.r),
                     ),
                   ),
-                  child: const Text('Got It', style: TextStyle(fontWeight: FontWeight.bold)),
+                  child: Text('Got It'.tr, style: const TextStyle(fontWeight: FontWeight.w600)),
                 ),
               ),
             ],
@@ -148,11 +149,11 @@ class HelpSupportScreen extends StatelessWidget {
           },
         ),
         title: Text(
-          'Help & Support',
+          'Help & Support'.tr,
           style: TextStyle(
             color: textColor,
             fontSize: 18.sp,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),
@@ -169,21 +170,21 @@ class HelpSupportScreen extends StatelessWidget {
               SizedBox(height: 20.h),
 
               // 2. QUICK HELP SECTION
-              _buildSectionTitle('Quick Help', textColor),
+              _buildSectionTitle('Quick Help'.tr, textColor),
               SizedBox(height: 10.h),
               _buildQuickHelpCard(context, isDark, textColor, secondaryTextColor),
 
               SizedBox(height: 20.h),
 
               // 3. CONTACT US SECTION (DYNAMIC CALL, MAIL, CHAT)
-              _buildSectionTitle('Contact Us', textColor),
+              _buildSectionTitle('Contact Us'.tr, textColor),
               SizedBox(height: 10.h),
               _buildContactUsCard(context, isDark, textColor, secondaryTextColor),
 
               SizedBox(height: 20.h),
 
               // 4. SUPPORT INFORMATION SECTION
-              _buildSectionTitle('Support Information', textColor),
+              _buildSectionTitle('Support Information'.tr, textColor),
               SizedBox(height: 10.h),
               _buildSupportInfoCard(isDark, textColor, secondaryTextColor),
 
@@ -195,21 +196,21 @@ class HelpSupportScreen extends StatelessWidget {
                   children: [
                     Icon(
                       Icons.favorite_rounded,
-                      color: const Color(0xFFFF6D00),
+                      color: const Color(0xFFFFB800),
                       size: 16.sp,
                     ),
                     SizedBox(height: 6.h),
                     Text(
-                      'Thank you for choosing Suvio!',
+                      'Thank you for choosing JhatPat!'.tr,
                       style: TextStyle(
                         fontSize: 12.5.sp,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                         color: textColor,
                       ),
                     ),
                     SizedBox(height: 2.h),
                     Text(
-                      'We\'re always here to help you.',
+                      'We\'re always here to help you.'.tr,
                       style: TextStyle(
                         fontSize: 11.5.sp,
                         color: secondaryTextColor,
@@ -237,17 +238,17 @@ class HelpSupportScreen extends StatelessWidget {
           end: Alignment.bottomRight,
           colors: isDark
               ? [
-                  const Color(0xFF231A14),
-                  const Color(0xFF1E1A16),
+                  const Color(0xFF1E1E1E),
+                  const Color(0xFF181818),
                 ]
               : [
-                  const Color(0xFFFFFBF5),
-                  const Color(0xFFFFF4EA),
+                  const Color(0xFFFFFDF5),
+                  const Color(0xFFFFF8E1),
                 ],
         ),
         borderRadius: BorderRadius.circular(20.r),
         border: Border.all(
-          color: isDark ? const Color(0xFF3D2B1F) : const Color(0xFFFFE5D0),
+          color: isDark ? const Color(0xFF333333) : const Color(0xFFFFE8A3),
           width: 1,
         ),
         boxShadow: [
@@ -266,26 +267,26 @@ class HelpSupportScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'We\'re here to',
+                  'We\'re here to'.tr,
                   style: TextStyle(
                     fontSize: 15.sp,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: textColor,
                   ),
                 ),
                 SizedBox(height: 2.h),
                 Text(
-                  'help you!',
+                  'help you!'.tr,
                   style: TextStyle(
                     fontSize: 22.sp,
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.primary,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFFE5A600),
                     letterSpacing: -0.3,
                   ),
                 ),
                 SizedBox(height: 8.h),
                 Text(
-                  'Facing an issue? Our support team is ready to assist you.',
+                  'Facing an issue? Our support team is ready to assist you.'.tr,
                   style: TextStyle(
                     fontSize: 11.5.sp,
                     color: secondaryTextColor,
@@ -319,7 +320,7 @@ class HelpSupportScreen extends StatelessWidget {
       title,
       style: TextStyle(
         fontSize: 15.sp,
-        fontWeight: FontWeight.w800,
+        fontWeight: FontWeight.w600,
         color: textColor,
       ),
     );
@@ -345,7 +346,7 @@ class HelpSupportScreen extends StatelessWidget {
         'icon': Icons.replay_rounded,
         'title': 'Refund & Payments',
         'subtitle': 'Queries about refunds and payments',
-        'details': 'Refunds are automatically processed to your original payment method or Suvio Wallet within 24-48 hours.',
+        'details': 'Refunds are automatically processed to your original payment method or JhatPat Wallet within 24-48 hours.',
       },
       {
         'icon': Icons.shield_outlined,
@@ -379,8 +380,8 @@ class HelpSupportScreen extends StatelessWidget {
           return InkWell(
             onTap: () => _showInfoModal(
               context,
-              item['title'] as String,
-              item['details'] as String,
+              (item['title'] as String).tr,
+              (item['details'] as String).tr,
             ),
             borderRadius: BorderRadius.vertical(
               top: index == 0 ? Radius.circular(16.r) : Radius.zero,
@@ -395,12 +396,12 @@ class HelpSupportScreen extends StatelessWidget {
                       Container(
                         padding: EdgeInsets.all(8.r),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFF6D00).withValues(alpha: 0.1),
+                          color: const Color(0xFFFFB800).withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           item['icon'] as IconData,
-                          color: const Color(0xFFFF6D00),
+                          color: const Color(0xFFFFB800),
                           size: 18.sp,
                         ),
                       ),
@@ -410,16 +411,16 @@ class HelpSupportScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              item['title'] as String,
+                              (item['title'] as String).tr,
                               style: TextStyle(
                                 fontSize: 13.5.sp,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w600,
                                 color: textColor,
                               ),
                             ),
                             SizedBox(height: 2.h),
                             Text(
-                              item['subtitle'] as String,
+                              (item['subtitle'] as String).tr,
                               style: TextStyle(
                                 fontSize: 11.sp,
                                 color: secondaryTextColor,
@@ -498,16 +499,16 @@ class HelpSupportScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Call Us',
+                          'Call Us'.tr,
                           style: TextStyle(
                             fontSize: 13.5.sp,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: textColor,
                           ),
                         ),
                         SizedBox(height: 2.h),
                         Text(
-                          'Speak with our support team',
+                          'Speak with our support team'.tr,
                           style: TextStyle(
                             fontSize: 11.sp,
                             color: secondaryTextColor,
@@ -520,8 +521,8 @@ class HelpSupportScreen extends StatelessWidget {
                     '9301988718',
                     style: TextStyle(
                       fontSize: 12.5.sp,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.primary,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFFE5A600),
                     ),
                   ),
                   SizedBox(width: 4.w),
@@ -566,16 +567,16 @@ class HelpSupportScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Email Us',
+                          'Email Us'.tr,
                           style: TextStyle(
                             fontSize: 13.5.sp,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: textColor,
                           ),
                         ),
                         SizedBox(height: 2.h),
                         Text(
-                          'We reply as soon as possible',
+                          'We reply as soon as possible'.tr,
                           style: TextStyle(
                             fontSize: 11.sp,
                             color: secondaryTextColor,
@@ -584,12 +585,16 @@ class HelpSupportScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Text(
-                    'tanuchouhan161@gmaim.com',
-                    style: TextStyle(
-                      fontSize: 11.5.sp,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
+                  Flexible(
+                    child: Text(
+                      'tanuchouhan161@gmaim.com',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 11.5.sp,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFFE5A600),
+                      ),
                     ),
                   ),
                   SizedBox(width: 4.w),
@@ -623,12 +628,12 @@ class HelpSupportScreen extends StatelessWidget {
                   Container(
                     padding: EdgeInsets.all(8.r),
                     decoration: const BoxDecoration(
-                      color: Color(0xFFF3E8FF),
+                      color: Color(0xFFFFF8E1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       Icons.chat_bubble_outline_rounded,
-                      color: const Color(0xFF9333EA),
+                      color: const Color(0xFFE5A600),
                       size: 18.sp,
                     ),
                   ),
@@ -638,16 +643,16 @@ class HelpSupportScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Live Chat',
+                          'Live Chat'.tr,
                           style: TextStyle(
                             fontSize: 13.5.sp,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: textColor,
                           ),
                         ),
                         SizedBox(height: 2.h),
                         Text(
-                          'Chat with our support team',
+                          'Chat with our support team'.tr,
                           style: TextStyle(
                             fontSize: 11.sp,
                             color: secondaryTextColor,
@@ -659,19 +664,19 @@ class HelpSupportScreen extends StatelessWidget {
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFF3E0),
+                      color: const Color(0xFFFFF8E1),
                       borderRadius: BorderRadius.circular(12.r),
                       border: Border.all(
-                        color: const Color(0xFFFFE0B2),
+                        color: const Color(0xFFFFE8A3),
                         width: 1,
                       ),
                     ),
                     child: Text(
-                      'Available 9AM - 9PM',
+                      'Available 9AM - 9PM'.tr,
                       style: TextStyle(
                         fontSize: 10.sp,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFFE65100),
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF121212),
                       ),
                     ),
                   ),
@@ -695,10 +700,10 @@ class HelpSupportScreen extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 8.w),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF231A14) : const Color(0xFFFFFBF5),
+        color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFFFFDF5),
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: isDark ? const Color(0xFF3D2B1F) : const Color(0xFFFFE5D0),
+          color: isDark ? const Color(0xFF333333) : const Color(0xFFFFE8A3),
           width: 1,
         ),
       ),
@@ -712,7 +717,7 @@ class HelpSupportScreen extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(7.r),
                   decoration: const BoxDecoration(
-                    color: Color(0xFFFFECE0),
+                    color: Color(0xFFFFF0C2),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -723,17 +728,17 @@ class HelpSupportScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 6.h),
                 Text(
-                  'Support Hours',
+                  'Support Hours'.tr,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 11.5.sp,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: textColor,
                   ),
                 ),
                 SizedBox(height: 2.h),
                 Text(
-                  '9AM - 9PM\nEveryday',
+                  '9AM - 9PM\nEveryday'.tr,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 10.5.sp,
@@ -747,7 +752,7 @@ class HelpSupportScreen extends StatelessWidget {
           Container(
             height: 48.h,
             width: 1,
-            color: isDark ? const Color(0xFF3D2B1F) : const Color(0xFFFFE5D0),
+            color: isDark ? const Color(0xFF333333) : const Color(0xFFFFE8A3),
           ),
 
           // 2. Response Time
@@ -757,7 +762,7 @@ class HelpSupportScreen extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(7.r),
                   decoration: const BoxDecoration(
-                    color: Color(0xFFFFECE0),
+                    color: Color(0xFFFFF0C2),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -768,17 +773,17 @@ class HelpSupportScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 6.h),
                 Text(
-                  'Response Time',
+                  'Response Time'.tr,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 11.5.sp,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: textColor,
                   ),
                 ),
                 SizedBox(height: 2.h),
                 Text(
-                  'Within 24 hours',
+                  'Within 24 hours'.tr,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 10.5.sp,
@@ -791,7 +796,7 @@ class HelpSupportScreen extends StatelessWidget {
           Container(
             height: 48.h,
             width: 1,
-            color: isDark ? const Color(0xFF3D2B1F) : const Color(0xFFFFE5D0),
+            color: isDark ? const Color(0xFF333333) : const Color(0xFFFFE8A3),
           ),
 
           // 3. We Care
@@ -801,7 +806,7 @@ class HelpSupportScreen extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(7.r),
                   decoration: const BoxDecoration(
-                    color: Color(0xFFFFECE0),
+                    color: Color(0xFFFFF0C2),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -812,17 +817,17 @@ class HelpSupportScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 6.h),
                 Text(
-                  'We Care',
+                  'We Care'.tr,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 11.5.sp,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: textColor,
                   ),
                 ),
                 SizedBox(height: 2.h),
                 Text(
-                  'Your satisfaction is\nour priority',
+                  'Your satisfaction is\nour priority'.tr,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 10.5.sp,

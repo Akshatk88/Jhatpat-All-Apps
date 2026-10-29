@@ -6,23 +6,26 @@ import 'package:flutter/material.dart';
 /// its own identity — the hub and shared screens use [hub], and entering a
 /// module re-accents that route subtree only.
 ///
-/// Note the two inherited brands were *different* oranges: Suvio shipped
+/// Note the two inherited brands were *different* oranges: Justorder shipped
 /// `0xFFFF7A00` and UdanX `0xFFFF5C2B`. Both are preserved here rather than
 /// silently reconciled — which one (if either) becomes the super-app brand is
 /// a product decision, not an architectural one.
 enum ModuleAccent {
   /// Hub and shared surfaces (wallet, activity, profile, settings).
-  hub(Color(0xFFFF7A00), Color(0xFFFF8A1D)),
+  hub(Color(0xFFFFB800), Color(0xFFE5A600)),
 
-  /// Suvio orange.
-  food(Color(0xFFFF7A00), Color(0xFFFF8A1D)),
+  /// Jhatpat Golden Yellow.
+  food(Color(0xFFFFB800), Color(0xFFE5A600)),
 
   /// UdanX orange.
-  taxi(Color(0xFFFF5C2B), Color(0xFFE04313)),
+  taxi(Color(0xFFFFB800), Color(0xFFE5A600)),
 
-  parcel(Color(0xFFF59E0B), Color(0xFFD97706)),
+  parcel(Color(0xFFFFB800), Color(0xFFE5A600)),
 
-  rental(Color(0xFF3B82F6), Color(0xFF2563EB));
+
+  /// Home services — teal, deliberately far from both inherited oranges so a
+  /// user can tell at a glance which vertical they are inside.
+  services(Color(0xFFFFB800), Color(0xFFE5A600));
 
   const ModuleAccent(this.primary, this.primaryVariant);
 

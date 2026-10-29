@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:superapp_user/modules/food/data/models/cart_item_model.dart';
 import 'package:superapp_user/design_system/components/media/smart_image.dart';
@@ -157,9 +158,9 @@ class FloatingViewCartBarState extends ConsumerState<FloatingViewCartBar> with T
       child: Text(
         '+$extra',
         style: const TextStyle(
-          color: Colors.white,
+          color: Color(0xFF121212),
           fontSize: 11,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w600,
         ),
       ),
     );
@@ -218,11 +219,11 @@ class FloatingViewCartBarState extends ConsumerState<FloatingViewCartBar> with T
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFF7A00),
+                      color: const Color(0xFFFFB800),
                       borderRadius: BorderRadius.circular(24),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFFFF7A00).withValues(alpha: 0.4),
+                          color: const Color(0xFFFFB800).withValues(alpha: 0.4),
                           blurRadius: 20,
                           offset: const Offset(0, 8),
                         ),
@@ -248,9 +249,9 @@ class FloatingViewCartBarState extends ConsumerState<FloatingViewCartBar> with T
                                     return Text(
                                       '₹${val.toInt()}',
                                       style: const TextStyle(
-                                        color: Colors.white,
+                                        color: Color(0xFF121212),
                                         fontSize: 17,
-                                        fontWeight: FontWeight.bold,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     );
                                   },
@@ -261,9 +262,9 @@ class FloatingViewCartBarState extends ConsumerState<FloatingViewCartBar> with T
                                   tween: Tween(end: cartState.items.length.toDouble()),
                                   builder: (context, val, child) {
                                     return Text(
-                                      '${val.round()} item${val.round() != 1 ? 's' : ''}',
+                                      (val.round() == 1 ? '{count} item' : '{count} items').trArgs({'count': val.round()}),
                                       style: const TextStyle(
-                                        color: Colors.white,
+                                        color: Colors.black87,
                                         fontSize: 12,
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -282,15 +283,15 @@ class FloatingViewCartBarState extends ConsumerState<FloatingViewCartBar> with T
                         ],
 
                         // View Cart label + chevron (right)
-                        const Text(
-                          'View Cart',
-                          style: TextStyle(
-                            color: Colors.white,
+                        Text(
+                          'View Cart'.tr,
+                          style: const TextStyle(
+                            color: Color(0xFF121212),
                             fontSize: 15,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                        const Icon(Icons.chevron_right, color: Colors.white, size: 24),
+                        const Icon(Icons.chevron_right, color: Color(0xFF121212), size: 24),
                       ],
                     ),
                   ),

@@ -51,7 +51,7 @@ class PromoBanner extends StatelessWidget {
                     Text(
                       title,
                       style: const TextStyle(
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w600,
                         color: TaxiColors.primary,
                         fontSize: 15,
                       ),

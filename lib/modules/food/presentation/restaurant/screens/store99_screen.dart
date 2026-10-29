@@ -1,4 +1,5 @@
 import 'package:superapp_user/design_system/components/layout/app_refresh_indicator.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -47,8 +48,15 @@ class _Store99ScreenState extends ConsumerState<Store99Screen> {
   // the-banner) position up to a pinned spot below the status bar — the
   // same mechanic Home uses for its search bar + categories.
   double get _iconRowHeight => 56.h;
-  double get _titleHeight => 24.h;
-  double get _cuisinesRowHeight => 96.h;
+  // Both rows hold text, so they grow with the system font scale — otherwise
+  // the cuisine chips overflow their fixed-height row at large text.
+  double get _titleHeight => 24.h + _textGrowth(21.sp);
+  double get _cuisinesRowHeight => 96.h + _textGrowth(14.sp);
+
+  double _textGrowth(double lineHeight) {
+    final growth = MediaQuery.textScalerOf(context).scale(lineHeight) - lineHeight;
+    return growth > 0 ? growth : 0;
+  }
   double get _blockInnerGap => 10.h;
   double get _stickyBlockHeight =>
       _iconRowHeight +
@@ -198,7 +206,7 @@ class _Store99ScreenState extends ConsumerState<Store99Screen> {
                                           height: _titleHeight,
                                           child: _buildSectionTitle(
                                             context,
-                                            'Popular Cuisines',
+                                            'Popular Cuisines'.tr,
                                             isDark,
                                           ),
                                         ),
@@ -230,7 +238,7 @@ class _Store99ScreenState extends ConsumerState<Store99Screen> {
                                             .isNotEmpty) ...[
                                           _buildSectionTitle(
                                             context,
-                                            'Trending dishes near you',
+                                            'Trending dishes near you'.tr,
                                             isDark,
                                           ),
                                           SizedBox(height: 14.h),
@@ -247,7 +255,7 @@ class _Store99ScreenState extends ConsumerState<Store99Screen> {
                                         if (storeState.brands.isNotEmpty) ...[
                                           _buildSectionTitle(
                                             context,
-                                            'Big Savings with Top Brands',
+                                            'Big Savings with Top Brands'.tr,
                                             isDark,
                                           ),
                                           SizedBox(height: 14.h),
@@ -262,7 +270,7 @@ class _Store99ScreenState extends ConsumerState<Store99Screen> {
                                         // Explore Grid
                                         _buildSectionTitle(
                                           context,
-                                          'Explore ₹99 Meals',
+                                          'Explore ₹99 Meals'.tr,
                                           isDark,
                                         ),
                                         SizedBox(height: 14.h),
@@ -423,7 +431,7 @@ class _Store99ScreenState extends ConsumerState<Store99Screen> {
             SizedBox(width: 8.w),
             Expanded(
               child: Text(
-                "Search for '99 store' meals...",
+                "Search for '99 store' meals...".tr,
                 style: TextStyle(
                   color: isDark
                       ? AppColors.textSecondaryDark
@@ -452,14 +460,14 @@ class _Store99ScreenState extends ConsumerState<Store99Screen> {
         style:
             theme.textTheme.displaySmall?.copyWith(
               fontSize: 18.sp,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
               color: isDark
                   ? AppColors.textPrimaryDark
                   : AppColors.textPrimaryLight,
             ) ??
             TextStyle(
               fontSize: 18.sp,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
               color: isDark
                   ? AppColors.textPrimaryDark
                   : AppColors.textPrimaryLight,
@@ -478,7 +486,7 @@ class _Store99ScreenState extends ConsumerState<Store99Screen> {
         : AppColors.textSecondaryLight;
 
     return SizedBox(
-      height: 96.h,
+      height: _cuisinesRowHeight,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -535,7 +543,7 @@ class _Store99ScreenState extends ConsumerState<Store99Screen> {
                             ),
                             child: Icon(
                               Icons.check,
-                              color: Colors.white,
+                              color: const Color(0xFF121212),
                               size: 10.sp,
                             ),
                           ),
@@ -545,11 +553,11 @@ class _Store99ScreenState extends ConsumerState<Store99Screen> {
                 ),
                 SizedBox(height: 6.h),
                 Text(
-                  cuisine.label,
+                  cuisine.id == 'all' ? cuisine.label.tr : cuisine.label,
                   style: TextStyle(
                     fontSize: 12.sp,
-                    fontWeight: FontWeight.w600,
-                    color: isSelected ? AppColors.primary : secondaryTextColor,
+                    fontWeight: FontWeight.w500,
+                    color: isSelected ? const Color(0xFFE5A600) : secondaryTextColor,
                   ),
                 ),
               ],
@@ -575,8 +583,12 @@ class _Store99ScreenState extends ConsumerState<Store99Screen> {
 
     if (list.isEmpty) return const SizedBox.shrink();
 
+    // The card's text lines grow with the system font scale; reserve that
+    // extra room so the cards don't overflow at large text.
+    final textGrowth = MediaQuery.textScalerOf(context).scale(40.sp) - 40.sp;
+
     return SizedBox(
-      height: 252.h,
+      height: 252.h + (textGrowth > 0 ? textGrowth : 0),
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -678,7 +690,7 @@ class _Store99ScreenState extends ConsumerState<Store99Screen> {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 12.sp,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                   color: textColor,
                   height: 1.2,
                 ),
@@ -722,7 +734,7 @@ class _Store99ScreenState extends ConsumerState<Store99Screen> {
                     style: TextStyle(
                       fontSize: 10.sp,
                       color: AppColors.success,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
@@ -839,17 +851,17 @@ class _Store99ScreenState extends ConsumerState<Store99Screen> {
               ),
               SizedBox(height: 16.h),
               Text(
-                'No ₹99 Store deals available right now.',
+                'No ₹99 Store deals available right now.'.tr,
                 style: TextStyle(
                   fontSize: 15.sp,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   color: primaryTextColor,
                 ),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 6.h),
               Text(
-                'Check back soon for delicious meals at ₹99 or less.',
+                'Check back soon for delicious meals at ₹99 or less.'.tr,
                 style: TextStyle(
                   fontSize: 12.sp,
                   color: secondaryColor,
@@ -863,6 +875,18 @@ class _Store99ScreenState extends ConsumerState<Store99Screen> {
       );
     }
 
+    // Tiles hold several text lines that grow with the system font scale, so
+    // add that growth to the 0.61-ratio tile height instead of overflowing.
+    // Two columns on phones; on tablets / desktop add columns instead of
+    // stretching each tile (and its 0.61-ratio height) across half the screen.
+    final contentWidth = MediaQuery.sizeOf(context).width - 40.w;
+    final columns = ((contentWidth + 14.w) ~/ 220).clamp(2, 6);
+    final tileWidth =
+        (contentWidth - 14.w * (columns - 1)) / columns;
+    final textGrowth = MediaQuery.textScalerOf(context).scale(70.sp) - 70.sp;
+    final tileHeight =
+        tileWidth / 0.61 + (textGrowth > 0 ? textGrowth : 0);
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.w),
       child: GridView.builder(
@@ -871,10 +895,10 @@ class _Store99ScreenState extends ConsumerState<Store99Screen> {
         padding: EdgeInsets.zero,
         itemCount: exploreList.length,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
+          crossAxisCount: columns,
           crossAxisSpacing: 14.w,
           mainAxisSpacing: 18.h,
-          childAspectRatio: 0.61,
+          childAspectRatio: tileWidth / tileHeight,
         ),
         itemBuilder: (context, index) {
           final dish = exploreList[index];
@@ -959,7 +983,7 @@ class _Store99ScreenState extends ConsumerState<Store99Screen> {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 13.sp,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w600,
                       color: textColor,
                     ),
                   ),
@@ -987,7 +1011,7 @@ class _Store99ScreenState extends ConsumerState<Store99Screen> {
                     style: TextStyle(
                       fontSize: 10.sp,
                       color: AppColors.success,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
@@ -1150,8 +1174,8 @@ class _Store99ScreenState extends ConsumerState<Store99Screen> {
                     Text(
                       '$quantity',
                       style: TextStyle(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w900,
+                        color: const Color(0xFFE5A600),
+                        fontWeight: FontWeight.w700,
                         fontSize: 12.5.sp,
                       ),
                     ),
@@ -1223,11 +1247,11 @@ class _Store99ScreenState extends ConsumerState<Store99Screen> {
                   borderRadius: BorderRadius.circular(8.r),
                   child: Center(
                     child: Text(
-                      'ADD',
+                      'ADD'.tr,
                       style: TextStyle(
-                        color: AppColors.primary,
+                        color: const Color(0xFFE5A600),
                         fontSize: 12.5.sp,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
@@ -1255,9 +1279,9 @@ class _Store99ScreenState extends ConsumerState<Store99Screen> {
                     Text(
                       '$quantity',
                       style: TextStyle(
-                        color: AppColors.primary,
+                        color: const Color(0xFFE5A600),
                         fontSize: 12.5.sp,
-                        fontWeight: FontWeight.w900,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                     SizedBox(width: 3.w),
@@ -1315,8 +1339,8 @@ class _Store99ScreenState extends ConsumerState<Store99Screen> {
         '₹$price',
         style: TextStyle(
           fontSize: fontSize.sp,
-          fontWeight: FontWeight.w900,
-          color: AppColors.primary,
+          fontWeight: FontWeight.w700,
+          color: const Color(0xFFE5A600),
         ),
       ),
     );

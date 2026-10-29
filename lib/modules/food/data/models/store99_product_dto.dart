@@ -42,7 +42,7 @@ class Store99ProductDto {
       price: (json['price'] as num).toDouble(),
       originalPrice: json['originalPrice'] != null ? (json['originalPrice'] as num).toDouble() : null,
       imageUrl: json['imageUrl'] as String,
-      rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
+      rating: num.tryParse('${json['rating']}')?.toDouble() ?? 0.0,
       ratingCount: json['ratingCount'] as int? ?? 0,
       deliveryTime: json['deliveryTime'] as String? ?? '',
       isVeg: json['isVeg'] as bool? ?? false,

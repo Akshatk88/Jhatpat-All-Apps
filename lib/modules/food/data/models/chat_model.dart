@@ -1,3 +1,5 @@
+import 'package:superapp_user/core/i18n/tr.dart';
+
 /// One row of `GET /food/chat/conversations`.
 class ChatConversation {
   final String conversationId;
@@ -45,11 +47,11 @@ class ChatConversation {
   String get statusLabel {
     switch (status) {
       case 'closed':
-        return 'Closed';
+        return 'Closed'.tr;
       case 'in_progress':
-        return 'In Progress';
+        return 'In Progress'.tr;
       default:
-        return 'Open';
+        return 'Open'.tr;
     }
   }
 
@@ -65,7 +67,7 @@ class ChatConversation {
       peerToken: (json['peerToken'] ?? '').toString(),
       lastMessage: (json['lastMessage'] ?? '').toString(),
       lastAt: _date(json['lastAt']),
-      unread: (json['unread'] as num?)?.toInt() ?? 0,
+      unread: num.tryParse('${json['unread']}')?.toInt() ?? 0,
       title: (json['title'] ?? '').toString(),
       status: (json['status'] ?? 'open').toString(),
       createdAt: _date(json['createdAt']),
@@ -102,6 +104,16 @@ class ChatMessage {
 
   bool isMine(String myUserId) => senderId == myUserId;
 
+  /// Sent by the customer — i.e. by this app's user. Every thread this app
+  /// can open has the customer on one side, so this is "mine".
+  bool get isFromUser => senderRole.toUpperCase() == 'USER';
+
+  /// True when either side of the message is [role] (`DELIVERY_PARTNER`, `ADMIN`…).
+  bool involves(String role) {
+    final r = role.toUpperCase();
+    return senderRole.toUpperCase() == r || recipientRole.toUpperCase() == r;
+  }
+
   factory ChatMessage.fromApi(Map<String, dynamic> json) {
     final read = json['readAt']?.toString();
     final created = json['createdAt']?.toString();
@@ -114,8 +126,8 @@ class ChatMessage {
       recipientRole: (json['recipientRole'] ?? '').toString(),
       recipientId: (json['recipientId'] ?? '').toString(),
       text: (json['text'] ?? '').toString(),
-      readAt: read == null ? null : DateTime.tryParse(read),
-      createdAt: created == null ? null : DateTime.tryParse(created),
+      readAt: read == null ? null : DateTime.tryParse(read)?.toLocal(),
+      createdAt: created == null ? null : DateTime.tryParse(created)?.toLocal(),
     );
   }
 }

@@ -6,6 +6,7 @@ import 'package:superapp_user/core/utils/taxi_formatters.dart';
 import 'package:superapp_user/design_system/components/ride/custom_app_bar.dart';
 import 'package:superapp_user/design_system/components/ride/empty_state.dart';
 import 'package:superapp_user/modules/taxi/notifications/application/notifications_providers.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 IconData _iconForType(String type) {
   switch (type) {
@@ -29,7 +30,7 @@ class TaxiNotificationsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: CustomAppBar(
-        title: 'Notifications',
+        title: 'Notifications'.tr,
         actions: [
           IconButton(
             icon: const Icon(Icons.done_all_rounded),
@@ -42,10 +43,10 @@ class TaxiNotificationsScreen extends ConsumerWidget {
       ),
       body: notificationsAsync.when(
         data: (notifications) => notifications.isEmpty
-            ? const EmptyState(
+            ? EmptyState(
                 icon: Icons.notifications_none_rounded,
-                title: 'No notifications',
-                message: 'You\'re all caught up. New updates will appear here.',
+                title: 'No notifications'.tr,
+                message: 'You\'re all caught up. New updates will appear here.'.tr,
               )
             : RefreshIndicator(
                 onRefresh: () async => ref.invalidate(notificationsListProvider),
@@ -62,7 +63,7 @@ class TaxiNotificationsScreen extends ConsumerWidget {
                       title: Text(
                         notification.title,
                         style: TextStyle(
-                          fontWeight: notification.isRead ? FontWeight.w500 : FontWeight.w800,
+                          fontWeight: notification.isRead ? FontWeight.w500 : FontWeight.w600,
                         ),
                       ),
                       subtitle: Text(notification.body, maxLines: 2, overflow: TextOverflow.ellipsis),
@@ -83,10 +84,10 @@ class TaxiNotificationsScreen extends ConsumerWidget {
                 ),
               ),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, _) => const EmptyState(
+        error: (_, _) => EmptyState(
           icon: Icons.error_outline_rounded,
-          title: 'Could not load notifications',
-          message: 'Please check your connection and try again.',
+          title: 'Could not load notifications'.tr,
+          message: 'Please check your connection and try again.'.tr,
         ),
       ),
     );

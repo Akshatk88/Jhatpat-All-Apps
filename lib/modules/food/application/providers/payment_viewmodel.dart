@@ -40,27 +40,27 @@ class PaymentViewModel extends Notifier<List<PaymentMethodModel>> {
   @override
   List<PaymentMethodModel> build() {
     return const [
-      PaymentMethodModel(
-        id: 'pay-1',
-        type: 'UPI',
-        title: 'Google Pay UPI',
-        subtitle: 'tanu.chouhan@okicici',
-        isDefault: true,
-      ),
+      // PaymentMethodModel(
+      //   id: 'pay-1',
+      //   type: 'UPI',
+      //   title: 'Google Pay UPI',
+      //   subtitle: 'tanu.chouhan@okicici',
+      //   isDefault: true,
+      // ),
       PaymentMethodModel(
         id: 'pay-2',
         type: 'Card',
         title: 'HDFC Bank Credit Card',
         subtitle: '•••• •••• •••• 4921',
-        isDefault: false,
+        isDefault: true,
       ),
-      PaymentMethodModel(
-        id: 'pay-3',
-        type: 'UPI',
-        title: 'PhonePe UPI',
-        subtitle: '9876543210@ybl',
-        isDefault: false,
-      ),
+      // PaymentMethodModel(
+      //   id: 'pay-3',
+      //   type: 'UPI',
+      //   title: 'PhonePe UPI',
+      //   subtitle: '9876543210@ybl',
+      //   isDefault: false,
+      // ),
     ];
   }
 

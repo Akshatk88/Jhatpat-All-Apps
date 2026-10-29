@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
 import 'package:superapp_user/modules/food/data/models/food_model.dart';
@@ -124,12 +125,16 @@ class _CartRecommendationsSectionState extends ConsumerState<CartRecommendations
                     ),
                   ),
                   const SizedBox(width: 10),
-                  Text(
-                    'Complete your meal with',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: textColor,
+                  Flexible(
+                    child: Text(
+                      'Complete your meal with'.tr,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: textColor,
+                      ),
                     ),
                   ),
                 ],
@@ -173,10 +178,10 @@ class _CartRecommendationsSectionState extends ConsumerState<CartRecommendations
                           ),
                           child: Center(
                             child: Text(
-                              _categories[index],
+                              _categories[index].tr,
                               style: TextStyle(
                                 fontSize: 13,
-                                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                                 color: isSelected
                                     ? (isDark ? Colors.white : const Color(0xFF1D2939))
                                     : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight),
@@ -386,7 +391,7 @@ class _RecommendationProductCardState extends ConsumerState<_RecommendationProdu
               food.name,
               style: TextStyle(
                 fontSize: 13,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w500,
                 color: widget.textColor,
                 height: 1.15,
               ),
@@ -401,7 +406,7 @@ class _RecommendationProductCardState extends ConsumerState<_RecommendationProdu
               '₹${food.price.toStringAsFixed(0)}',
               style: TextStyle(
                 fontSize: 13,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
                 color: widget.textColor,
               ),
             ),

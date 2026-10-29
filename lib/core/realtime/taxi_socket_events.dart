@@ -21,5 +21,7 @@ class SocketEvents {
   static const String rideSearchUpdate = 'rideSearchUpdate';
   static const String rideAccepted = 'rideAccepted';
   static const String rideCancelled = 'rideCancelled';
+  /// Accepted driver cancelled; ride re-opened. `{ rideId, reason }`.
+  static const String rideDriverCancelled = 'rideDriverCancelled';
   static const String rideRequestClosed = 'rideRequestClosed';
 }

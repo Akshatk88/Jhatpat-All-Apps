@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
 import 'package:superapp_user/design_system/components/feedback/app_snackbar.dart';
 import 'package:superapp_user/design_system/components/skeletons/skeleton_loading.dart';
+import 'package:superapp_user/modules/food/data/models/chat_model.dart';
 import 'package:superapp_user/shared/support/presentation/chat/viewmodels/chat_viewmodel.dart';
 
 /// Everything the chat screen needs to identify the thread and label the
@@ -15,11 +18,16 @@ class ChatArgs {
   final String peerName;
   final String peerRole;
 
+  /// Set when opening a known thread (e.g. from an order's thread list) so the
+  /// exact conversation loads instead of being looked up by order + peer.
+  final String? conversationId;
+
   const ChatArgs({
     required this.orderId,
     this.peerId,
     required this.peerName,
     this.peerRole = 'DELIVERY_PARTNER',
+    this.conversationId,
   });
 }
 
@@ -40,6 +48,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
         peerRole: widget.args.peerRole,
         peerId: widget.args.peerId,
         orderId: widget.args.orderId,
+        conversationId: widget.args.conversationId,
       );
 
   bool get _isNearBottom {
@@ -80,8 +89,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
   }
 
   void _scrollToBottom() {
-    if (!_scrollController.hasClients) return;
+    // Checked inside the callback: on first load the list does not exist yet
+    // (the skeleton is showing) and only attaches on the next frame.
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       if (!_scrollController.hasClients) return;
       _scrollController.animateTo(
         _scrollController.position.maxScrollExtent,
@@ -101,11 +112,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
   Future<void> _send() async {
     final text = _controller.text;
     if (text.trim().isEmpty) return;
+    if (ref.read(chatViewModelProvider(_target)).isSending) return;
     _controller.clear();
     Haptics.light();
     final error = await ref.read(chatViewModelProvider(_target).notifier).sendMessage(text);
     if (!mounted) return;
     if (error != null) {
+      // Give the text back so the user can retry without retyping it.
+      if (_controller.text.isEmpty) _controller.text = text;
       AppSnackbar.error(context, error);
     } else {
       _scrollToBottom();
@@ -124,9 +138,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
     ref.listen(chatViewModelProvider(_target), (previous, next) {
       if (previous == null || next.messages.length == previous.messages.length) return;
 
-      final isLastMessageMine = next.messages.isNotEmpty && next.messages.last.senderId == myId;
+      final isLastMessageMine = next.messages.isNotEmpty && _isMine(next.messages.last, myId);
 
-      if (isLastMessageMine || _isNearBottom) {
+      // First page of history: always land on the newest message.
+      if (previous.messages.isEmpty || isLastMessageMine || _isNearBottom) {
         _scrollToBottom();
         setState(() {
           _showNewMessagesIndicator = false;
@@ -151,9 +166,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(widget.args.peerName, style: TextStyle(color: textColor, fontSize: 16, fontWeight: FontWeight.bold)),
+            Text(widget.args.peerName, maxLines: 1, overflow: TextOverflow.ellipsis, style:TextStyle(color: textColor, fontSize: 16, fontWeight: FontWeight.w600)),
             if (state.peerTyping)
-              Text('typing…', style: TextStyle(color: AppColors.primary, fontSize: 11.5, fontWeight: FontWeight.w600)),
+              Text('typing…'.tr, style: TextStyle(color: const Color(0xFFE5A600), fontSize: 11.5, fontWeight: FontWeight.w500)),
           ],
         ),
       ),
@@ -187,14 +202,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
                           ),
                         ],
                       ),
-                      child: const Row(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.arrow_downward_rounded, color: Colors.white, size: 16),
-                          SizedBox(width: 6),
+                          const Icon(Icons.arrow_downward_rounded, color: Colors.black, size: 16),
+                          const SizedBox(width: 6),
                           Text(
-                            'New Messages',
-                            style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                            'New Messages'.tr,
+                            style: const TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.w600),
                           ),
                         ],
                       ),
@@ -223,7 +238,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
             const SizedBox(height: 12),
             TextButton(
               onPressed: () => ref.read(chatViewModelProvider(_target).notifier).retry(),
-              child: const Text('Retry'),
+              child: Text('Retry'.tr),
             ),
           ],
         ),
@@ -231,17 +246,19 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
     }
     if (state.messages.isEmpty) {
       return Center(
-        child: Text('Say hello 👋', style: TextStyle(color: secondary, fontSize: 14)),
+        child: Text('Say hello 👋'.tr, style: TextStyle(color: secondary, fontSize: 14)),
       );
     }
 
     return ListView.builder(
       controller: _scrollController,
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       padding: const EdgeInsets.all(16),
       itemCount: state.messages.length,
       itemBuilder: (context, index) {
         final message = state.messages[index];
-        final mine = message.senderId == myId;
+        final mine = _isMine(message, myId);
+        final sentAt = message.createdAt;
         return Align(
           alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
           child: Container(
@@ -258,14 +275,42 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
               ),
               boxShadow: mine || isDark ? null : [BoxShadow(color: AppColors.shadow1, blurRadius: 8, offset: const Offset(0, 2))],
             ),
-            child: Text(
-              message.text,
-              style: TextStyle(color: mine ? Colors.white : textColor, fontSize: 14),
+            child: Column(
+              crossAxisAlignment: mine ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  message.text,
+                  style: TextStyle(color: mine ? Colors.black : textColor, fontSize: 14),
+                ),
+                if (sentAt != null) ...[
+                  const SizedBox(height: 3),
+                  Text(
+                    _stamp(sentAt),
+                    style: TextStyle(
+                      color: mine ? Colors.black54 : secondary,
+                      fontSize: 10.5,
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
         );
       },
     );
+  }
+
+  /// Every thread this app opens has the customer on one side, so the
+  /// customer's messages are "mine". The id check covers a missing role.
+  bool _isMine(ChatMessage message, String myId) =>
+      message.isFromUser || (myId.isNotEmpty && message.senderId == myId);
+
+  /// `h:mm a` today, otherwise prefixed with the date.
+  String _stamp(DateTime at) {
+    final now = DateTime.now();
+    final sameDay = at.year == now.year && at.month == now.month && at.day == now.day;
+    return sameDay ? DateFormat('h:mm a').format(at) : DateFormat('d MMM, h:mm a').format(at);
   }
 
   Widget _buildComposer(bool isDark, Color textColor, bool isSending) {
@@ -281,10 +326,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
             child: TextField(
               controller: _controller,
               style: TextStyle(color: textColor),
+              minLines: 1,
+              maxLines: 4,
+              // The server rejects anything over 2000 characters.
+              maxLength: 2000,
+              textCapitalization: TextCapitalization.sentences,
+              textInputAction: TextInputAction.send,
               onChanged: (_) => ref.read(chatViewModelProvider(_target).notifier).notifyTyping(),
               onSubmitted: (_) => _send(),
               decoration: InputDecoration(
-                hintText: 'Message...',
+                hintText: 'Message...'.tr,
+                counterText: '',
                 filled: true,
                 fillColor: isDark ? AppColors.cardDark : AppColors.secondarySurfaceLight,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -303,9 +355,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
               child: isSending
                   ? const Padding(
                       padding: EdgeInsets.all(13),
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black),
                     )
-                  : const Icon(Icons.send_rounded, color: Colors.white, size: 20),
+                  : const Icon(Icons.send_rounded, color: Colors.black, size: 20),
             ),
           ),
         ],

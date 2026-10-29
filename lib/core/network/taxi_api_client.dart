@@ -2,7 +2,7 @@ import 'package:superapp_user/core/error/failures.dart';
 import 'package:superapp_user/core/network/api_client.dart';
 import 'package:superapp_user/core/error/taxi_api_exception.dart';
 
-/// Adapter that lets the taxi/parcel/rental repositories keep their original
+/// Adapter that lets the taxi/parcel repositories keep their original
 /// call style (`await api.get(path)` returning `dynamic`) while actually
 /// running on the app's single [ApiClient].
 ///

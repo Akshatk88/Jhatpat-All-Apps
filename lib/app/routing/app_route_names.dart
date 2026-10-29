@@ -2,7 +2,7 @@
 ///
 /// Reading rule for the whole app: **a path with no module prefix is shared.**
 /// `/wallet` means *the* wallet; `/food/orders` is food's. Anything under
-/// `/food`, `/taxi`, `/parcel` or `/rental` belongs to that module and is
+/// `/food`, `/taxi` or `/parcel` belongs to that module and is
 /// declared in its own `*_route_names.dart`.
 class AppRoutePaths {
   const AppRoutePaths._();

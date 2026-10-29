@@ -4,7 +4,8 @@ import 'package:superapp_user/modules/module_registry.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:superapp_user/design_system/tokens/app_colors.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:superapp_user/shared/auth/presentation/viewmodels/auth_viewmodel.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -64,8 +65,27 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
     );
 
     _animationController.forward().then((_) {
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (mounted) {
+      Future.delayed(const Duration(milliseconds: 500), () async {
+        if (!mounted) return;
+        // 1. Login first. 2. Then the location prompt. 3. Then the app.
+        final user = await ref
+            .read(authViewModelProvider.future)
+            .catchError((_) => null);
+        if (!mounted) return;
+        if (user == null) {
+          context.go(Uri(
+            path: AppRoutePaths.authPhone,
+            queryParameters: {'from': AppRoutePaths.permissionLocation},
+          ).toString());
+          return;
+        }
+        final permission = await Geolocator.checkPermission();
+        if (!mounted) return;
+        if (permission == LocationPermission.denied) {
+          context.go(AppRoutePaths.permissionLocation);
+          return;
+        }
+        {
           // Land in the first enabled module rather than on a separate hub
           // screen: the service switcher is now pinned to the top of every
           // module home, so an extra tap-through would be pure friction.
@@ -88,7 +108,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, 
+      backgroundColor: const Color.fromARGB(255, 0, 0, 0), 
       body: Stack(
         alignment: Alignment.center,
         children: [
@@ -106,7 +126,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
                   child: Container(
                     width: 480,  
                     height: 480, 
-                    color: AppColors.backgroundDark,
+                    color: const Color(0xFFFFC803), // brand yellow, same as the logo's background
                   ),
                 ),
               );
@@ -125,7 +145,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Image.asset(
-                        'assets/images/logo.png',
+                        'assets/images/jhatpat_splash_v2.png',
                         width: 270,
                         height: 270,
                         fit: BoxFit.contain,

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:superapp_user/core/config/backend_ids.dart';
 import 'package:superapp_user/design_system/tokens/module_accent.dart';
 import 'package:superapp_user/app/shell/module_home_shell.dart';
+import 'package:superapp_user/design_system/components/ride/app_bottom_navigation_bar.dart';
 import 'package:superapp_user/modules/app_module.dart';
 import 'package:superapp_user/modules/module_id.dart';
 import 'package:superapp_user/modules/parcel/presentation/delivery_address_screen.dart';
@@ -11,6 +12,7 @@ import 'package:superapp_user/modules/parcel/presentation/delivery_category_vehi
 import 'package:superapp_user/modules/parcel/presentation/delivery_vehicle_screen.dart';
 import 'package:superapp_user/modules/parcel/presentation/finding_captain_screen.dart';
 import 'package:superapp_user/modules/parcel/presentation/new_delivery_screen.dart';
+import 'package:superapp_user/modules/parcel/presentation/parcel_home_screen.dart';
 
 class ParcelRoutePaths {
   const ParcelRoutePaths._();
@@ -57,6 +59,9 @@ class ParcelModule extends AppModule {
   IconData get icon => Icons.inventory_2_rounded;
 
   @override
+  String get navIconAsset => 'assets/images/parcel.png';
+
+  @override
   ModuleAccent get accent => ModuleAccent.parcel;
 
   @override
@@ -66,45 +71,53 @@ class ParcelModule extends AppModule {
   String get entryRoute => ParcelRoutePaths.home;
 
   @override
-  int get order => 2;
+  int get order => 1;
 
   @override
   List<RouteBase> routes(GlobalKey<NavigatorState> rootNavigatorKey) => [
+    GoRoute(
+      name: ParcelRouteNames.home,
+      path: ParcelRoutePaths.home,
+      builder: (context, state) => const ModuleHomeShell(
+        moduleId: ModuleId.parcel,
+        bottomNavigationBar: AppBottomNavigationBar(
+          currentIndex: AppBottomNavigationBar.parcel,
+        ),
+        child: ParcelHomeScreen(),
+      ),
+    ),
+    GoRoute(
+      name: 'parcel.new',
+      path: '/parcel/new',
+      builder: (context, state) => const NewDeliveryScreen(),
+    ),
+    GoRoute(
+      name: ParcelRouteNames.vehicles,
+      path: ParcelRoutePaths.vehicles,
+      builder: (context, state) => const DeliveryVehicleScreen(),
+      routes: [
         GoRoute(
-          name: ParcelRouteNames.home,
-          path: ParcelRoutePaths.home,
-          builder: (context, state) => const ModuleHomeShell(
-            moduleId: ModuleId.parcel,
-            child: NewDeliveryScreen(),
+          name: ParcelRouteNames.categoryVehicles,
+          path: ':categoryId',
+          parentNavigatorKey: rootNavigatorKey,
+          builder: (context, state) => DeliveryCategoryVehiclesScreen(
+            categoryId: state.pathParameters['categoryId']!,
           ),
         ),
-        GoRoute(
-          name: ParcelRouteNames.vehicles,
-          path: ParcelRoutePaths.vehicles,
-          builder: (context, state) => const DeliveryVehicleScreen(),
-          routes: [
-            GoRoute(
-              name: ParcelRouteNames.categoryVehicles,
-              path: ':categoryId',
-              parentNavigatorKey: rootNavigatorKey,
-              builder: (context, state) => DeliveryCategoryVehiclesScreen(
-                categoryId: state.pathParameters['categoryId']!,
-              ),
-            ),
-          ],
-        ),
-        GoRoute(
-          name: ParcelRouteNames.addresses,
-          path: ParcelRoutePaths.addresses,
-          builder: (context, state) => const DeliveryAddressScreen(),
-        ),
-        GoRoute(
-          name: ParcelRouteNames.searching,
-          path: ParcelRoutePaths.searching,
-          builder: (context, state) =>
-              FindingCaptainScreen(rideId: state.pathParameters['jobId']!),
-        ),
-      ];
+      ],
+    ),
+    GoRoute(
+      name: ParcelRouteNames.addresses,
+      path: ParcelRoutePaths.addresses,
+      builder: (context, state) => const DeliveryAddressScreen(),
+    ),
+    GoRoute(
+      name: ParcelRouteNames.searching,
+      path: ParcelRoutePaths.searching,
+      builder: (context, state) =>
+          FindingCaptainScreen(rideId: state.pathParameters['jobId']!),
+    ),
+  ];
 
   @override
   PushRoute? resolvePush(PushMessage message) {

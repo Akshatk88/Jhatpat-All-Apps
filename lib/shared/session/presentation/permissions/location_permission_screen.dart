@@ -1,7 +1,9 @@
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/app/routing/app_route_names.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:superapp_user/modules/module_registry.dart';
 import 'package:superapp_user/modules/taxi/application/taxi_core_providers.dart';
 import 'package:superapp_user/design_system/tokens/taxi_colors.dart';
 import 'package:superapp_user/design_system/components/ride/primary_button.dart';
@@ -17,10 +19,16 @@ class LocationPermissionScreen extends ConsumerStatefulWidget {
 class _LocationPermissionScreenState extends ConsumerState<LocationPermissionScreen> {
   bool _requesting = false;
 
+  /// Straight into the app: first enabled module, as the splash does.
+  void _goHome() {
+    final modules = ref.read(moduleRegistryProvider).enabled;
+    context.go(modules.isEmpty ? AppRoutePaths.hub : modules.first.entryRoute);
+  }
+
   Future<void> _allow() async {
     setState(() => _requesting = true);
     await ref.read(taxiLocationServiceProvider).ensurePermission();
-    if (mounted) context.go(AppRoutePaths.permissionNotifications);
+    if (mounted) _goHome();
   }
 
   @override
@@ -43,26 +51,26 @@ class _LocationPermissionScreenState extends ConsumerState<LocationPermissionScr
               ),
               const SizedBox(height: 32),
               Text(
-                'Enable your location',
+                'Enable your location'.tr,
                 style: Theme.of(context).textTheme.headlineLarge,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
               Text(
-                'We use your location to find nearby drivers and get you the fastest, most accurate pickup.',
+                'We use your location to find nearby drivers and get you the fastest, most accurate pickup.'.tr,
                 style: Theme.of(context).textTheme.bodyMedium,
                 textAlign: TextAlign.center,
               ),
               const Spacer(),
               TaxiPrimaryButton(
-                label: 'Allow location access',
+                label: 'Allow location access'.tr,
                 isLoading: _requesting,
                 onPressed: _allow,
               ),
               const SizedBox(height: 12),
               TaxiSecondaryButton(
-                label: 'Not now',
-                onPressed: () => context.go(AppRoutePaths.permissionNotifications),
+                label: 'Not now'.tr,
+                onPressed: () => _goHome(),
               ),
               const SizedBox(height: 24),
             ],

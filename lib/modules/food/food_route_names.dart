@@ -1,7 +1,7 @@
 /// Route names and paths for the food module.
 ///
 /// Every path starts with `/food`. That prefix is what guarantees this module
-/// can never collide with taxi, parcel or rental — nine paths collided between
+/// can never collide with taxi or parcel — nine paths collided between
 /// the two source apps before namespacing (`/home`, `/search`, `/profile`,
 /// `/wallet`, `/notifications`, `/` among them).
 ///

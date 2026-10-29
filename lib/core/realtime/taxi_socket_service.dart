@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:socket_io_client/socket_io_client.dart' as io;
 import 'package:superapp_user/core/config/app_constants.dart';
 import 'package:superapp_user/core/realtime/taxi_socket_events.dart';
@@ -32,34 +34,70 @@ class TaxiSocketService {
   /// are both live at times, and a single field would let one clobber the other.
   final List<void Function()> _connectionListeners = [];
 
+  /// Reads the freshest stored access token. Access tokens are short-lived and
+  /// refreshed by the REST client, so a reconnect must not replay the token
+  /// the socket was first opened with — the server would reject it and the
+  /// socket (and with it live ride chat) would stay down for good.
+  Future<String?> Function()? _tokenReader;
+
+  /// Pending retry after the server refused the handshake.
+  Timer? _authRetry;
+
   bool get isConnected => _socket?.connected ?? false;
 
-  void connect(String token) {
+  void connect(String token, {Future<String?> Function()? tokenReader}) {
+    if (tokenReader != null) _tokenReader = tokenReader;
     if (_socket != null && _socket!.connected && _token == token) return;
 
     // A non-null but dead socket still owns its listeners and reconnect timers;
     // replacing it without disposing leaks one per reconnect.
+    _authRetry?.cancel();
     _socket?.dispose();
 
     _token = token;
-    _socket = io.io(
+    final socket = io.io(
       AppConstants.socketUrl,
       io.OptionBuilder()
           .setTransports(['websocket'])
           .disableAutoConnect()
           .enableReconnection()
-          .setAuth({'token': token})
+          .setAuthFn((callback) => _resolveAuth(callback))
           .build(),
     );
+    _socket = socket;
     for (final entry in _pendingHandlers) {
-      _socket!.on(entry.key, entry.value);
+      socket.on(entry.key, entry.value);
     }
-    _socket!.onConnect((_) {
+    socket.onConnect((_) {
       for (final listener in List<void Function()>.from(_connectionListeners)) {
         listener();
       }
     });
-    _socket!.connect();
+    // A handshake the server refuses (expired token) is not retried by the
+    // client on its own. Try again shortly with whatever token is now stored.
+    socket.onConnectError((error) {
+      final text = '$error';
+      if (!text.contains('AUTH') && !text.toLowerCase().contains('token')) return;
+      _authRetry?.cancel();
+      _authRetry = Timer(const Duration(seconds: 5), () {
+        if (identical(_socket, socket) && !socket.connected) socket.connect();
+      });
+    });
+    socket.connect();
+  }
+
+  void _resolveAuth(void Function(Map auth) callback) {
+    final reader = _tokenReader;
+    if (reader == null) {
+      callback({'token': _token ?? ''});
+      return;
+    }
+    reader().then((fresh) {
+      if (fresh != null && fresh.isNotEmpty) _token = fresh;
+      callback({'token': _token ?? ''});
+    }).catchError((Object _) {
+      callback({'token': _token ?? ''});
+    });
   }
 
   /// Registers [listener] to run on every (re)connect. Returns a disposer.
@@ -82,6 +120,8 @@ class TaxiSocketService {
   }
 
   void disconnect() {
+    _authRetry?.cancel();
+    _tokenReader = null;
     _socket?.disconnect();
     _socket?.dispose();
     _socket = null;
@@ -96,11 +136,20 @@ class TaxiSocketService {
     _socket?.emit(SocketEvents.rideRejoinCurrent);
   }
 
-  void sendRideMessage(String rideId, String message) {
-    _socket?.emit(SocketEvents.rideMessageSend, {
+  /// Sends a ride chat message. The server echoes it to the whole ride room
+  /// (sender included) as `ride:message:new`; failures come back on
+  /// `errorMessage`. Returns false when there is no socket at all (signed
+  /// out). While merely disconnected the emit is buffered and flushed on
+  /// reconnect.
+  bool sendRideMessage(String rideId, String message) {
+    final socket = _socket;
+    if (socket == null) return false;
+    if (!socket.connected) ensureConnected();
+    socket.emit(SocketEvents.rideMessageSend, {
       'rideId': rideId,
       'message': message,
     });
+    return true;
   }
 
   void on(String event, void Function(dynamic data) handler) {

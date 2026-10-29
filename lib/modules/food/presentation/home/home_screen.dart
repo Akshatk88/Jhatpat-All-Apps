@@ -1,4 +1,5 @@
 import 'dart:developer' as developer;
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/design_system/components/layout/app_refresh_indicator.dart';
 import 'package:superapp_user/design_system/components/skeletons/skeleton_loading.dart';
 import 'package:superapp_user/design_system/components/feedback/exit_confirmation_dialog.dart';
@@ -16,7 +17,6 @@ import 'package:superapp_user/modules/food/data/models/restaurant_model.dart';
 import 'package:superapp_user/modules/food/data/models/food_model.dart';
 import 'package:superapp_user/modules/food/presentation/orders/viewmodels/active_order_viewmodel.dart';
 import 'package:superapp_user/design_system/components/layout/collapsing_header_delegate.dart';
-import 'package:superapp_user/modules/food/presentation/home/screens/home_filter_screen.dart';
 import 'package:superapp_user/modules/food/presentation/home/viewmodels/banners_viewmodel.dart';
 import 'package:superapp_user/modules/food/presentation/home/viewmodels/home_viewmodel.dart';
 import 'package:superapp_user/modules/food/presentation/home/viewmodels/veg_filter_provider.dart';
@@ -27,6 +27,7 @@ import 'package:superapp_user/modules/food/presentation/home/widgets/popular_bra
 import 'package:superapp_user/modules/food/presentation/home/widgets/promo_banner_carousel.dart';
 import 'package:superapp_user/modules/food/presentation/home/widgets/popular_items_list.dart';
 import 'package:superapp_user/modules/food/presentation/home/widgets/restaurant_card.dart';
+import 'package:superapp_user/design_system/components/media/smart_image.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -56,7 +57,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   // as one fixed-height block from their original (floating-over-the-banner)
   // position up to a pinned spot below the status bar.
   double get _stickyBlockHeight =>
-      50.h + 4.h + 84.h; // search + gap + categories
+      50.h + 4.h + 92.h; // search + gap + categories
   double get _bannerToBlockOverlap =>
       26.h; // preserves the original floating-overlap look
   double get _collapsedTopPadding =>
@@ -98,14 +99,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    final topInset = MediaQuery.of(context).padding.top;
     // Matches HomeHeaderBanner's own height calc exactly, so the sticky
     // header's expanded size is pixel-identical to the old static layout.
-    final bannerHeight = topInset + 315.h;
-    // Expanded: the block floats over the banner exactly as before.
-    final expandedBlockTop = bannerHeight - _bannerToBlockOverlap;
-    // Collapsed: the block sits pinned just below the status bar.
-    final collapsedBlockTop = topInset + _collapsedTopPadding;
+    // Breathing room between the Rides/Parcel/Food tabs and the search bar.
+    final expandedBlockTop = 12.h;
+    final collapsedBlockTop = 12.h;
     final expandedHeaderExtent =
         expandedBlockTop + _stickyBlockHeight + _shadowRoom;
     final collapsedHeaderExtent =
@@ -121,13 +119,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         }
       },
       child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: (_headerCollapsed && !isDark)
+        value: !isDark
             ? SystemUiOverlayStyle.dark
             : SystemUiOverlayStyle.light,
       child: Scaffold(
-        backgroundColor: isDark
-            ? AppColors.backgroundDark
-            : AppColors.backgroundLight,
+        backgroundColor: Colors.transparent,
         body: SafeArea(
           top: false,
           child: Stack(
@@ -158,7 +154,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         blockHeight: _stickyBlockHeight,
                         backdropColor: isDark
                             ? AppColors.backgroundDark
-                            : AppColors.backgroundLight,
+                            : const Color(0xFFFFB800),
                         bannerDriftUp: 30.h,
                         banner: const HomeHeaderBanner(),
                         stickyBlock: Column(
@@ -182,17 +178,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     ),
                     SliverToBoxAdapter(
+                      // Tablets / desktop: the feed stays a readable column
+                      // rather than stretching cards across the full width.
+                      child: Center(
+                      child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 720),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // The sticky header already reserves _shadowRoom
-                          // worth of clearance below the categories row, so
-                          // only the remainder of _sectionGap is needed here
-                          // to keep the total spacing identical to before.
-                          SizedBox(height: _sectionGap - _shadowRoom),
+                          SizedBox(height: 6.h),
+                          // 2. JHATPAT 50% OFF Promo Banner matching screenshot
+                          _buildJhatpatPromoBanner(isDark),
 
-                          // 3. Quick Feature Filter Pills (Trending Now, ₹99 Store, Buy 1 Get 1 Free, Free Delivery, Pure Veg, Near You)
-                          _buildQuickFilterPills(isDark),
+                          SizedBox(height: 10.h),
+
+                          // 3. "Popular near you" section matching screenshot
+                          _buildPopularNearYouSection(context, homeState, isDark),
 
                           SizedBox(height: _sectionGap),
 
@@ -219,7 +220,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                           // 5. RESTAURANTS NEAR YOU Section
                           _buildSectionHeader(
-                            title: 'RESTAURANTS NEAR YOU',
+                            title: 'RESTAURANTS NEAR YOU'.tr,
                             onViewAll: () => context.push(RouteNames.search),
                             isDark: isDark,
                           ),
@@ -257,7 +258,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                           // 6. POPULAR BRANDS Section
                           _buildSectionHeader(
-                            title: 'POPULAR BRANDS',
+                            title: 'POPULAR BRANDS'.tr,
                             onViewAll: () => context.push(RouteNames.search),
                             isDark: isDark,
                           ),
@@ -278,15 +279,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               final restaurants = _filterRestaurants(
                                 allRestaurants,
                               );
-                              if (restaurants.isEmpty)
+                              if (restaurants.isEmpty) {
                                 return const SizedBox.shrink();
+                              }
                               final totalCount = restaurants.length;
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   _buildSectionHeader(
                                     title:
-                                        '$totalCount RESTAURANTS DELIVERING TO YOU',
+                                        '{count} RESTAURANTS DELIVERING TO YOU'.trArgs({'count': totalCount}),
                                     onViewAll: null,
                                     isDark: isDark,
                                   ),
@@ -313,6 +315,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                           SizedBox(height: 100.h),
                         ],
+                      ),
+                      ),
                       ),
                     ),
                   ],
@@ -386,13 +390,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           SizedBox(width: 8.w),
                           Expanded(
                             child: Text(
-                              "Search for 'Pizza', 'Burger', 'Fries'...",
+                              'Search for restaurants, dishes, combos...'.tr,
                               style: TextStyle(
                                 color: isDark
                                     ? AppColors.textSecondaryDark
                                     : AppColors.textSecondaryLight,
                                 fontSize: 11.5.sp,
-                               // fontStyle: FontStyle.italic,
                                 fontWeight: FontWeight.w400,
                               ),
                               maxLines: 1,
@@ -439,7 +442,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               duration: const Duration(milliseconds: 200),
               height: 50.h,
               width: 64.w,
-              padding: EdgeInsets.symmetric(vertical: 6.h, horizontal: 6.w),
+              padding: EdgeInsets.symmetric(vertical: 4.h, horizontal: 4.w),
               decoration: BoxDecoration(
                 color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
                 borderRadius: BorderRadius.circular(20.r),
@@ -449,7 +452,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       : (isDark
                             ? AppColors.borderDark
                             : const Color(0xFFEEEEEE)),
-                  width: isVegOnly ? 1.5 : 1.0,
+                  width: 1.2,
                 ),
                 boxShadow: isDark
                     ? []
@@ -464,6 +467,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ],
               ),
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Row(
@@ -483,10 +487,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                       SizedBox(width: 3.w),
                       Text(
-                        'VEG',
+                        'VEG'.tr,
                         style: TextStyle(
                           fontSize: 10.5.sp,
-                          fontWeight: FontWeight.w900,
+                          fontWeight: FontWeight.w700,
                           color: isVegOnly
                               ? AppColors.success
                               : (isDark
@@ -497,7 +501,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 3.h),
+                  SizedBox(height: 2.h),
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     width: 34.w,
@@ -542,174 +546,304 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  /// 4. Quick Feature Filter Pills Row
-  Widget _buildQuickFilterPills(bool isDark) {
-    final pills = [
-      {
-        'icon': Icons.local_fire_department_rounded,
-        'title': 'Trending',
-        'highlight': 'Now',
-        'bg': AppColors.primary.withValues(alpha: 0.12),
-        'color': AppColors.primary,
-        'onTap': () => _openFilter(
-          title: 'Trending Now',
-          emptyMessage: 'No trending restaurants right now',
-          emptyIcon: Icons.local_fire_department_rounded,
-          matches: (r) => r.isFeatured,
+  Widget _buildJhatpatPromoBanner(bool isDark) {
+    return InkWell(
+      onTap: () {
+        Haptics.light();
+        context.push(RouteNames.allOffers);
+      },
+      borderRadius: BorderRadius.circular(16.r),
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
+        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFD54F),
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(color: Colors.black, width: 1.2),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
-      },
-      {
-        'icon': Icons.currency_rupee_rounded,
-        'title': '99',
-        'highlight': 'Store',
-        'bg': const Color(0xFFFFF9E6),
-        'color': const Color(0xFFF57F17),
-        'onTap': () {
-          Haptics.light();
-          context.push(RouteNames.store99);
-        },
-      },
-      {
-        'icon': Icons.shopping_bag_outlined,
-        'title': 'Buy 1 Get 1',
-        'highlight': 'Free',
-        'bg': AppColors.success.withValues(alpha: 0.12),
-        'color': AppColors.success,
-        'onTap': () => _openFilter(
-          title: 'Buy 1 Get 1 Free',
-          emptyMessage: 'No Buy 1 Get 1 Free meals available right now',
-          emptyIcon: Icons.card_giftcard_rounded,
-          matches: (r) => r.offerBadges.any(
-            (b) => RegExp(
-              r'buy\s*1|b\s*1\s*g\s*1',
-              caseSensitive: false,
-            ).hasMatch(b),
-          ),
-        ),
-      },
-      {
-        'icon': Icons.directions_bike_rounded,
-        'title': 'FREE',
-        'highlight': 'Delivery',
-        'bg': AppColors.primary.withValues(alpha: 0.12),
-        'color': AppColors.primary,
-        'onTap': () => _openFilter(
-          title: 'Free Delivery',
-          emptyMessage: 'No free-delivery restaurants nearby right now',
-          emptyIcon: Icons.delivery_dining_rounded,
-          matches: (r) => r.deliveryFee <= 0,
-        ),
-      },
-      {
-        'icon': Icons.eco_rounded,
-        'title': 'Pure Veg',
-        'highlight': '',
-        'bg': AppColors.success.withValues(alpha: 0.12),
-        'color': AppColors.success,
-        // No per-restaurant veg flag exists on the backend yet — this filters
-        // the real food list below (same switch as the VEG toggle) rather
-        // than fabricating one.
-        'onTap': () {
-          Haptics.light();
-          ref.read(vegFilterProvider.notifier).set(true);
-        },
-      },
-      {
-        'icon': Icons.location_on_outlined,
-        'title': 'Near You',
-        'highlight': '',
-        'bg': const Color(0xFFF8F0FF),
-        'color': const Color(0xFF7B1FA2),
-        'onTap': () => _openFilter(
-          title: 'Near You',
-          emptyMessage: 'No nearby fast-delivery restaurants right now',
-          emptyIcon: Icons.location_on_rounded,
-          matches: (r) => r.isNearAndFast,
-        ),
-      },
-    ];
-
-    return SizedBox(
-      height: 38.h,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: EdgeInsets.symmetric(horizontal: 16.w),
-        itemCount: pills.length,
-        separatorBuilder: (context, index) => SizedBox(width: 8.w),
-        itemBuilder: (context, index) {
-          final p = pills[index];
-          final bgColor = isDark ? AppColors.surfaceDark : (p['bg'] as Color);
-          final textColor = p['color'] as Color;
-
-          return InkWell(
-            borderRadius: BorderRadius.circular(20.r),
-            onTap: p['onTap'] as VoidCallback,
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-              decoration: BoxDecoration(
-                color: bgColor,
-                borderRadius: BorderRadius.circular(20.r),
-                border: Border.all(
-                  color: textColor.withValues(alpha: 0.15),
-                  width: 1,
-                ),
-              ),
-              child: Row(
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(p['icon'] as IconData, color: textColor, size: 15.sp),
-                  SizedBox(width: 5.w),
-                  Text(
-                    p['title'] as String,
-                    style: TextStyle(
-                      fontSize: 11.5.sp,
-                      fontWeight: FontWeight.w800,
-                      color: isDark
-                          ? AppColors.textPrimaryDark
-                          : AppColors.textPrimaryLight,
+                  RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: '50% OFF '.tr,
+                          style: TextStyle(
+                            fontSize: 14.5.sp,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.black,
+                          ),
+                        ),
+                        TextSpan(
+                          text: 'up to ₹100'.tr,
+                          style: TextStyle(
+                            fontSize: 13.sp,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  if ((p['highlight'] as String).isNotEmpty) ...[
-                    SizedBox(width: 3.w),
-                    Text(
-                      p['highlight'] as String,
-                      style: TextStyle(
-                        fontSize: 11.5.sp,
-                        fontWeight: FontWeight.w500,
-                        color: isDark
-                            ? AppColors.textSecondaryDark
-                            : AppColors.textSecondaryLight,
-                      ),
+                  SizedBox(height: 2.h),
+                  Text(
+                    'on your first food order • Use code JHAT50'.tr,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 10.5.sp,
+                      color: Colors.black.withValues(alpha: 0.8),
+                      fontWeight: FontWeight.w500,
                     ),
-                  ],
+                  ),
                 ],
               ),
             ),
-          );
-        },
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'See all'.tr,
+                  style: TextStyle(
+                    fontSize: 11.5.sp,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  size: 16.sp,
+                  color: Colors.black,
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  void _openFilter({
-    required String title,
-    required String emptyMessage,
-    required IconData emptyIcon,
-    required bool Function(RestaurantModel) matches,
-  }) {
-    Haptics.light();
-    context.push(
-      RouteNames.homeFilter,
-      extra: HomeFilterArgs(
-        title: title,
-        emptyMessage: emptyMessage,
-        emptyIcon: emptyIcon,
-        matches: matches,
+  Widget _buildPopularNearYouSection(
+    BuildContext context,
+    HomeState homeState,
+    bool isDark,
+  ) {
+    // Real restaurants from the backend, best-rated open ones first. This was a
+    // hardcoded mockup list (Biryani House, Burger King, …) that did not exist,
+    // so every tap could only fall through to search.
+    final restaurants = [
+      ..._filterRestaurants(homeState.nearbyRestaurants.value ?? const []),
+    ]..sort((a, b) {
+        if (a.isOpen != b.isOpen) return a.isOpen ? -1 : 1;
+        return b.rating.compareTo(a.rating);
+      });
+    final popular = restaurants.take(3).toList();
+    if (popular.isEmpty) return const SizedBox.shrink();
+
+    void openRestaurant(RestaurantModel restaurant) {
+      Haptics.light();
+      context.push(RouteNames.restaurantDetail, extra: restaurant);
+    }
+
+    String reviewsLabel(int count) {
+      if (count <= 0) return '';
+      if (count >= 1000) {
+        return '(${(count / 1000).toStringAsFixed(count >= 10000 ? 0 : 1)}k+) ';
+      }
+      return '($count) ';
+    }
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header Row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Flexible(
+                child: Text(
+                'Popular near you'.tr,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.2,
+                  color: isDark ? Colors.white : Colors.black,
+                ),
+              ),
+              ),
+              InkWell(
+                onTap: () {
+                  Haptics.light();
+                  context.push(RouteNames.search);
+                },
+                child: Row(
+                  children: [
+                    Text(
+                      'See all'.tr,
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? Colors.white70 : Colors.black,
+                      ),
+                    ),
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      size: 16.sp,
+                      color: isDark ? Colors.white70 : Colors.black,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10.h),
+          // 3 Food / Restaurant Cards matching screenshot
+          ...popular.map((restaurant) {
+            final tags = restaurant.tags.take(2).join(' • ');
+            return GestureDetector(
+              onTap: () => openRestaurant(restaurant),
+              behavior: HitTestBehavior.opaque,
+              child: Container(
+              margin: EdgeInsets.only(bottom: 10.h),
+              padding: EdgeInsets.all(10.r),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                borderRadius: BorderRadius.circular(16.r),
+                border: Border.all(
+                  color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFEEEEEE),
+                ),
+                boxShadow: isDark
+                    ? []
+                    : [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.04),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+              ),
+              child: Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(14.r),
+                    child: SmartImage(
+                      url: restaurant.imageUrl,
+                      category: ImageCategory.food,
+                      width: 64.w,
+                      height: 64.h,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          restaurant.name,
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w700,
+                            color: isDark ? Colors.white : Colors.black,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: 2.h),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.star_rounded,
+                              size: 14.sp,
+                              color: const Color(0xFFFFB800),
+                            ),
+                            SizedBox(width: 2.w),
+                            Flexible(
+                              child: Text(
+                              '${restaurant.rating.toStringAsFixed(1)} ${reviewsLabel(restaurant.reviewCount)}• ${restaurant.deliveryTime}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 11.sp,
+                                color: isDark ? Colors.white70 : Colors.black87,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 2.h),
+                        Text(
+                          tags.isNotEmpty ? tags : restaurant.area,
+                          style: TextStyle(
+                            fontSize: 10.5.sp,
+                            color: isDark ? Colors.white38 : Colors.black45,
+                            fontWeight: FontWeight.w400,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: 8.w),
+                  // Yellow + ADD Button matching screenshot
+                  InkWell(
+                    onTap: () => openRestaurant(restaurant),
+                    borderRadius: BorderRadius.circular(16.r),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16.w,
+                        vertical: 7.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFC700),
+                        borderRadius: BorderRadius.circular(16.r),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFFFFC700).withValues(alpha: 0.35),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        '+ ADD'.tr,
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            );
+          }),
+        ],
       ),
     );
   }
 
-  /// Section Header (Title + Suvio Primary View All >)
+  /// Section Header (Title + Jhatpat Primary View All >)
   Widget _buildSectionHeader({
     required String title,
     required VoidCallback? onViewAll,
@@ -720,15 +854,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 15.sp,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 0.5,
-              color: isDark
-                  ? AppColors.textPrimaryDark
-                  : AppColors.textPrimaryLight,
+          Flexible(
+            child: Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 15.sp,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.5,
+                color: isDark
+                    ? AppColors.textPrimaryDark
+                    : AppColors.textPrimaryLight,
+              ),
             ),
           ),
           if (onViewAll != null)
@@ -740,11 +878,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: Row(
                 children: [
                   Text(
-                    'View All',
+                    'View All'.tr,
                     style: TextStyle(
-                      color: AppColors.primary,
+                      color: const Color(0xFFE5A600),
                       fontSize: 12.5.sp,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   Icon(
@@ -772,7 +910,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ? query.substring(0, query.length - 1)
           : query;
       result = result.where((f) {
-        final haystack = '${f.name} ${f.description}'.toLowerCase();
+        final haystack =
+            '${f.name} ${f.description} ${f.category}'.toLowerCase();
         return haystack.contains(query) || haystack.contains(singular);
       }).toList();
     }
@@ -795,7 +934,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final singular = query.endsWith('s')
         ? query.substring(0, query.length - 1)
         : query;
+    // A restaurant also matches when one of its dishes is in the category
+    // (dish categories like "Beverages" are not restaurant cuisines).
+    final foods = ref.watch(homeViewModelProvider).popularFoods.value ?? const [];
+    final restaurantsWithDish = {
+      for (final f in foods)
+        if (f.category.toLowerCase().contains(singular)) f.restaurantId,
+    };
     return list.where((r) {
+      if (restaurantsWithDish.contains(r.id)) return true;
       final haystack =
           '${r.name} ${r.tags.join(' ')} ${r.restaurantTags.join(' ')}'
               .toLowerCase();

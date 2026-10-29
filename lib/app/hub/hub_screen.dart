@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 import 'package:superapp_user/app/routing/app_route_names.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
@@ -36,15 +37,15 @@ class HubScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'What do you need?',
+                      'What do you need?'.tr,
                       style: theme.textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w600,
                         letterSpacing: -0.5,
                       ),
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'Food, rides and more — one app.',
+                      'Food, rides and more — one app.'.tr,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: isDark
                             ? AppColors.textSecondaryDark
@@ -58,8 +59,9 @@ class HubScreen extends ConsumerWidget {
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
               sliver: SliverGrid(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
+                // Two tiles per row on phones, more on tablets / desktop.
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 240,
                   mainAxisSpacing: 14,
                   crossAxisSpacing: 14,
                   childAspectRatio: 1.05,
@@ -154,10 +156,12 @@ class _ModuleTile extends StatelessWidget {
                 child: Icon(module.icon, color: accent.primary, size: 24),
               ),
               Text(
-                module.label,
+                module.label.tr,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 17,
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.w600,
                   letterSpacing: -0.3,
                   color: isDark
                       ? AppColors.textPrimaryDark
@@ -188,7 +192,7 @@ class _ShortcutChip extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return ActionChip(
       avatar: Icon(icon, size: 17, color: AppColors.primary),
-      label: Text(label),
+      label: Text(label.tr),
       onPressed: () => context.push(location),
       backgroundColor: isDark ? AppColors.cardDark : AppColors.cardLight,
       side: BorderSide(

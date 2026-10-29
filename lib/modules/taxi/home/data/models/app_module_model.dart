@@ -22,16 +22,27 @@ class AppModuleModel {
   });
 
   factory AppModuleModel.fromJson(Map<String, dynamic> json) {
+    final rawActive = json['active'] ?? json['is_active'] ?? json['status'];
+    bool isActive = true;
+    if (rawActive is bool) {
+      isActive = rawActive;
+    } else if (rawActive is num) {
+      isActive = rawActive == 1;
+    } else if (rawActive is String) {
+      final s = rawActive.toLowerCase();
+      isActive = s == '1' || s == 'true' || s == 'active';
+    }
+
     return AppModuleModel(
       id: (json['id'] ?? json['_id'] ?? '').toString(),
       name: (json['name'] ?? '').toString(),
-      transportType: (json['transport_type'] ?? '').toString(),
-      serviceType: (json['service_type'] ?? '').toString(),
-      orderBy: int.tryParse('${json['order_by'] ?? 0}') ?? 0,
-      shortDescription: (json['short_description'] ?? '').toString(),
+      transportType: (json['transport_type'] ?? json['transportType'] ?? '').toString(),
+      serviceType: (json['service_type'] ?? json['serviceType'] ?? '').toString(),
+      orderBy: int.tryParse('${json['order_by'] ?? json['orderBy'] ?? 0}') ?? 0,
+      shortDescription: (json['short_description'] ?? json['shortDescription'] ?? '').toString(),
       description: (json['description'] ?? '').toString(),
-      mobileMenuIcon: (json['mobile_menu_icon'] ?? '').toString(),
-      active: (int.tryParse('${json['active'] ?? 0}') ?? 0) == 1,
+      mobileMenuIcon: (json['mobile_menu_icon'] ?? json['mobileMenuIcon'] ?? json['icon'] ?? '').toString(),
+      active: isActive,
     );
   }
 }

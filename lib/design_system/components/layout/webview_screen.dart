@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
@@ -78,7 +79,7 @@ class _WebViewScreenState extends State<WebViewScreen> {
       _controller.loadRequest(uri);
     } else {
       _hasError = true;
-      _errorMessage = 'Invalid web page URL';
+      _errorMessage = 'Invalid web page URL'.tr;
     }
   }
 
@@ -88,7 +89,7 @@ class _WebViewScreenState extends State<WebViewScreen> {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
       if (mounted) {
-        AppSnackbar.error(context, 'Could not launch external browser.');
+        AppSnackbar.error(context, 'Could not launch external browser.'.tr);
       }
     }
   }
@@ -137,11 +138,11 @@ class _WebViewScreenState extends State<WebViewScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                widget.title,
+                widget.title.tr,
                 style: TextStyle(
                   color: textColor,
                   fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
               if (hostDomain.isNotEmpty)
@@ -158,7 +159,7 @@ class _WebViewScreenState extends State<WebViewScreen> {
           actions: [
             IconButton(
               icon: Icon(Icons.refresh_rounded, color: textColor, size: 22),
-              tooltip: 'Reload',
+              tooltip: 'Reload'.tr,
               onPressed: () {
                 setState(() {
                   _hasError = false;
@@ -168,7 +169,7 @@ class _WebViewScreenState extends State<WebViewScreen> {
             ),
             IconButton(
               icon: Icon(Icons.open_in_browser_rounded, color: textColor, size: 22),
-              tooltip: 'Open in Browser',
+              tooltip: 'Open in Browser'.tr,
               onPressed: _openInExternalBrowser,
             ),
             const SizedBox(width: 4),
@@ -211,16 +212,16 @@ class _WebViewScreenState extends State<WebViewScreen> {
                       ),
                       const SizedBox(height: 20),
                       Text(
-                        'Failed to load page',
+                        'Failed to load page'.tr,
                         style: TextStyle(
                           fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: textColor,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        _errorMessage.isNotEmpty ? _errorMessage : 'Please check your internet connection and try again.',
+                        _errorMessage.isNotEmpty ? _errorMessage : 'Please check your internet connection and try again.'.tr,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 13,
@@ -238,14 +239,14 @@ class _WebViewScreenState extends State<WebViewScreen> {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
-                          foregroundColor: Colors.white,
+                          foregroundColor: Colors.black,
                           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
                         icon: const Icon(Icons.refresh_rounded, size: 18),
-                        label: const Text('Try Again', style: TextStyle(fontWeight: FontWeight.bold)),
+                        label: Text('Try Again'.tr, style: const TextStyle(fontWeight: FontWeight.w600)),
                       ),
                     ],
                   ),

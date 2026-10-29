@@ -79,11 +79,11 @@ class SmartImage extends StatelessWidget {
     return Container(
       width: width,
       height: height,
-      color: const Color(0xFFFFE9D6),
+      color: const Color(0xFFFFF8E1),
       alignment: Alignment.center,
       child: Icon(
         category == ImageCategory.food ? Icons.restaurant_rounded : Icons.storefront_rounded,
-        color: const Color(0xFFFF7A00).withValues(alpha: 0.6),
+        color: const Color(0xFFFFB800).withValues(alpha: 0.6),
         size: (width != null && width! < 40) ? width! * 0.6 : 28,
       ),
     );

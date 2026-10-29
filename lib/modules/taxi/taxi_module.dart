@@ -26,6 +26,9 @@ class TaxiModule extends AppModule {
   IconData get icon => Icons.local_taxi_rounded;
 
   @override
+  String get navIconAsset => 'assets/images/Rides.png';
+
+  @override
   ModuleAccent get accent => ModuleAccent.taxi;
 
   @override
@@ -35,7 +38,7 @@ class TaxiModule extends AppModule {
   String get entryRoute => TaxiRoutePaths.home;
 
   @override
-  int get order => 1;
+  int get order => 0;
 
   @override
   List<RouteBase> routes(GlobalKey<NavigatorState> rootNavigatorKey) =>

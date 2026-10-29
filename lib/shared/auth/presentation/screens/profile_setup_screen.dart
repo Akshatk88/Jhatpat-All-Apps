@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
 import 'package:superapp_user/design_system/components/feedback/app_snackbar.dart';
@@ -33,7 +34,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   String? _nameError;
   String? _emailError;
 
-  static const _orange = Color(0xFFFF5700);
+  static const _orange = Color(0xFFFFB800);
 
   @override
   void initState() {
@@ -55,9 +56,9 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
     final email = _emailController.text.trim();
 
     setState(() {
-      _nameError = name.length < 2 ? 'Please enter your name' : null;
+      _nameError = name.length < 2 ? 'Please enter your name'.tr : null;
       _emailError = (email.isNotEmpty && !RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email))
-          ? 'Please enter a valid email'
+          ? 'Please enter a valid email'.tr
           : null;
     });
 
@@ -85,7 +86,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
     if (!ok) {
       Haptics.error();
-      AppSnackbar.error(context, notifier.lastError ?? 'Could not save your details.');
+      AppSnackbar.error(context, notifier.lastError ?? 'Could not save your details.'.tr);
       return;
     }
 
@@ -137,12 +138,12 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
               const SizedBox(height: 20),
 
               Text(
-                'Almost there!',
-                style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: textColor),
+                'Almost there!'.tr,
+                style: TextStyle(fontSize: 26, fontWeight: FontWeight.w600, color: textColor),
               ),
               const SizedBox(height: 6),
               Text(
-                'Tell us what to call you so we can personalise your orders.',
+                'Tell us what to call you so we can personalise your orders.'.tr,
                 style: TextStyle(fontSize: 14, color: secondary, height: 1.35),
               ),
               const SizedBox(height: 28),
@@ -150,8 +151,8 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
               _field(
                 controller: _nameController,
                 focusNode: _nameFocus,
-                label: 'Full Name',
-                hint: 'e.g. Tanu Chouhan',
+                label: 'Full Name'.tr,
+                hint: 'e.g. Tanu Chouhan'.tr,
                 icon: Icons.person_outline_rounded,
                 error: _nameError,
                 isDark: isDark,
@@ -166,8 +167,8 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
               _field(
                 controller: _emailController,
                 focusNode: _emailFocus,
-                label: 'Email',
-                hint: 'Optional — for order receipts',
+                label: 'Email'.tr,
+                hint: 'Optional — for order receipts'.tr,
                 icon: Icons.mail_outline_rounded,
                 error: _emailError,
                 isDark: isDark,
@@ -195,14 +196,14 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                       ? const SizedBox(
                           width: 22,
                           height: 22,
-                          child: CircularProgressIndicator(strokeWidth: 2.4, color: Colors.white),
+                          child: CircularProgressIndicator(strokeWidth: 2.4, color: Colors.black),
                         )
-                      : const Text(
-                          'Continue',
-                          style: TextStyle(
-                            color: Colors.white,
+                      : Text(
+                          'Continue'.tr,
+                          style: const TextStyle(
+                            color: Colors.black,
                             fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             letterSpacing: 0.3,
                           ),
                         ),
@@ -233,7 +234,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: textColor)),
+        Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: textColor)),
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
@@ -252,7 +253,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
             textInputAction: textInputAction,
             onSubmitted: onSubmitted,
             inputFormatters: formatters,
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: textColor),
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: textColor),
             decoration: InputDecoration(
               hintText: hint,
               hintStyle: TextStyle(fontSize: 14, color: secondary, fontWeight: FontWeight.w400),

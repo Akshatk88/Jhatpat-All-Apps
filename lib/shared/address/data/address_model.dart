@@ -1,3 +1,5 @@
+import 'package:superapp_user/core/i18n/tr.dart';
+
 class AddressModel {
   final String id;
   final String title;
@@ -122,15 +124,15 @@ class AddressModel {
   /// at placement with a bare 400 — worth catching here, with something the
   /// user can act on, rather than firing a request that cannot succeed.
   String? get missingOrderField {
-    if (effectiveStreet.isEmpty) return 'street address';
-    if (city.trim().isEmpty) return 'city';
-    if (state.trim().isEmpty) return 'state';
+    if (effectiveStreet.isEmpty) return 'street address'.tr;
+    if (city.trim().isEmpty) return 'city'.tr;
+    if (state.trim().isEmpty) return 'state'.tr;
     // Without coordinates the order document gets a half-formed GeoJSON Point
     // (Mongoose defaults `type: 'Point'`, coordinates stay undefined) and the
     // `deliveryAddress.location` 2dsphere index refuses the insert. A delivery
     // address with no location is also undispatchable, so this is worth
     // blocking on rather than failing at the database.
-    if (latitude == null || longitude == null) return 'map location';
+    if (latitude == null || longitude == null) return 'map location'.tr;
     return null;
   }
 

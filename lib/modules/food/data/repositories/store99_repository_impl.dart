@@ -1,4 +1,5 @@
 import 'package:superapp_user/core/error/failures.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/core/network/api_response.dart';
 import 'package:superapp_user/modules/food/data/models/store99_brand.dart';
 import 'package:superapp_user/modules/food/data/models/store99_cuisine.dart';
@@ -106,7 +107,7 @@ class Store99RepositoryImpl implements Store99Repository {
     } on Failure catch (f) {
       return ApiResponse<T>.error(f.message);
     } catch (_) {
-      return ApiResponse<T>.error('Something went wrong. Please try again.');
+      return ApiResponse<T>.error('Something went wrong. Please try again.'.tr);
     }
   }
 }

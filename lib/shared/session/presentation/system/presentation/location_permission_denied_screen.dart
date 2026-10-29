@@ -1,3 +1,4 @@
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:superapp_user/shared/session/presentation/system/presentation/widgets/system_status_view.dart';
@@ -9,11 +10,11 @@ class LocationPermissionDeniedScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return SystemStatusView(
       icon: Icons.location_off_rounded,
-      title: 'Location permission needed',
-      message: 'We need access to your location to show nearby drivers, calculate fares and get you picked up accurately.',
-      primaryActionLabel: 'Open app settings',
+      title: 'Location permission needed'.tr,
+      message: 'We need access to your location to show nearby drivers, calculate fares and get you picked up accurately.'.tr,
+      primaryActionLabel: 'Open app settings'.tr,
       onPrimaryAction: () => openAppSettings(),
-      secondaryActionLabel: 'Not now',
+      secondaryActionLabel: 'Not now'.tr,
       onSecondaryAction: () => Navigator.of(context).maybePop(),
     );
   }

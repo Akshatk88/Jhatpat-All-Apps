@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
 import 'package:superapp_user/design_system/components/feedback/app_snackbar.dart';
@@ -118,7 +119,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
 
     final enteredOtp = _enteredOtp;
     if (enteredOtp.length < 4) {
-      _showSnackBar(AppSnackbarType.warning, 'Please enter the 4-digit code');
+      _showSnackBar(AppSnackbarType.warning, 'Please enter the 4-digit code'.tr);
       return;
     }
 
@@ -142,7 +143,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     if (session == null) {
       // Failure path: no session was created, no auth state changed, no
       // navigation — the user stays a guest.
-      _showSnackBar(AppSnackbarType.error, notifier.lastError ?? 'Invalid OTP. Please try again.');
+      _showSnackBar(AppSnackbarType.error, notifier.lastError ?? 'Invalid OTP. Please try again.'.tr);
       Haptics.error();
       for (final c in _controllers) {
         c.clear();
@@ -170,10 +171,16 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
       return;
     }
 
-    if (Navigator.of(context).canPop()) {
-      Navigator.of(context).popUntil((route) => route.isFirst);
+    // Grab the router BEFORE popping: popUntil removes this OtpScreen, and its
+    // context is then deactivated — calling context.go on it threw ("looking
+    // up a deactivated widget's ancestor"), the navigation never happened and
+    // the user was left on a blank screen after logging in again.
+    final router = GoRouter.of(context);
+    final navigator = Navigator.of(context);
+    if (navigator.canPop()) {
+      navigator.popUntil((route) => route.isFirst);
     }
-    context.go(target);
+    router.go(target);
   }
 
   void _handleResendOtp() async {
@@ -184,12 +191,12 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     if (!result.ok) {
       _showSnackBar(
         AppSnackbarType.error,
-        ref.read(authViewModelProvider.notifier).lastError ?? 'Could not resend OTP.',
+        ref.read(authViewModelProvider.notifier).lastError ?? 'Could not resend OTP.'.tr,
       );
       return;
     }
     _startResendTimer();
-    _showSnackBar(AppSnackbarType.success, 'New OTP code sent to +91 ${widget.phoneNumber}');
+    _showSnackBar(AppSnackbarType.success, 'New OTP code sent to +91 {phone}'.trArgs({'phone': widget.phoneNumber}));
   }
 
   void _showSnackBar(AppSnackbarType type, String msg) {
@@ -262,16 +269,16 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Verify OTP 🔒',
+                      'Verify OTP 🔒'.tr,
                       style: TextStyle(
                         fontSize: 24,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                         color: textColor,
                       ),
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'Enter the 4-digit code sent to +91 ${widget.phoneNumber}',
+                      'Enter the 4-digit code sent to +91 {phone}'.trArgs({'phone': widget.phoneNumber}),
                       style: TextStyle(fontSize: 13.5, color: secondaryColor, height: 1.3),
                     ),
                   ],
@@ -298,14 +305,14 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                           color: isFocused
-                              ? const Color(0xFFFF5700)
+                              ? const Color(0xFFFFB800)
                               : (isDark ? AppColors.borderDark : const Color(0xFFE0E0E0)),
                           width: isFocused ? 1.8 : 1.0,
                         ),
                         boxShadow: isFocused
                             ? [
                                 BoxShadow(
-                                  color: const Color(0xFFFF5700).withValues(alpha: 0.15),
+                                  color: const Color(0xFFFFB800).withValues(alpha: 0.15),
                                   blurRadius: 10,
                                   offset: const Offset(0, 3),
                                 ),
@@ -319,10 +326,10 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                           keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
                           maxLength: 1,
-                          cursorColor: const Color(0xFFFF5700),
+                          cursorColor: const Color(0xFFFFB800),
                           style: TextStyle(
                             fontSize: 22,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: textColor,
                           ),
                           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -369,14 +376,14 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                         ? const SizedBox(
                             width: 22,
                             height: 22,
-                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                            child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2.5),
                           )
-                        : const Text(
-                            'Verify & Continue',
-                            style: TextStyle(
-                              color: Colors.white,
+                        : Text(
+                            'Verify & Continue'.tr,
+                            style: const TextStyle(
+                              color: Colors.black,
                               fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w600,
                               letterSpacing: 0.5,
                             ),
                           ),
@@ -391,27 +398,27 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Didn\'t receive OTP? ',
+                    'Didn\'t receive OTP? '.tr,
                     style: TextStyle(fontSize: 13.5, color: secondaryColor),
                   ),
                   if (_resendCountdown > 0)
                     Text(
-                      'Resend in ${_resendCountdown}s',
+                      'Resend in {s}s'.trArgs({'s': _resendCountdown}),
                       style: TextStyle(
                         fontSize: 13.5,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFFE5A600),
                       ),
                     )
                   else
                     TextButton(
                       onPressed: _handleResendOtp,
                       child: Text(
-                        'Resend OTP',
+                        'Resend OTP'.tr,
                         style: TextStyle(
                           fontSize: 13.5,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFFE5A600),
                         ),
                       ),
                     ),

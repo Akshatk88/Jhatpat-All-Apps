@@ -35,7 +35,7 @@ class EmptyStateWidget extends StatelessWidget {
             title,
             style: TextStyle(
               fontSize: 20,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
               color: Theme.of(context).textTheme.bodyLarge?.color,
             ),
           ),

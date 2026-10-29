@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
 import 'package:superapp_user/design_system/components/feedback/app_snackbar.dart';
@@ -80,13 +81,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
     final phone = _phoneController.text.trim().replaceAll(RegExp(r'\D'), '');
 
     if (phone.length < 10) {
-      _showErrorSnackBar('Please enter a valid 10-digit mobile number');
+      _showErrorSnackBar('Please enter a valid 10-digit mobile number'.tr);
       return;
     }
 
     final name = _nameController.text.trim();
     if (_isNewUserMode && name.length < 2) {
-      _showErrorSnackBar('Please enter your full name');
+      _showErrorSnackBar('Please enter your full name'.tr);
       return;
     }
 
@@ -100,7 +101,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
 
     if (!result.ok) {
       _showErrorSnackBar(
-        ref.read(authViewModelProvider.notifier).lastError ?? 'Could not send OTP. Please try again.',
+        ref.read(authViewModelProvider.notifier).lastError ?? 'Could not send OTP. Please try again.'.tr,
       );
       return;
     }
@@ -157,11 +158,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFF5700),
+                    color: const Color(0xFFFFB800),
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFFF5700).withValues(alpha: 0.35),
+                        color: const Color(0xFFFFB800).withValues(alpha: 0.35),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -169,7 +170,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                   ),
                   child: const Icon(
                     Icons.verified_user_rounded,
-                    color: Colors.white,
+                    color: Colors.black,
                     size: 26,
                   ),
                 ),
@@ -181,11 +182,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                 child: Column(
                   children: [
                     Text(
-                      _isNewUserMode ? 'Complete your Profile' : 'Enter your phone number',
+                      _isNewUserMode ? 'Complete your Profile'.tr : 'Enter your phone number'.tr,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 22,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                         color: textColor,
                         letterSpacing: -0.2,
                       ),
@@ -193,8 +194,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                     const SizedBox(height: 8),
                     Text(
                       _isNewUserMode
-                          ? 'Enter your name to register your account with +91 ${_phoneController.text.trim()}'
-                          : 'We will send a 4-digit verification code to verify your phone number.',
+                          ? 'Enter your name to register your account with +91 {phone}'.trArgs({'phone': _phoneController.text.trim()})
+                          : 'We will send a 4-digit verification code to verify your phone number.'.tr,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 13.5,
@@ -221,7 +222,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                   child: _buildModernInputField(
                     controller: _nameController,
                     focusNode: _nameFocus,
-                    hintText: 'Full Name (Required)',
+                    hintText: 'Full Name (Required)'.tr,
                     icon: Icons.person_outline_rounded,
                     textColor: textColor,
                     secondaryColor: secondaryTextColor,
@@ -234,7 +235,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                   child: _buildModernInputField(
                     controller: _emailController,
                     focusNode: _emailFocus,
-                    hintText: 'Email Address (Optional)',
+                    hintText: 'Email Address (Optional)'.tr,
                     icon: Icons.email_outlined,
                     keyboardType: TextInputType.emailAddress,
                     textColor: textColor,
@@ -258,15 +259,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        _isNewUserMode ? 'Already registered? ' : 'New to Suvio? ',
+                        _isNewUserMode ? 'Already registered? '.tr : 'New to JhatPat? '.tr,
                         style: TextStyle(fontSize: 13.5, color: secondaryTextColor),
                       ),
                       Text(
-                        _isNewUserMode ? 'Sign In' : 'Create Account',
+                        _isNewUserMode ? 'Sign In'.tr : 'Create Account'.tr,
                         style: const TextStyle(
                           fontSize: 13.5,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFFFF5700),
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFFE5A600),
                         ),
                       ),
                     ],
@@ -287,11 +288,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(26),
                       gradient: const LinearGradient(
-                        colors: [Color(0xFFFF6D00), Color(0xFFFF3D00)],
+                        colors: [Color(0xFFFFB800), Color(0xFFFFC72C)],
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFFFF4500).withValues(alpha: 0.35),
+                          color: const Color(0xFFFFB800).withValues(alpha: 0.35),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -310,22 +311,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                           ? const SizedBox(
                               width: 22,
                               height: 22,
-                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                              child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2.5),
                             )
                           : Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  _isNewUserMode ? 'Continue & Send OTP' : 'Continue',
+                                  _isNewUserMode ? 'Continue & Send OTP'.tr : 'Continue'.tr,
                                   style: const TextStyle(
-                                    color: Colors.white,
+                                    color: Colors.black,
                                     fontSize: 16,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.w600,
                                     letterSpacing: 0.3,
                                   ),
                                 ),
                                 const SizedBox(width: 8),
-                                const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 20),
+                                const Icon(Icons.arrow_forward_rounded, color: Colors.black, size: 20),
                               ],
                             ),
                     ),
@@ -342,7 +343,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const Icon(Icons.shield_outlined, color: Color(0xFFFF5700), size: 16),
+                    const Icon(Icons.shield_outlined, color: Color(0xFFFFB800), size: 16),
                     const SizedBox(width: 6),
                     Expanded(
                       child: RichText(
@@ -350,19 +351,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                         text: TextSpan(
                           style: TextStyle(fontSize: 11.5, color: secondaryTextColor, height: 1.3),
                           children: [
-                            const TextSpan(text: 'By continuing, you agree to our '),
+                            TextSpan(text: 'By continuing, you agree to our '.tr),
                             TextSpan(
-                              text: 'Terms of Service',
-                              style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary),
+                              text: 'Terms of Service'.tr,
+                              style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFFE5A600)),
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () {
                                   context.push(RouteNames.termsConditions);
                                 },
                             ),
-                            const TextSpan(text: '\n& '),
+                            TextSpan(text: '\n& '.tr),
                             TextSpan(
-                              text: 'Privacy Policy',
-                              style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary),
+                              text: 'Privacy Policy'.tr,
+                              style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFFE5A600)),
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () {
                                   context.push(RouteNames.privacyPolicy);
@@ -387,11 +388,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 14.0),
                       child: Text(
-                        'OR',
+                        'OR'.tr,
                         style: TextStyle(
                           fontSize: 12,
                           color: secondaryTextColor.withValues(alpha: 0.8),
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w500,
                           letterSpacing: 0.8,
                         ),
                       ),
@@ -428,17 +429,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                               ),
                             ],
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.person_outline_rounded, color: Color(0xFFFF5700), size: 19),
-                        SizedBox(width: 8),
+                        const Icon(Icons.person_outline_rounded, color: Color(0xFFFFB800), size: 19),
+                        const SizedBox(width: 8),
                         Text(
-                          'Continue as Guest',
-                          style: TextStyle(
+                          'Continue as Guest'.tr,
+                          style: const TextStyle(
                             fontSize: 14.5,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFFFF5700),
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFFE5A600),
                           ),
                         ),
                       ],
@@ -466,8 +467,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                     ),
                     _buildTrustFeature(
                       icon: Icons.flash_on_rounded,
-                      iconColor: const Color(0xFFF57C00),
-                      bgColor: const Color(0xFFFFF3E0),
+                      iconColor: const Color(0xFFE5A600),
+                      bgColor: const Color(0xFFFFF8E1),
                       title: 'Quick & Easy',
                       subtitle: 'Get started in\njust seconds',
                       textColor: textColor,
@@ -549,12 +550,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
         color: isDark ? AppColors.cardDark : Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: const Color(0xFFFF5700),
+          color: const Color(0xFFFFB800),
           width: 1.8,
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFF5700).withValues(alpha: 0.12),
+            color: const Color(0xFFFFB800).withValues(alpha: 0.12),
             blurRadius: 14,
             offset: const Offset(0, 4),
           ),
@@ -574,7 +575,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                   '+91',
                   style: TextStyle(
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: isDark ? Colors.white : const Color(0xFF1E1E1E),
                   ),
                 ),
@@ -600,11 +601,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                 focusNode: _phoneFocus,
                 readOnly: false,
                 keyboardType: TextInputType.phone,
-                cursorColor: const Color(0xFFFF5700),
+                cursorColor: const Color(0xFFFFB800),
                 style: TextStyle(
                   color: isDark ? Colors.white : const Color(0xFF1E1E1E),
                   fontSize: 15.5,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w500,
                 ),
                 inputFormatters: [
                   FilteringTextInputFormatter.digitsOnly,
@@ -613,7 +614,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                 decoration: InputDecoration(
                   filled: false,
                   fillColor: Colors.transparent,
-                  hintText: 'Enter 10-digit mobile number',
+                  hintText: 'Enter 10-digit mobile number'.tr,
                   hintStyle: TextStyle(
                     color: isDark ? AppColors.textSecondaryDark : const Color(0xFF94A3B8),
                     fontSize: 14.5,
@@ -636,7 +637,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
             Padding(
               padding: const EdgeInsets.only(right: 8.0),
               child: IconButton(
-                icon: const Icon(Icons.edit_rounded, size: 18, color: Color(0xFFFF5700)),
+                icon: const Icon(Icons.edit_rounded, size: 18, color: Color(0xFFFFB800)),
                 onPressed: () {
                   Haptics.light();
                   setState(() => _isNewUserMode = false);
@@ -670,14 +671,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isFocused
-              ? const Color(0xFFFF5700)
+              ? const Color(0xFFFFB800)
               : (isDark ? AppColors.borderDark : const Color(0xFFE5E7EB)),
           width: 1.8,
         ),
         boxShadow: isFocused
             ? [
                 BoxShadow(
-                  color: const Color(0xFFFF5700).withValues(alpha: 0.12),
+                  color: const Color(0xFFFFB800).withValues(alpha: 0.12),
                   blurRadius: 10,
                   offset: const Offset(0, 3),
                 ),
@@ -689,11 +690,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
           controller: controller,
           focusNode: focusNode,
           keyboardType: keyboardType,
-          cursorColor: const Color(0xFFFF5700),
+          cursorColor: const Color(0xFFFFB800),
           style: TextStyle(
             color: isDark ? Colors.white : const Color(0xFF1E1E1E),
             fontSize: 15.5,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w500,
           ),
           decoration: InputDecoration(
             filled: false,
@@ -706,7 +707,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
             ),
             prefixIcon: Icon(
               icon,
-              color: isFocused ? const Color(0xFFFF5700) : secondaryColor,
+              color: isFocused ? const Color(0xFFFFB800) : secondaryColor,
               size: 20,
             ),
             border: InputBorder.none,
@@ -733,7 +734,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
     required Color textColor,
     required Color secondaryColor,
   }) {
-    return Column(
+    return Expanded(
+      child: Column(
       children: [
         Container(
           width: 44,
@@ -746,16 +748,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
         ),
         const SizedBox(height: 8),
         Text(
-          title,
-          style: const TextStyle(
+          title.tr,
+          textAlign: TextAlign.center,
+          style: TextStyle(
             fontSize: 12.5,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFFE65100),
+            fontWeight: FontWeight.w600,
+            color: textColor,
           ),
         ),
         const SizedBox(height: 3),
         Text(
-          subtitle,
+          subtitle.tr,
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 11,
@@ -764,6 +767,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
           ),
         ),
       ],
+      ),
     );
   }
 }

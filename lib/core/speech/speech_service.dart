@@ -2,6 +2,7 @@ import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:superapp_user/core/i18n/tr.dart';
 
 /// Platform service encapsulating Speech-to-Text and microphone permissions.
 class SpeechService {
@@ -71,14 +72,14 @@ class SpeechService {
       if (!hasPerm) {
         final granted = await requestPermission();
         if (!granted) {
-          onError('Microphone permission denied. Please enable it in device Settings.');
+          onError('Microphone permission denied. Please enable it in device Settings.'.tr);
           return;
         }
       }
 
       final initialized = await initialize();
       if (!initialized) {
-        onError('Voice recognition unavailable on this device/browser.');
+        onError('Voice recognition unavailable on this device/browser.'.tr);
         return;
       }
 
@@ -100,7 +101,7 @@ class SpeechService {
       );
     } catch (e, stack) {
       developer.log('[VOICE] Caught exception in startListening: $e\n$stack', name: 'VOICE');
-      onError('Unable to start speech recognition: $e');
+      onError('Unable to start speech recognition: {error}'.trArgs({'error': e}));
     }
   }
 

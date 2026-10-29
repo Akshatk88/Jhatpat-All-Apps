@@ -22,7 +22,7 @@ class TaxiPrimaryButton extends StatelessWidget {
     final disabled = onPressed == null || isLoading;
     final gradient = useAccentGradient
         ? TaxiColors.accentGradient
-        : TaxiColors.primaryGradient;
+        : const [TaxiColors.primary, TaxiColors.primaryDark];
 
     return Opacity(
       opacity: disabled ? 0.6 : 1,
@@ -56,33 +56,45 @@ class TaxiPrimaryButton extends StatelessWidget {
                         width: 22,
                         child: CircularProgressIndicator(
                           strokeWidth: 2.4,
-                          color: Colors.white,
+                          color: Colors.black,
                         ),
                       )
-                    : Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (icon != null) ...[
-                            Icon(
-                              icon,
-                              color: useAccentGradient
-                                  ? TaxiColors.primary
-                                  : Colors.white,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 8),
-                          ],
-                          Text(
-                            label,
-                            style: TextStyle(
-                              color: useAccentGradient
-                                  ? TaxiColors.primary
-                                  : Colors.white,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 16,
-                            ),
+                    // One Text.rich instead of an icon + label Row: a long
+                    // label ellipsises in a narrow slot, yet it stays safe
+                    // when a caller drops the button into a Row without
+                    // Expanded (unbounded width), where a Flexible would throw.
+                    : Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text.rich(
+                          TextSpan(
+                            children: [
+                              if (icon != null) ...[
+                                WidgetSpan(
+                                  alignment: PlaceholderAlignment.middle,
+                                  child: Icon(
+                                    icon,
+                                    color: useAccentGradient
+                                        ? TaxiColors.primary
+                                        : Colors.black,
+                                    size: 20,
+                                  ),
+                                ),
+                                const WidgetSpan(child: SizedBox(width: 8)),
+                              ],
+                              TextSpan(text: label),
+                            ],
                           ),
-                        ],
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: useAccentGradient
+                                ? TaxiColors.primary
+                                : Colors.black,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                        ),
                       ),
               ),
             ),

@@ -2,11 +2,19 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/core/utils/taxi_formatters.dart';
 import 'package:superapp_user/modules/taxi/ride/application/ride_tracking_controller.dart';
 import 'package:superapp_user/modules/taxi/ride/data/models/ride_message_model.dart';
 
+/// Rider <-> driver chat for one ride.
+///
+/// Carried over the ride's socket room: `ride:message:send { rideId, message }`
+/// out, `ride:message:new` back to everyone in the room (sender included).
+/// History is the ride document's last 30 messages, which the tracking
+/// controller loads and polls; this screen only renders that state.
 class RideChatScreen extends ConsumerStatefulWidget {
   final String rideId;
   const RideChatScreen({super.key, required this.rideId});
@@ -18,6 +26,7 @@ class RideChatScreen extends ConsumerStatefulWidget {
 class _RideChatScreenState extends ConsumerState<RideChatScreen> {
   final _messageController = TextEditingController();
   final _scrollController = ScrollController();
+  bool _didInitialScroll = false;
 
   @override
   void dispose() {
@@ -30,8 +39,40 @@ class _RideChatScreenState extends ConsumerState<RideChatScreen> {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
     final controller = ref.read(rideTrackingControllerProvider(widget.rideId).notifier);
-    controller.sendMessage(text);
-    _messageController.clear();
+    if (controller.sendMessage(text)) {
+      _messageController.clear();
+      _scrollToBottom();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Message not sent. Please try again.'.tr)),
+      );
+    }
+  }
+
+  void _scrollToBottom({bool animate = true}) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_scrollController.hasClients) return;
+      final target = _scrollController.position.maxScrollExtent;
+      if (animate) {
+        _scrollController.animateTo(
+          target,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+        );
+      } else {
+        _scrollController.jumpTo(target);
+      }
+    });
+  }
+
+  void _markSeen(List<RideMessageModel> messages) {
+    final fromDriver = messages.where((m) => !m.isFromRider).length;
+    if (fromDriver <= ref.read(rideChatSeenProvider(widget.rideId))) return;
+    // Not during build: updating another provider mid-build is not allowed.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref.read(rideChatSeenProvider(widget.rideId).notifier).markSeen(fromDriver);
+    });
   }
 
   Future<void> _callDriver(String phone) async {
@@ -40,53 +81,108 @@ class _RideChatScreenState extends ConsumerState<RideChatScreen> {
     if (await canLaunchUrl(uri)) await launchUrl(uri);
   }
 
+  String _dayLabel(DateTime day) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final that = DateTime(day.year, day.month, day.day);
+    final diff = today.difference(that).inDays;
+    if (diff == 0) return 'Today'.tr;
+    if (diff == 1) return 'Yesterday'.tr;
+    return DateFormat('d MMM yyyy').format(day);
+  }
+
   @override
   Widget build(BuildContext context) {
     final tracking = ref.watch(rideTrackingControllerProvider(widget.rideId));
     final ride = tracking.ride;
 
-    final driverName = (ride?.driver?.name.isNotEmpty == true) ? ride!.driver!.name : 'RISHI';
-    final vehicleNo = (ride?.driver?.vehicleNumber.isNotEmpty == true) ? ride!.driver!.vehicleNumber : 'DL01AD1234';
-    final vehicleType = (ride?.driver?.vehicleMake.isNotEmpty == true)
-        ? ride!.driver!.vehicleMake
-        : (ride?.vehicleType?.isNotEmpty == true ? ride!.vehicleType! : 'Bike');
-    final driverRating = (ride?.driver?.rating != null && ride!.driver!.rating > 0)
-        ? ride.driver!.rating.toStringAsFixed(1)
-        : '3.0';
-    final driverPhone = ride?.driver?.phone ?? '';
+    ref.listen(rideTrackingControllerProvider(widget.rideId), (prev, next) {
+      final before = prev?.ride?.messages.length ?? 0;
+      final after = next.ride?.messages.length ?? 0;
+      if (after > before) _scrollToBottom();
+      if (next.chatError != null && next.chatErrorSeq != (prev?.chatErrorSeq ?? 0)) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(next.chatError!)));
+      }
+    });
 
-    final messages = ride?.messages ?? <RideMessageModel>[];
+    final driver = ride?.driver;
+    final driverName = (driver?.name.isNotEmpty == true) ? driver!.name : 'Your driver'.tr;
+    final vehicleNo = driver?.vehicleNumber ?? '';
+    final vehicleType = (driver?.vehicleMake.isNotEmpty == true)
+        ? driver!.vehicleMake
+        : (ride?.vehicleType?.isNotEmpty == true ? ride!.vehicleType! : '');
+    final vehicleLine = [vehicleNo, vehicleType].where((s) => s.isNotEmpty).join(' • ');
+    final driverRating = (driver != null && driver.rating > 0) ? driver.rating.toStringAsFixed(1) : '';
+    final driverPhone = driver?.phone ?? '';
+
+    final messages = ride?.messages ?? const <RideMessageModel>[];
+    if (messages.isNotEmpty) {
+      _markSeen(messages);
+      if (!_didInitialScroll) {
+        _didInitialScroll = true;
+        _scrollToBottom(animate: false);
+      }
+    }
+
+    // Day separators between messages from different days.
+    final children = <Widget>[];
+    DateTime? lastDay;
+    for (final m in messages) {
+      final day = DateTime(m.sentAt.year, m.sentAt.month, m.sentAt.day);
+      if (lastDay == null || day != lastDay) {
+        if (lastDay != null) children.add(const SizedBox(height: 8));
+        children.add(_dayChip(_dayLabel(day)));
+        children.add(const SizedBox(height: 16));
+        lastDay = day;
+      }
+      final timeStr = Formatters.time(m.sentAt);
+      children.add(m.isFromRider
+          ? _buildOutgoingBubble(m.message, timeStr, pending: m.pending)
+          : _buildIncomingBubble(m.message, timeStr));
+    }
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF0F172A)),
-          onPressed: () => context.pop(),
+        leading: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () => context.pop(),
+          child: const Padding(
+            padding: EdgeInsets.all(12),
+            child: Icon(Icons.arrow_back, color: Color(0xFF0F172A)),
+          ),
         ),
-        title: const Text(
-          'Chat with Driver',
-          style: TextStyle(
+        title: Text(
+          'Chat with Driver'.tr,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
             color: Color(0xFF0F172A),
             fontSize: 18,
-            fontWeight: FontWeight.w900,
+            fontWeight: FontWeight.w700,
           ),
         ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: CircleAvatar(
-              radius: 20,
-              backgroundColor: const Color(0xFFF1F5F9),
-              child: IconButton(
-                icon: const Icon(Icons.call_outlined, color: Color(0xFF0F172A), size: 18),
-                onPressed: () => _callDriver(driverPhone),
+          if (driverPhone.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: CircleAvatar(
+                radius: 20,
+                backgroundColor: const Color(0xFFF1F5F9),
+                child: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: () => _callDriver(driverPhone),
+                  child: const Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Icon(Icons.call_outlined, color: Color(0xFF0F172A), size: 18),
+                  ),
+                ),
               ),
             ),
-          ),
         ],
       ),
       body: Column(
@@ -108,11 +204,13 @@ class _RideChatScreenState extends ConsumerState<RideChatScreen> {
                     shape: BoxShape.circle,
                     border: Border.all(color: const Color(0xFFE2E8F0)),
                   ),
-                  child: (ride?.driver?.profileImage != null && ride!.driver!.profileImage.isNotEmpty)
+                  child: (driver != null && driver.profileImage.isNotEmpty)
                       ? ClipOval(
                           child: CachedNetworkImage(
-                            imageUrl: ride.driver!.profileImage,
+                            imageUrl: driver.profileImage,
                             fit: BoxFit.cover,
+                            errorWidget: (_, _, _) =>
+                                const Icon(Icons.person, color: Color(0xFF0F172A), size: 24),
                           ),
                         )
                       : const Icon(Icons.person, color: Color(0xFF0F172A), size: 24),
@@ -124,39 +222,48 @@ class _RideChatScreenState extends ConsumerState<RideChatScreen> {
                     children: [
                       Text(
                         driverName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.w900,
+                          fontWeight: FontWeight.w700,
                           color: Color(0xFF0F172A),
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '$vehicleNo • $vehicleType',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF64748B),
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Row(
-                        children: [
-                          const Icon(Icons.star_rounded, size: 14, color: Color(0xFFFFB800)),
-                          const SizedBox(width: 3),
-                          Text(
-                            driverRating,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800,
-                              color: Color(0xFF0F172A),
-                            ),
+                      if (vehicleLine.isNotEmpty) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          vehicleLine,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF64748B),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
+                      if (driverRating.isNotEmpty) ...[
+                        const SizedBox(height: 2),
+                        Row(
+                          children: [
+                            const Icon(Icons.star_rounded, size: 14, color: Color(0xFFFFB800)),
+                            const SizedBox(width: 3),
+                            Text(
+                              driverRating,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF0F172A),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ],
                   ),
                 ),
+                const SizedBox(width: 8),
                 const Icon(
                   Icons.two_wheeler_rounded,
                   size: 40,
@@ -170,43 +277,35 @@ class _RideChatScreenState extends ConsumerState<RideChatScreen> {
           Expanded(
             child: ListView(
               controller: _scrollController,
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               children: [
-                // Date Chip: Today
-                Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF1F5F9),
-                      borderRadius: BorderRadius.circular(16),
+                if (tracking.isLoading && ride == null)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 32),
+                    child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                  )
+                else if (messages.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 32),
+                    child: Column(
+                      children: [
+                        const Icon(Icons.chat_bubble_outline_rounded, size: 36, color: Color(0xFF94A3B8)),
+                        const SizedBox(height: 10),
+                        Text(
+                          'No messages yet. Say hello to your driver.'.tr,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF64748B),
+                          ),
+                        ),
+                      ],
                     ),
-                    child: const Text(
-                      'Today',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF64748B),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // Mock / Dynamic Messages
-                if (messages.isEmpty) ...[
-                  // Sample Incoming Message (as seen in mockup)
-                  _buildIncomingBubble('hello', '11:01 AM'),
-                  const SizedBox(height: 12),
-                  // Sample Outgoing Message (as seen in mockup)
-                  _buildOutgoingBubble('hello', '11:04 AM'),
-                ] else
-                  ...messages.map((m) {
-                    final isUser = m.senderRole == 'user';
-                    final timeStr = Formatters.time(m.sentAt);
-                    return isUser
-                        ? _buildOutgoingBubble(m.message, timeStr)
-                        : _buildIncomingBubble(m.message, timeStr);
-                  }),
+                  )
+                else
+                  ...children,
 
                 const SizedBox(height: 24),
 
@@ -214,43 +313,43 @@ class _RideChatScreenState extends ConsumerState<RideChatScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFFF7ED),
+                    color: const Color(0xFFFFF8E1),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFFFFEDD5)),
+                    border: Border.all(color: const Color(0xFFFFE9A8)),
                   ),
                   child: Row(
                     children: [
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFFEDD5),
+                          color: const Color(0xFFFFE9A8),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(
                           Icons.verified_user_outlined,
                           size: 22,
-                          color: Color(0xFFFF5200),
+                          color: Color(0xFF121212),
                         ),
                       ),
                       const SizedBox(width: 14),
-                      const Expanded(
+                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Your safety is our priority',
-                              style: TextStyle(
+                              'Your safety is our priority'.tr,
+                              style: const TextStyle(
                                 fontSize: 14,
-                                fontWeight: FontWeight.w900,
+                                fontWeight: FontWeight.w700,
                                 color: Color(0xFF0F172A),
                               ),
                             ),
-                            SizedBox(height: 2),
+                            const SizedBox(height: 2),
                             Text(
-                              'Never share personal or payment details in chat.',
-                              style: TextStyle(
+                              'Never share personal or payment details in chat.'.tr,
+                              style: const TextStyle(
                                 fontSize: 12,
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.w500,
                                 color: Color(0xFF64748B),
                               ),
                             ),
@@ -277,58 +376,53 @@ class _RideChatScreenState extends ConsumerState<RideChatScreen> {
                 children: [
                   Expanded(
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                       decoration: BoxDecoration(
                         color: const Color(0xFFF8FAFC),
                         borderRadius: BorderRadius.circular(26),
                         border: Border.all(color: const Color(0xFFE2E8F0)),
                       ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.attach_file_rounded,
-                            size: 20,
+                      child: TextField(
+                        controller: _messageController,
+                        minLines: 1,
+                        maxLines: 4,
+                        // The ride stores at most 1000 characters per message.
+                        maxLength: 1000,
+                        textCapitalization: TextCapitalization.sentences,
+                        textInputAction: TextInputAction.send,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF0F172A),
+                        ),
+                        decoration: InputDecoration(
+                          hintText: 'Type a message...'.tr,
+                          hintStyle: const TextStyle(
+                            fontSize: 14,
                             color: Color(0xFF94A3B8),
                           ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: TextField(
-                              controller: _messageController,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Color(0xFF0F172A),
-                              ),
-                              decoration: const InputDecoration(
-                                hintText: 'Type a message...',
-                                hintStyle: TextStyle(
-                                  fontSize: 14,
-                                  color: Color(0xFF94A3B8),
-                                ),
-                                border: InputBorder.none,
-                                isDense: true,
-                                contentPadding: EdgeInsets.symmetric(vertical: 12),
-                              ),
-                              onSubmitted: (_) => _send(),
-                            ),
-                          ),
-                        ],
+                          counterText: '',
+                          border: InputBorder.none,
+                          isDense: true,
+                          contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        onSubmitted: (_) => _send(),
                       ),
                     ),
                   ),
                   const SizedBox(width: 10),
                   Material(
-                    color: const Color(0xFFFF5200),
+                    color: const Color(0xFFFFB800),
                     shape: const CircleBorder(),
                     elevation: 2,
-                    shadowColor: const Color(0x40FF5200),
+                    shadowColor: const Color(0x40FFB800),
                     child: InkWell(
                       customBorder: const CircleBorder(),
-                      onTap: _send,
+                      onTap: ride == null ? null : _send,
                       child: const Padding(
                         padding: EdgeInsets.all(12),
                         child: Icon(
                           Icons.near_me_rounded,
-                          color: Colors.white,
+                          color: Color(0xFF121212),
                           size: 20,
                         ),
                       ),
@@ -343,13 +437,33 @@ class _RideChatScreenState extends ConsumerState<RideChatScreen> {
     );
   }
 
+  Widget _dayChip(String label) {
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF1F5F9),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF64748B),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildIncomingBubble(String message, String timeStr) {
     return Align(
       alignment: Alignment.centerLeft,
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(14),
-        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
+        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: const BorderRadius.only(
@@ -374,7 +488,7 @@ class _RideChatScreenState extends ConsumerState<RideChatScreen> {
               message,
               style: const TextStyle(
                 fontSize: 14.5,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w500,
                 color: Color(0xFF0F172A),
               ),
             ),
@@ -383,7 +497,7 @@ class _RideChatScreenState extends ConsumerState<RideChatScreen> {
               timeStr,
               style: const TextStyle(
                 fontSize: 10.5,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w500,
                 color: Color(0xFF94A3B8),
               ),
             ),
@@ -393,61 +507,64 @@ class _RideChatScreenState extends ConsumerState<RideChatScreen> {
     );
   }
 
-  Widget _buildOutgoingBubble(String message, String timeStr) {
+  Widget _buildOutgoingBubble(String message, String timeStr, {bool pending = false}) {
     return Align(
       alignment: Alignment.centerRight,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(14),
-        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
-        decoration: const BoxDecoration(
-          color: Color(0xFFFF5200),
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(18),
-            topRight: Radius.circular(18),
-            bottomLeft: Radius.circular(18),
-            bottomRight: Radius.circular(4),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Color(0x33FF5200),
-              blurRadius: 6,
-              offset: Offset(0, 2),
+      child: Opacity(
+        opacity: pending ? 0.7 : 1,
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(14),
+          constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+          decoration: const BoxDecoration(
+            color: Color(0xFFFFB800),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(18),
+              topRight: Radius.circular(18),
+              bottomLeft: Radius.circular(18),
+              bottomRight: Radius.circular(4),
             ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-              message,
-              style: const TextStyle(
-                fontSize: 14.5,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Color(0x33FFB800),
+                blurRadius: 6,
+                offset: Offset(0, 2),
               ),
-            ),
-            const SizedBox(height: 4),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  timeStr,
-                  style: const TextStyle(
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white70,
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                message,
+                style: const TextStyle(
+                  fontSize: 14.5,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF121212),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    timeStr,
+                    style: const TextStyle(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black54,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 4),
-                const Icon(
-                  Icons.done_all_rounded,
-                  size: 14,
-                  color: Colors.white,
-                ),
-              ],
-            ),
-          ],
+                  const SizedBox(width: 4),
+                  Icon(
+                    pending ? Icons.schedule_rounded : Icons.done_all_rounded,
+                    size: 14,
+                    color: const Color(0xFF121212),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

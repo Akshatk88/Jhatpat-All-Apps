@@ -7,17 +7,25 @@ class NotificationsRepository {
 
   NotificationsRepository(this.api);
 
+  /// `GET /taxi/users/notifications` -> `{ results: [...] }`.
   Future<List<NotificationModel>> getNotifications() async {
     final data = await api.get(ApiConstants.notifications);
-    final results = (data is Map ? (data['results'] ?? data['notifications']) : data) as List? ?? [];
-    return results.map((e) => NotificationModel.fromJson(Map<String, dynamic>.from(e))).toList();
+    final results = (data is Map ? (data['results'] ?? data['notifications']) : data) as List? ?? const [];
+    return results
+        .whereType<Map>()
+        .map((e) => NotificationModel.fromJson(Map<String, dynamic>.from(e)))
+        .toList();
   }
 
-  Future<void> markAsRead(String id) {
-    return api.patch('${ApiConstants.notifications}/$id/read');
-  }
+  /// The backend has no per-user read state for ride notifications (only
+  /// `DELETE /notifications/:id` and `DELETE /notifications`); the old
+  /// `PATCH /:id/read` and `/read-all` calls were 404s. Kept as a no-op so the
+  /// tap handler can still open the linked ride.
+  Future<void> markAsRead(String id) async {}
 
-  Future<void> markAllAsRead() {
-    return api.patch('${ApiConstants.notifications}/read-all');
-  }
+  Future<void> markAllAsRead() async {}
+
+  Future<void> delete(String id) => api.delete('${ApiConstants.notifications}/$id');
+
+  Future<void> clearAll() => api.delete(ApiConstants.notifications);
 }

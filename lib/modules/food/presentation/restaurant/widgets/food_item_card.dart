@@ -87,7 +87,7 @@ class _FoodItemCardState extends ConsumerState<FoodItemCard> {
                     style: TextStyle(
                       color: Theme.of(context).textTheme.bodyLarge?.color,
                       fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -111,9 +111,9 @@ class _FoodItemCardState extends ConsumerState<FoodItemCard> {
                       Text(
                         '\$${food.price.toStringAsFixed(2)}',
                         style: TextStyle(
-                          color: Theme.of(context).primaryColor,
+                          color: const Color(0xFFE5A600),
                           fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       _buildAddButton(context, quantity, cartItemId),
@@ -164,7 +164,7 @@ class _FoodItemCardState extends ConsumerState<FoodItemCard> {
                   onTap: _handleFirstAdd,
                   borderRadius: BorderRadius.circular(12),
                   child: const Center(
-                    child: Icon(Icons.add, color: Colors.white, size: 20),
+                    child: Icon(Icons.add, color: Color(0xFF121212), size: 20),
                   ),
                 )
               : Row(
@@ -182,15 +182,15 @@ class _FoodItemCardState extends ConsumerState<FoodItemCard> {
                             },
                       child: const Icon(
                         Icons.remove,
-                        color: Colors.white,
+                        color: Color(0xFF121212),
                         size: 16,
                       ),
                     ),
                     Text(
                       '$quantity',
                       style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF121212),
+                        fontWeight: FontWeight.w600,
                         fontSize: 13,
                       ),
                     ),
@@ -201,7 +201,7 @@ class _FoodItemCardState extends ConsumerState<FoodItemCard> {
                       },
                       child: const Icon(
                         Icons.add,
-                        color: Colors.white,
+                        color: Color(0xFF121212),
                         size: 16,
                       ),
                     ),

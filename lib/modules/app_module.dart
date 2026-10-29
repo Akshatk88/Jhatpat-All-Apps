@@ -78,6 +78,15 @@ abstract class AppModule {
   /// hub gets its final design.
   IconData get icon;
 
+  /// Artwork for this module's tab in the service switcher.
+  ///
+  /// Empty means "no artwork" and the tab falls back to [icon], which is why
+  /// a module can ship without one. The existing three assets are named
+  /// inconsistently (`food.png`, `Rides.png`, `parcel.png`), so this is
+  /// declared per module rather than derived from [ModuleId.name] — a
+  /// convention would silently break the taxi tab.
+  String get navIconAsset => '';
+
   /// Which backend this module talks to. All four currently resolve to the
   /// single k9 host — the indirection exists so a future split (or a
   /// transitional second host) is a config change, not a refactor.

@@ -5,6 +5,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
+import 'package:superapp_user/core/i18n/language_provider.dart';
+import 'package:superapp_user/shared/settings/presentation/language_sheet.dart';
 import 'package:superapp_user/shared/auth/application/auth_providers.dart';
 import 'package:superapp_user/shared/auth/presentation/viewmodels/auth_viewmodel.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
@@ -24,7 +27,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   late TextEditingController _phoneController;
   late TextEditingController _emailController;
   DateTime _selectedDob = DateTime(2001, 1, 16);
-  String _selectedLanguage = 'English';
   
   File? _pickedImageFile;
   String? _selectedAvatarUrl;
@@ -65,14 +67,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         if (mounted) {
           AppSnackbar.success(
             context,
-            'Profile photo selected! Tap "Save Changes" to apply.',
+            'Profile photo selected! Tap "Save Changes" to apply.'.tr,
             duration: const Duration(seconds: 2),
           );
         }
       }
     } catch (e) {
       if (mounted) {
-        AppSnackbar.error(context, 'Could not access camera/gallery: $e');
+        AppSnackbar.error(context, 'Could not access camera/gallery: {error}'.trArgs({'error': e}));
       }
     }
   }
@@ -105,10 +107,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               ),
               SizedBox(height: 16.h),
               Text(
-                'Change Profile Photo 📷',
+                'Change Profile Photo 📷'.tr,
                 style: TextStyle(
                   fontSize: 17.sp,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   color: textColor,
                 ),
               ),
@@ -117,13 +119,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 leading: Container(
                   padding: EdgeInsets.all(8.r),
                   decoration: const BoxDecoration(
-                    color: Color(0xFFFFECE0),
+                    color: Color(0xFFFFF0C2),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(Icons.photo_camera_rounded, color: AppColors.primary),
                 ),
-                title: const Text('Take a Photo'),
-                subtitle: const Text('Use camera to capture photo'),
+                title: Text('Take a Photo'.tr),
+                subtitle: Text('Use camera to capture photo'.tr),
                 onTap: () {
                   Navigator.pop(ctx);
                   _pickImage(ImageSource.camera);
@@ -133,13 +135,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 leading: Container(
                   padding: EdgeInsets.all(8.r),
                   decoration: const BoxDecoration(
-                    color: Color(0xFFFFECE0),
+                    color: Color(0xFFFFF0C2),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(Icons.photo_library_rounded, color: AppColors.primary),
                 ),
-                title: const Text('Choose from Gallery'),
-                subtitle: const Text('Select photo from your gallery'),
+                title: Text('Choose from Gallery'.tr),
+                subtitle: Text('Select photo from your gallery'.tr),
                 onTap: () {
                   Navigator.pop(ctx);
                   _pickImage(ImageSource.gallery);
@@ -149,13 +151,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 leading: Container(
                   padding: EdgeInsets.all(8.r),
                   decoration: const BoxDecoration(
-                    color: Color(0xFFFFECE0),
+                    color: Color(0xFFFFF0C2),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(Icons.face_rounded, color: AppColors.primary),
                 ),
-                title: const Text('3D Character Avatar'),
-                subtitle: const Text('Use default high quality 3D avatar'),
+                title: Text('3D Character Avatar'.tr),
+                subtitle: Text('Use default high quality 3D avatar'.tr),
                 onTap: () {
                   Navigator.pop(ctx);
                   Haptics.success();
@@ -163,7 +165,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     _pickedImageFile = null;
                     _selectedAvatarUrl = 'assets/images/user_avatar_3d.png';
                   });
-                  AppSnackbar.success(context, '3D Character Avatar set!');
+                  AppSnackbar.success(context, '3D Character Avatar set!'.tr);
                 },
               ),
             ],
@@ -195,16 +197,16 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Edit Full Name ✏️',
-                  style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.bold),
+                  'Edit Full Name ✏️'.tr,
+                  style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.w600),
                 ),
                 SizedBox(height: 14.h),
                 TextField(
                   controller: tempController,
                   autofocus: true,
                   decoration: InputDecoration(
-                    labelText: 'Full Name',
-                    hintText: 'Enter your full name',
+                    labelText: 'Full Name'.tr,
+                    hintText: 'Enter your full name'.tr,
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
                   ),
                 ),
@@ -226,7 +228,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       }
                       Navigator.pop(ctx);
                     },
-                    child: const Text('Update Name', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    child: Text('Update Name'.tr, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w600)),
                   ),
                 ),
               ],
@@ -259,8 +261,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Edit Email Address ✉️',
-                  style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.bold),
+                  'Edit Email Address ✉️'.tr,
+                  style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.w600),
                 ),
                 SizedBox(height: 14.h),
                 TextField(
@@ -268,7 +270,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   keyboardType: TextInputType.emailAddress,
                   autofocus: true,
                   decoration: InputDecoration(
-                    labelText: 'Email Address',
+                    labelText: 'Email Address'.tr,
                     hintText: 'name@example.com',
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
                   ),
@@ -291,7 +293,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       }
                       Navigator.pop(ctx);
                     },
-                    child: const Text('Update Email', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    child: Text('Update Email'.tr, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w600)),
                   ),
                 ),
               ],
@@ -324,8 +326,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Edit Phone Number 📞',
-                  style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.bold),
+                  'Edit Phone Number 📞'.tr,
+                  style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.w600),
                 ),
                 SizedBox(height: 14.h),
                 TextField(
@@ -333,8 +335,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   keyboardType: TextInputType.phone,
                   autofocus: true,
                   decoration: InputDecoration(
-                    labelText: 'Mobile Number',
-                    hintText: '10-digit mobile number',
+                    labelText: 'Mobile Number'.tr,
+                    hintText: '10-digit mobile number'.tr,
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
                   ),
                 ),
@@ -356,7 +358,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       }
                       Navigator.pop(ctx);
                     },
-                    child: const Text('Update Phone', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    child: Text('Update Phone'.tr, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w600)),
                   ),
                 ),
               ],
@@ -379,7 +381,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
               primary: AppColors.primary,
-              onPrimary: Colors.white,
+              onPrimary: Colors.black,
               onSurface: Colors.black,
             ),
           ),
@@ -390,44 +392,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     if (picked != null) {
       setState(() => _selectedDob = picked);
     }
-  }
-
-  void _selectLanguageModal() {
-    Haptics.light();
-    final languages = ['English', 'Hindi (हिंदी)', 'Hinglish'];
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) {
-        final isDark = Theme.of(ctx).brightness == Brightness.dark;
-        return Container(
-          padding: EdgeInsets.all(20.r),
-          decoration: BoxDecoration(
-            color: isDark ? AppColors.surfaceDark : Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Select Language 🌐', style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.bold)),
-              SizedBox(height: 12.h),
-              ...languages.map((lang) {
-                final isSel = _selectedLanguage.contains(lang.split(' ')[0]);
-                return ListTile(
-                  title: Text(lang, style: TextStyle(fontWeight: isSel ? FontWeight.bold : FontWeight.normal)),
-                  trailing: isSel ? Icon(Icons.check_circle_rounded, color: AppColors.primary) : null,
-                  onTap: () {
-                    Haptics.light();
-                    setState(() => _selectedLanguage = lang.split(' ')[0]);
-                    Navigator.pop(ctx);
-                  },
-                );
-              }),
-            ],
-          ),
-        );
-      },
-    );
   }
 
   String _formatDate(DateTime dt) {
@@ -458,7 +422,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Could not upload your photo: $e'),
+            content: Text('Could not upload your photo: {error}'.trArgs({'error': e})),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -479,7 +443,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     if (mounted) {
       AppSnackbar.success(
         context,
-        'Profile information updated successfully! 🎉',
+        'Profile information updated successfully! 🎉'.tr,
         duration: const Duration(seconds: 2),
       );
       Navigator.of(context).pop();
@@ -515,15 +479,15 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         title: Column(
           children: [
             Text(
-              'Edit Profile',
+              'Edit Profile'.tr,
               style: TextStyle(
                 color: textColor,
                 fontSize: 18.sp,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
               ),
             ),
             Text(
-              'Update your profile information',
+              'Update your profile information'.tr,
               style: TextStyle(
                 color: secondaryTextColor,
                 fontSize: 11.5.sp,
@@ -551,9 +515,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           height: 96.r,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: const Color(0xFFFFECE0),
+                            color: const Color(0xFFFFF0C2),
                             border: Border.all(
-                              color: const Color(0xFFFFD4B8),
+                              color: const Color(0xFFFFE8A3),
                               width: 2,
                             ),
                           ),
@@ -581,7 +545,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                             child: Container(
                               padding: EdgeInsets.all(7.r),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFFF6D00),
+                                color: const Color(0xFFFFB800),
                                 shape: BoxShape.circle,
                                 border: Border.all(color: Colors.white, width: 2),
                                 boxShadow: const [
@@ -594,7 +558,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                               ),
                               child: Icon(
                                 Icons.camera_alt_rounded,
-                                color: Colors.white,
+                                color: Colors.black,
                                 size: 15.sp,
                               ),
                             ),
@@ -606,17 +570,17 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     GestureDetector(
                       onTap: _changeProfilePhoto,
                       child: Text(
-                        'Change Profile Photo',
+                        'Change Profile Photo'.tr,
                         style: TextStyle(
                           fontSize: 14.sp,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: textColor,
                         ),
                       ),
                     ),
                     SizedBox(height: 2.h),
                     Text(
-                      'JPG, PNG or WEBP. Max size 2MB',
+                      'JPG, PNG or WEBP. Max size 2MB'.tr,
                       style: TextStyle(
                         fontSize: 11.5.sp,
                         color: secondaryTextColor,
@@ -629,7 +593,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               SizedBox(height: 20.h),
 
               // 2. PERSONAL INFORMATION CARD
-              _buildSectionTitle('Personal Information', textColor),
+              _buildSectionTitle('Personal Information'.tr, textColor),
               SizedBox(height: 8.h),
               Container(
                 decoration: _cardDecoration(isDark),
@@ -638,7 +602,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     // Full Name (Editable)
                     _buildEditableRow(
                       icon: Icons.person_outline_rounded,
-                      label: 'Full Name',
+                      label: 'Full Name'.tr,
                       value: _nameController.text,
                       textColor: textColor,
                       secondaryTextColor: secondaryTextColor,
@@ -655,7 +619,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     // Mobile Number (Editable)
                     _buildEditableRow(
                       icon: Icons.phone_in_talk_rounded,
-                      label: 'Mobile Number',
+                      label: 'Mobile Number'.tr,
                       value: _phoneController.text,
                       textColor: textColor,
                       secondaryTextColor: secondaryTextColor,
@@ -679,7 +643,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     // Email Address (Editable!)
                     _buildEditableRow(
                       icon: Icons.mail_outline_rounded,
-                      label: 'Email Address',
+                      label: 'Email Address'.tr,
                       value: _emailController.text,
                       textColor: textColor,
                       secondaryTextColor: secondaryTextColor,
@@ -703,7 +667,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     // Date of Birth (Editable via DatePicker)
                     _buildEditableRow(
                       icon: Icons.calendar_today_outlined,
-                      label: 'Date of Birth',
+                      label: 'Date of Birth'.tr,
                       value: _formatDate(_selectedDob),
                       textColor: textColor,
                       secondaryTextColor: secondaryTextColor,
@@ -722,7 +686,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               SizedBox(height: 20.h),
 
               // 3. ADDRESS CARD
-              _buildSectionTitle('Address', textColor),
+              _buildSectionTitle('Address'.tr, textColor),
               SizedBox(height: 8.h),
               Container(
                 decoration: _cardDecoration(isDark),
@@ -731,7 +695,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     // Home Address
                     _buildEditableRow(
                       icon: Icons.location_on_outlined,
-                      label: 'Home Address',
+                      label: 'Home Address'.tr,
                       value: homeAddressText,
                       textColor: textColor,
                       secondaryTextColor: secondaryTextColor,
@@ -762,12 +726,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                             Container(
                               padding: EdgeInsets.all(8.r),
                               decoration: const BoxDecoration(
-                                color: Color(0xFFFFF3E0),
+                                color: Color(0xFFFFF8E1),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
                                 Icons.map_outlined,
-                                color: const Color(0xFFFF6D00),
+                                color: const Color(0xFFFFB800),
                                 size: 18.sp,
                               ),
                             ),
@@ -777,16 +741,16 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Add Work Address (Optional)',
+                                    'Add Work Address (Optional)'.tr,
                                     style: TextStyle(
                                       fontSize: 13.5.sp,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w600,
                                       color: textColor,
                                     ),
                                   ),
                                   SizedBox(height: 2.h),
                                   Text(
-                                    'Add your work address for better delivery',
+                                    'Add your work address for better delivery'.tr,
                                     style: TextStyle(
                                       fontSize: 11.sp,
                                       color: secondaryTextColor,
@@ -811,7 +775,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               SizedBox(height: 20.h),
 
               // 4. PREFERENCES CARD
-              _buildSectionTitle('Preferences', textColor),
+              _buildSectionTitle('Preferences'.tr, textColor),
               SizedBox(height: 8.h),
               Container(
                 decoration: _cardDecoration(isDark),
@@ -831,12 +795,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                             Container(
                               padding: EdgeInsets.all(8.r),
                               decoration: const BoxDecoration(
-                                color: Color(0xFFFFF3E0),
+                                color: Color(0xFFFFF8E1),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
                                 Icons.notifications_none_rounded,
-                                color: const Color(0xFFFF6D00),
+                                color: const Color(0xFFFFB800),
                                 size: 18.sp,
                               ),
                             ),
@@ -846,16 +810,16 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Notification Preferences',
+                                    'Notification Preferences'.tr,
                                     style: TextStyle(
                                       fontSize: 13.5.sp,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w600,
                                       color: textColor,
                                     ),
                                   ),
                                   SizedBox(height: 2.h),
                                   Text(
-                                    'Manage your notification settings',
+                                    'Manage your notification settings'.tr,
                                     style: TextStyle(
                                       fontSize: 11.sp,
                                       color: secondaryTextColor,
@@ -877,7 +841,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
                     // Language
                     InkWell(
-                      onTap: _selectLanguageModal,
+                      onTap: () {
+                        Haptics.light();
+                        showLanguageSheet(context);
+                      },
                       borderRadius: BorderRadius.vertical(bottom: Radius.circular(16.r)),
                       child: Padding(
                         padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
@@ -886,12 +853,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                             Container(
                               padding: EdgeInsets.all(8.r),
                               decoration: const BoxDecoration(
-                                color: Color(0xFFFFF3E0),
+                                color: Color(0xFFFFF8E1),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
                                 Icons.language_rounded,
-                                color: const Color(0xFFFF6D00),
+                                color: const Color(0xFFFFB800),
                                 size: 18.sp,
                               ),
                             ),
@@ -901,16 +868,16 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Language',
+                                    'Language'.tr,
                                     style: TextStyle(
                                       fontSize: 13.5.sp,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w600,
                                       color: textColor,
                                     ),
                                   ),
                                   SizedBox(height: 2.h),
                                   Text(
-                                    _selectedLanguage,
+                                    ref.watch(localeProvider) == 'hi' ? 'हिन्दी' : 'English',
                                     style: TextStyle(
                                       fontSize: 11.5.sp,
                                       color: secondaryTextColor,
@@ -943,17 +910,17 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   onPressed: _saveChanges,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
+                    foregroundColor: Colors.black,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24.r),
                     ),
                   ),
                   child: Text(
-                    'Save Changes',
+                    'Save Changes'.tr,
                     style: TextStyle(
                       fontSize: 15.sp,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
@@ -971,7 +938,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       title,
       style: TextStyle(
         fontSize: 14.sp,
-        fontWeight: FontWeight.bold,
+        fontWeight: FontWeight.w600,
         color: textColor,
       ),
     );
@@ -1021,10 +988,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           ),
           SizedBox(width: 4.w),
           Text(
-            'Verified',
+            'Verified'.tr,
             style: TextStyle(
               fontSize: 10.5.sp,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
               color: const Color(0xFF16A34A),
             ),
           ),
@@ -1052,12 +1019,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             Container(
               padding: EdgeInsets.all(8.r),
               decoration: const BoxDecoration(
-                color: Color(0xFFFFF3E0),
+                color: Color(0xFFFFF8E1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 icon,
-                color: const Color(0xFFFF6D00),
+                color: const Color(0xFFFFB800),
                 size: 18.sp,
               ),
             ),
@@ -1078,7 +1045,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     value,
                     style: TextStyle(
                       fontSize: 13.5.sp,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       color: textColor,
                     ),
                     maxLines: 1,

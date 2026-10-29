@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:superapp_user/app/routing/back_navigation.dart';
 import 'package:share_plus/share_plus.dart';
 
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
 import 'package:superapp_user/shared/auth/presentation/viewmodels/auth_viewmodel.dart';
 import 'package:superapp_user/design_system/components/feedback/app_snackbar.dart';
@@ -72,8 +73,8 @@ class _ReferralTicketResultScreenState
     final msg = details?.shareText.isNotEmpty == true
         ? details!.shareText
         : (details?.referralLink.isNotEmpty == true
-            ? 'Join me on Suvio Food and get $rewardStr off on your first order! ${details!.referralLink}'
-            : 'Join Suvio as a user. Use my referral code: $code');
+            ? 'Join me on JhatPat Food and get $rewardStr off on your first order! ${details!.referralLink}'
+            : 'Join JhatPat as a user. Use my referral code: $code');
 
     Haptics.medium();
     SharePlus.instance.share(ShareParams(text: msg));
@@ -94,7 +95,7 @@ class _ReferralTicketResultScreenState
           onPressed: () => context.backOr(),
         ),
         title: Text(
-          'Refer & earn',
+          'Refer & earn'.tr,
           style: TextStyle(color: Colors.white, fontSize: 16.sp),
         ),
         centerTitle: true,
@@ -106,7 +107,7 @@ class _ReferralTicketResultScreenState
               padding: EdgeInsets.all(20),
               child: SkeletonBanner(height: 300),
             ),
-            error: (e, _) => Center(child: Text('Error: $e', style: const TextStyle(color: Colors.red))),
+            error: (e, _) => Center(child: Text('Error: {error}'.trArgs({'error': e}), style: const TextStyle(color: Colors.red))),
             data: (details) {
               final code = details.referralCode.isNotEmpty
                   ? details.referralCode
@@ -126,18 +127,18 @@ class _ReferralTicketResultScreenState
                   ),
                   SizedBox(height: 8.h),
                   Text(
-                    'Earn ₹$rewardAmountStr on every referral',
+                    'Earn ₹{amount} on every referral'.trArgs({'amount': rewardAmountStr}),
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 22.sp,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   SizedBox(height: 8.h),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20.w),
                     child: Text(
-                      'Earn credits when your friend completes their first order!',
+                      'Earn credits when your friend completes their first order!'.tr,
                       textAlign: TextAlign.center,
                       style: TextStyle(color: Colors.grey[400], fontSize: 14.sp),
                     ),
@@ -146,7 +147,9 @@ class _ReferralTicketResultScreenState
                   // Ticket — tilted, with a rotating glow tracing its edge.
                   Expanded(
                     child: Center(
-                      child: AnimatedBuilder(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: AnimatedBuilder(
                         animation: _entryController,
                         builder: (context, child) => Opacity(
                           opacity: _fadeAnimation.value,
@@ -168,6 +171,7 @@ class _ReferralTicketResultScreenState
                           ),
                         ),
                       ),
+                      ),
                     ),
                   ),
 
@@ -183,15 +187,15 @@ class _ReferralTicketResultScreenState
                             onPressed: () {
                               Clipboard.setData(ClipboardData(text: code));
                               Haptics.light();
-                              AppSnackbar.success(context, 'Code $code copied!');
+                              AppSnackbar.success(context, 'Code {code} copied!'.trArgs({'code': code}));
                             },
                             icon: const Icon(Icons.copy, color: Colors.white, size: 16),
-                            label: Text('Copy code: $code', style: const TextStyle(color: Colors.white)),
+                            label: Text('Copy code: {code}'.trArgs({'code': code}), style: const TextStyle(color: Colors.white)),
                           ),
                         ],
                         SizedBox(height: 8.h),
                         Text(
-                          'You earn ₹$rewardAmountStr & your friend gets\n₹$rewardAmountStr on successful referral',
+                          'You earn ₹{amount} & your friend gets\n₹{amount} on successful referral'.trArgs({'amount': rewardAmountStr}),
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.grey[400],

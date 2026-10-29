@@ -3,17 +3,36 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
 import 'package:superapp_user/shared/search/presentation/viewmodels/search_viewmodel.dart';
 
 /// Animated modal dialog displayed during Voice Search (Mic).
 /// Returns [Future<String?>] containing the recognized query, or null if canceled.
 class VoiceSearchDialog extends ConsumerStatefulWidget {
-  const VoiceSearchDialog({super.key});
+  const VoiceSearchDialog({
+    super.key,
+    this.hint = _foodHint,
+    this.quickTerms = _foodTerms,
+  });
+
+  static const _foodHint = 'Say something like "Burger", "Pizza", or "KFC"';
+  static const _foodTerms = ['Burger', 'Pizza', 'KFC', 'Biryani', 'Paratha'];
+
+  /// Prompt under the mic before anything is recognised.
+  final String hint;
+
+  /// Fallback taps when speech is unavailable; empty hides them (e.g. when
+  /// dictating an address, where canned dish names make no sense).
+  final List<String> quickTerms;
 
   static bool _isOpen = false;
 
-  static Future<String?> show(BuildContext context) async {
+  static Future<String?> show(
+    BuildContext context, {
+    String hint = _foodHint,
+    List<String> quickTerms = _foodTerms,
+  }) async {
     if (_isOpen) return null;
     _isOpen = true;
     developer.log('[VOICE] Mic tapped', name: 'VOICE');
@@ -22,7 +41,7 @@ class VoiceSearchDialog extends ConsumerStatefulWidget {
         context: context,
         backgroundColor: Colors.transparent,
         isScrollControlled: true,
-        builder: (context) => const VoiceSearchDialog(),
+        builder: (context) => VoiceSearchDialog(hint: hint, quickTerms: quickTerms),
       );
       return result;
     } catch (e, stack) {
@@ -180,7 +199,7 @@ class _VoiceSearchDialogState extends ConsumerState<VoiceSearchDialog>
                           ),
                           child: Icon(
                             searchState.isListening ? Icons.mic : Icons.mic_none,
-                            color: Colors.white,
+                            color: Colors.black,
                             size: 32.sp,
                           ),
                         ),
@@ -194,15 +213,15 @@ class _VoiceSearchDialogState extends ConsumerState<VoiceSearchDialog>
 
             Text(
               searchState.isListening
-                  ? 'Listening...'
+                  ? 'Listening...'.tr
                   : (searchState.speechError != null
-                      ? 'Voice Search Unavailable'
+                      ? 'Voice Search Unavailable'.tr
                       : (searchState.recognizedText.isNotEmpty
-                          ? 'Recognized!'
-                          : 'Processing...')),
+                          ? 'Recognized!'.tr
+                          : 'Processing...'.tr)),
               style: TextStyle(
                 fontSize: 18.sp,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
                 color: textColor,
               ),
             ),
@@ -212,7 +231,7 @@ class _VoiceSearchDialogState extends ConsumerState<VoiceSearchDialog>
               searchState.speechError ??
                   (searchState.recognizedText.isNotEmpty
                       ? '"${searchState.recognizedText}"'
-                      : 'Say something like "Burger", "Pizza", or "KFC"'),
+                      : widget.hint.tr),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13.5.sp,
@@ -227,9 +246,9 @@ class _VoiceSearchDialogState extends ConsumerState<VoiceSearchDialog>
             SizedBox(height: 20.h),
 
             // Quick Voice Search suggestions if engine fails or for simulator testing
-            if (searchState.speechError != null) ...[
+            if (searchState.speechError != null && widget.quickTerms.isNotEmpty) ...[
               Text(
-                'Or tap a quick search query:',
+                'Or tap a quick search query:'.tr,
                 style: TextStyle(fontSize: 12.sp, color: secondaryTextColor),
               ),
               SizedBox(height: 10.h),
@@ -237,9 +256,9 @@ class _VoiceSearchDialogState extends ConsumerState<VoiceSearchDialog>
                 spacing: 8.w,
                 runSpacing: 8.h,
                 alignment: WrapAlignment.center,
-                children: ['Burger', 'Pizza', 'KFC', 'Biryani', 'Paratha'].map((term) {
+                children: widget.quickTerms.map((term) {
                   return ActionChip(
-                    label: Text(term),
+                    label: Text(term.tr),
                     labelStyle: TextStyle(fontSize: 12.sp, color: textColor),
                     backgroundColor: isDark ? AppColors.cardDark : const Color(0xFFF4F5F7),
                     onPressed: () => _simulateVoiceSearch(term),
@@ -266,10 +285,10 @@ class _VoiceSearchDialogState extends ConsumerState<VoiceSearchDialog>
                       ),
                     ),
                     child: Text(
-                      'Cancel',
+                      'Cancel'.tr,
                       style: TextStyle(
                         color: secondaryTextColor,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
@@ -287,11 +306,11 @@ class _VoiceSearchDialogState extends ConsumerState<VoiceSearchDialog>
                           borderRadius: BorderRadius.circular(16.r),
                         ),
                       ),
-                      child: const Text(
-                        'Search',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                      child: Text(
+                        'Search'.tr,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),

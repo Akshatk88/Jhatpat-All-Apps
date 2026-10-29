@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Circular countdown for a horizontal ProgressBar: grey track, green arc that
+  shrinks with the remaining time (the activity tints it red near the end).
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/background">
+        <shape
+            android:innerRadiusRatio="2.3"
+            android:shape="ring"
+            android:thicknessRatio="15"
+            android:useLevel="false">
+            <solid android:color="#D5D8DE" />
+        </shape>
+    </item>
+    <item android:id="@android:id/progress">
+        <rotate
+            android:fromDegrees="270"
+            android:pivotX="50%"
+            android:pivotY="50%"
+            android:toDegrees="270">
+            <shape
+                android:innerRadiusRatio="2.3"
+                android:shape="ring"
+                android:thicknessRatio="15"
+                android:useLevel="true">
+                <solid android:color="#1E9E5A" />
+            </shape>
+        </rotate>
+    </item>
+</layer-list>

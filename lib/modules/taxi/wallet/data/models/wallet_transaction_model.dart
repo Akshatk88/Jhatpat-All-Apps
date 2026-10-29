@@ -22,9 +22,9 @@ class WalletTransactionModel {
     final inferredType = rawAmount >= 0 ? 'credit' : 'debit';
     return WalletTransactionModel(
       id: (json['id'] ?? json['_id'] ?? '').toString(),
-      type: (json['type'] ?? inferredType).toString(),
+      type: (json['kind'] ?? json['type'] ?? inferredType).toString(),
       amount: rawAmount.abs(),
-      description: (json['description'] ?? json['note'] ?? json['reason'] ?? 'Transaction').toString(),
+      description: (json['title'] ?? json['description'] ?? json['note'] ?? json['reason'] ?? 'Transaction').toString(),
       createdAt: DateTime.tryParse('${json['createdAt'] ?? json['created_at'] ?? ''}') ?? DateTime.now(),
       status: (json['status'] ?? 'success').toString(),
     );

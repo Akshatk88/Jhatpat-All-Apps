@@ -8,7 +8,7 @@ class TaxiAppTheme {
   static ThemeData get light {
     const scheme = ColorScheme.light(
       primary: TaxiColors.primary,
-      onPrimary: Colors.white,
+      onPrimary: Colors.black,
       secondary: TaxiColors.accent,
       onSecondary: Colors.white,
       error: TaxiColors.error,
@@ -81,7 +81,7 @@ class TaxiAppTheme {
             borderRadius: BorderRadius.circular(16),
           ),
           textStyle: const TextStyle(
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w500,
             fontSize: 16,
           ),
         ),
@@ -105,7 +105,7 @@ class TaxiAppTheme {
   static ThemeData get dark {
     const scheme = ColorScheme.dark(
       primary: TaxiColors.primary,
-      onPrimary: Colors.white,
+      onPrimary: Colors.black,
       secondary: TaxiColors.primaryLight,
       onSecondary: Colors.white,
       error: TaxiColors.error,
@@ -178,7 +178,7 @@ class TaxiAppTheme {
             borderRadius: BorderRadius.circular(16),
           ),
           textStyle: const TextStyle(
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w500,
             fontSize: 16,
           ),
         ),

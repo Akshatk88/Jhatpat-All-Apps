@@ -7,6 +7,7 @@ import 'package:superapp_user/app/routing/back_navigation.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
 import 'package:superapp_user/modules/food/data/models/order_model.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
@@ -54,7 +55,7 @@ class _OrderDeliveredScreenState extends ConsumerState<OrderDeliveredScreen> {
     if (mounted) {
       setState(() => _isSubmittingRating = false);
       if (err == null) {
-        AppSnackbar.success(context, 'Thank you for rating your delivery partner!');
+        AppSnackbar.success(context, 'Thank you for rating your delivery partner!'.tr);
       } else {
         AppSnackbar.error(context, err);
       }
@@ -83,10 +84,10 @@ class _OrderDeliveredScreenState extends ConsumerState<OrderDeliveredScreen> {
         loading: () => Scaffold(
           backgroundColor: scaffoldBg,
           appBar: AppBar(
-            backgroundColor: const Color(0xFF007A3D),
+            backgroundColor: const Color(0xFFFFB800),
             elevation: 0,
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+              icon: const Icon(Icons.arrow_back_rounded, color: Colors.black),
               onPressed: () => context.backOr(),
             ),
           ),
@@ -95,16 +96,16 @@ class _OrderDeliveredScreenState extends ConsumerState<OrderDeliveredScreen> {
         error: (err, _) => Scaffold(
           backgroundColor: scaffoldBg,
           appBar: AppBar(
-            backgroundColor: const Color(0xFF007A3D),
+            backgroundColor: const Color(0xFFFFB800),
             elevation: 0,
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+              icon: const Icon(Icons.arrow_back_rounded, color: Colors.black),
               onPressed: () => context.backOr(),
             ),
           ),
           body: Center(
             child: Text(
-              'Could not load order details.',
+              'Could not load order details.'.tr,
               style: TextStyle(color: isDark ? Colors.white : AppColors.textPrimaryLight),
             ),
           ),
@@ -113,11 +114,11 @@ class _OrderDeliveredScreenState extends ConsumerState<OrderDeliveredScreen> {
           final deliveredTime = order.deliveredAt ?? order.createdAt;
           final timeStr = deliveredTime != null ? DateFormat('hh:mm a').format(deliveredTime.toLocal()) : '';
           final totalItems = order.items.fold<int>(0, (sum, i) => sum + i.quantity);
-          final itemsCountText = totalItems == 1 ? '1 Item' : '$totalItems Items';
+          final itemsCountText = totalItems == 1 ? '1 Item'.tr : '{count} Items'.trArgs({'count': totalItems});
 
           final partnerName = order.deliveryPartner?.name.isNotEmpty == true
               ? order.deliveryPartner!.name
-              : 'DELIVERY BOY';
+              : 'DELIVERY BOY'.tr;
 
           return Column(
             children: [
@@ -130,6 +131,10 @@ class _OrderDeliveredScreenState extends ConsumerState<OrderDeliveredScreen> {
 
               // SCROLLABLE BODY CONTENT BELOW HEADER (REFRESHES INDEPENDENTLY)
               Expanded(
+                // Tablets / desktop: cards stay a readable width, centred.
+                child: Center(
+                child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 720),
                 child: AppRefreshIndicator(
                   onRefresh: () async {
                     await ref.read(ordersViewModelProvider.notifier).refresh(isRefresh: true);
@@ -190,6 +195,8 @@ class _OrderDeliveredScreenState extends ConsumerState<OrderDeliveredScreen> {
                     ],
                   ),
                 ),
+                ),
+                ),
               ),
             ],
           );
@@ -214,7 +221,7 @@ class _GreenDeliveredHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
-    final titleText = order.restaurantName.isNotEmpty ? order.restaurantName : 'Suvio';
+    final titleText = order.restaurantName.isNotEmpty ? order.restaurantName : 'JhatPat';
     final subtitleText = [
       if (timeStr.isNotEmpty) timeStr,
       if (itemsCountText.isNotEmpty) itemsCountText,
@@ -224,7 +231,7 @@ class _GreenDeliveredHeader extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(16.w, topPadding + 12.h, 16.w, 36.h),
       decoration: const BoxDecoration(
-        color: Color(0xFF007A3D),
+        color: Color(0xFFFFB800),
       ),
       child: Row(
         children: [
@@ -245,9 +252,9 @@ class _GreenDeliveredHeader extends StatelessWidget {
                 Text(
                   titleText,
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Colors.black,
                     fontSize: 18.sp,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -257,7 +264,7 @@ class _GreenDeliveredHeader extends StatelessWidget {
                   Text(
                     subtitleText,
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.85),
+                      color: Colors.black87,
                       fontSize: 12.sp,
                       fontWeight: FontWeight.w500,
                     ),
@@ -288,10 +295,10 @@ class _CircleHeaderButton extends StatelessWidget {
         width: 36.w,
         height: 36.h,
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.22),
+          color: Colors.black.withValues(alpha: 0.08),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, color: Colors.white, size: 20.sp),
+        child: Icon(icon, color: Colors.black, size: 20.sp),
       ),
     );
   }
@@ -341,36 +348,40 @@ class _DeliveryRatingCard extends StatelessWidget {
           Row(
             children: [
               Text(
-                'Delivered by ',
+                'Delivered by '.tr,
                 style: TextStyle(
                   color: secondaryTextColor,
                   fontSize: 13.5.sp,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-              Text(
-                partnerName.toUpperCase(),
-                style: TextStyle(
-                  color: const Color(0xFF007A3D),
-                  fontSize: 13.5.sp,
-                  fontWeight: FontWeight.bold,
+              Flexible(
+                child: Text(
+                  partnerName.toUpperCase(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: const Color(0xFFE5A600),
+                    fontSize: 13.5.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
               SizedBox(width: 5.w),
               Icon(
                 Icons.check_circle_rounded,
-                color: const Color(0xFF007A3D),
+                color: const Color(0xFFE5A600),
                 size: 17.sp,
               ),
             ],
           ),
           SizedBox(height: 8.h),
           Text(
-            'How was your delivery experience?',
+            'How was your delivery experience?'.tr,
             style: TextStyle(
               color: primaryTextColor,
               fontSize: 16.sp,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
             ),
           ),
           SizedBox(height: 20.h),
@@ -410,31 +421,34 @@ class _DeliveryRatingCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Order not delivered?',
-                    style: TextStyle(
-                      color: secondaryTextColor,
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  SizedBox(height: 2.h),
-                  GestureDetector(
-                    onTap: onCall,
-                    child: Text(
-                      'Contact Delivery Partner',
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Order not delivered?'.tr,
                       style: TextStyle(
-                        color: const Color(0xFF007A3D),
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.bold,
+                        color: secondaryTextColor,
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                  ),
-                ],
+                    SizedBox(height: 2.h),
+                    GestureDetector(
+                      onTap: onCall,
+                      child: Text(
+                        'Contact Delivery Partner'.tr,
+                        style: TextStyle(
+                          color: const Color(0xFFE5A600),
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
+              SizedBox(width: 8.w),
               InkWell(
                 onTap: onCall,
                 borderRadius: BorderRadius.circular(16.r),
@@ -447,7 +461,7 @@ class _DeliveryRatingCard extends StatelessWidget {
                   ),
                   child: Icon(
                     Icons.call_rounded,
-                    color: const Color(0xFF007A3D),
+                    color: const Color(0xFFE5A600),
                     size: 22.sp,
                   ),
                 ),
@@ -485,11 +499,11 @@ class _OrderSummaryDottedHeader extends StatelessWidget {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 14.w),
           child: Text(
-            'ORDER SUMMARY',
+            'ORDER SUMMARY'.tr,
             style: TextStyle(
               color: isDark ? AppColors.textSecondaryDark : const Color(0xFF64748B),
               fontSize: 12.sp,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
               letterSpacing: 0.8,
             ),
           ),
@@ -524,8 +538,8 @@ class _OrderSummaryLocationsCard extends StatelessWidget {
     final secondaryTextColor = isDark ? AppColors.textSecondaryDark : const Color(0xFF64748B);
     final dividerColor = isDark ? AppColors.borderDark : const Color(0xFFF1F5F9);
 
-    final restaurantName = order.restaurantName.isNotEmpty ? order.restaurantName : 'Suvio';
-    final customerName = order.customerName.isNotEmpty ? order.customerName : 'Home';
+    final restaurantName = order.restaurantName.isNotEmpty ? order.restaurantName : 'JhatPat';
+    final customerName = order.customerName.isNotEmpty ? order.customerName : 'Home'.tr;
 
     return Container(
       width: double.infinity,
@@ -551,12 +565,12 @@ class _OrderSummaryLocationsCard extends StatelessWidget {
                 width: 44.w,
                 height: 44.h,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF007A3D).withValues(alpha: 0.1),
+                  color: const Color(0xFFFFB800).withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.storefront_rounded,
-                  color: const Color(0xFF007A3D),
+                  color: const Color(0xFFE5A600),
                   size: 22.sp,
                 ),
               ),
@@ -570,14 +584,12 @@ class _OrderSummaryLocationsCard extends StatelessWidget {
                       style: TextStyle(
                         color: primaryTextColor,
                         fontSize: 15.sp,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     SizedBox(height: 3.h),
                     Text(
-                      order.restaurantAddress.isNotEmpty
-                          ? order.restaurantAddress
-                          : 'Restaurant address details',
+                      order.restaurantAddress,
                       style: TextStyle(
                         color: secondaryTextColor,
                         fontSize: 12.sp,
@@ -604,12 +616,12 @@ class _OrderSummaryLocationsCard extends StatelessWidget {
                 width: 44.w,
                 height: 44.h,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF007A3D).withValues(alpha: 0.1),
+                  color: const Color(0xFFFFB800).withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.home_rounded,
-                  color: const Color(0xFF007A3D),
+                  color: const Color(0xFFE5A600),
                   size: 22.sp,
                 ),
               ),
@@ -619,18 +631,18 @@ class _OrderSummaryLocationsCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Delivered to $customerName',
+                      'Delivered to {name}'.trArgs({'name': customerName}),
                       style: TextStyle(
                         color: primaryTextColor,
                         fontSize: 15.sp,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     SizedBox(height: 3.h),
                     Text(
                       order.deliveryAddress.isNotEmpty
                           ? order.deliveryAddress
-                          : 'Delivery address details',
+                          : 'Delivery address details'.tr,
                       style: TextStyle(
                         color: secondaryTextColor,
                         fontSize: 12.sp,
@@ -680,12 +692,12 @@ class _DeliverySafetyCard extends StatelessWidget {
             width: 38.w,
             height: 38.h,
             decoration: const BoxDecoration(
-              color: Color(0xFF007A3D),
+              color: Color(0xFFFFB800),
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.verified_user_rounded,
-              color: Colors.white,
+              color: Colors.black,
               size: 20.sp,
             ),
           ),
@@ -693,18 +705,18 @@ class _DeliverySafetyCard extends StatelessWidget {
           Expanded(
             child: RichText(
               text: TextSpan(
-                text: 'Your order is protected with\n',
+                text: 'Your order is protected with\n'.tr,
                 style: TextStyle(
                   color: primaryTextColor,
                   fontSize: 12.5.sp,
                   height: 1.3,
                 ),
-                children: const [
+                children: [
                   TextSpan(
-                    text: 'Suvio delivery safety.',
-                    style: TextStyle(
-                      color: Color(0xFF007A3D),
-                      fontWeight: FontWeight.bold,
+                    text: 'JhatPat delivery safety.'.tr,
+                    style: const TextStyle(
+                      color: Color(0xFFE5A600),
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
@@ -714,7 +726,7 @@ class _DeliverySafetyCard extends StatelessWidget {
           SizedBox(width: 8.w),
           OutlinedButton(
             style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFF007A3D),
+              foregroundColor: const Color(0xFFE5A600),
               side: const BorderSide(color: Color(0xFFE2E8F0)),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16.r),
@@ -725,10 +737,10 @@ class _DeliverySafetyCard extends StatelessWidget {
               Haptics.light();
             },
             child: Text(
-              'Know more',
+              'Know more'.tr,
               style: TextStyle(
                 fontSize: 12.sp,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
@@ -754,7 +766,7 @@ class _ReferralBannerCard extends StatelessWidget {
         width: double.infinity,
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
         decoration: BoxDecoration(
-          color: const Color(0xFF007A3D),
+          color: const Color(0xFFFFB800),
           borderRadius: BorderRadius.circular(20.r),
         ),
         child: Row(
@@ -763,12 +775,12 @@ class _ReferralBannerCard extends StatelessWidget {
               width: 44.w,
               height: 44.h,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.2),
+                color: Colors.black.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.card_giftcard_rounded,
-                color: Colors.white,
+                color: Colors.black,
                 size: 24.sp,
               ),
             ),
@@ -778,19 +790,19 @@ class _ReferralBannerCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Refer Friends &',
+                    'Refer Friends &'.tr,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontSize: 13.sp,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                   Text(
-                    'Earn Up to ₹200',
+                    'Earn Up to ₹200'.tr,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontSize: 17.sp,
-                      fontWeight: FontWeight.w900,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ],
@@ -799,23 +811,23 @@ class _ReferralBannerCard extends StatelessWidget {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 9.h),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Colors.black,
                 borderRadius: BorderRadius.circular(20.r),
               ),
               child: Row(
                 children: [
                   Text(
-                    'Refer Now',
+                    'Refer Now'.tr,
                     style: TextStyle(
-                      color: const Color(0xFF007A3D),
+                      color: const Color(0xFFFFB800),
                       fontSize: 12.5.sp,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   SizedBox(width: 3.w),
                   Icon(
                     Icons.chevron_right_rounded,
-                    color: const Color(0xFF007A3D),
+                    color: const Color(0xFFFFB800),
                     size: 18.sp,
                   ),
                 ],

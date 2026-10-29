@@ -37,8 +37,8 @@ class FoodVariant {
     final rawId = (json['_id'] ?? json['id'])?.toString().trim();
     return FoodVariant(
       name: (json['name'] ?? '').toString(),
-      price: (json['price'] as num?)?.toDouble() ?? 0.0,
-      otherPrice: (json['otherPrice'] as num?)?.toDouble(),
+      price: num.tryParse('${json['price']}')?.toDouble() ?? 0.0,
+      otherPrice: num.tryParse('${json['otherPrice']}')?.toDouble(),
       serverId: (rawId == null || rawId.isEmpty) ? null : rawId,
     );
   }
@@ -95,7 +95,7 @@ class FoodAddon {
       id: (json['_id'] ?? json['id'] ?? '').toString(),
       name: (json['name'] ?? '').toString(),
       description: (json['description'] ?? '').toString(),
-      price: (json['price'] as num?)?.toDouble() ?? 0.0,
+      price: num.tryParse('${json['price']}')?.toDouble() ?? 0.0,
       imageUrl: ApiConfig.resolveMedia(json['image'] as String?),
       // Backend enum is lowercase 'veg' | 'non-veg'.
       isVeg: (json['foodType']?.toString().toLowerCase() ?? 'veg') != 'non-veg',

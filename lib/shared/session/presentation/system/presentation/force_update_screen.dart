@@ -1,3 +1,4 @@
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:superapp_user/design_system/components/feedback/taxi_snackbar_utils.dart';
@@ -13,7 +14,7 @@ class ForceUpdateScreen extends StatelessWidget {
   Future<void> _openStore(BuildContext context) async {
     final url = Theme.of(context).platform == TargetPlatform.iOS ? _iosStoreUrl : _androidStoreUrl;
     if (url.isEmpty) {
-      SnackbarUtils.error(context, 'App store link is not configured yet');
+      SnackbarUtils.error(context, 'App store link is not configured yet'.tr);
       return;
     }
     final uri = Uri.parse(url);
@@ -28,9 +29,9 @@ class ForceUpdateScreen extends StatelessWidget {
       canPop: false,
       child: SystemStatusView(
         icon: Icons.system_update_alt_rounded,
-        title: 'Update required',
-        message: 'A new version of the app is available with important fixes and improvements. Please update to continue.',
-        primaryActionLabel: 'Update now',
+        title: 'Update required'.tr,
+        message: 'A new version of the app is available with important fixes and improvements. Please update to continue.'.tr,
+        primaryActionLabel: 'Update now'.tr,
         onPrimaryAction: () => _openStore(context),
       ),
     );

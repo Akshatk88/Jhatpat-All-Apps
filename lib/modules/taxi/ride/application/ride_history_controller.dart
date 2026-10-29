@@ -25,9 +25,14 @@ class RideHistoryController extends Notifier<RideHistoryState> {
             category: state.category == 'all' ? null : state.category,
           );
       final results = (data['results'] as List? ?? []);
-      final rides = results
-          .map((e) => RideModel.fromJson(Map<String, dynamic>.from(e)))
-          .toList();
+      final rides = <RideModel>[];
+      for (final e in results) {
+        try {
+          if (e is Map) {
+            rides.add(RideModel.fromJson(Map<String, dynamic>.from(e)));
+          }
+        } catch (_) {}
+      }
       state = state.copyWith(
         rides: rides,
         isLoading: false,
@@ -50,9 +55,14 @@ class RideHistoryController extends Notifier<RideHistoryState> {
             category: state.category == 'all' ? null : state.category,
           );
       final results = (data['results'] as List? ?? []);
-      final rides = results
-          .map((e) => RideModel.fromJson(Map<String, dynamic>.from(e)))
-          .toList();
+      final rides = <RideModel>[];
+      for (final e in results) {
+        try {
+          if (e is Map) {
+            rides.add(RideModel.fromJson(Map<String, dynamic>.from(e)));
+          }
+        } catch (_) {}
+      }
       state = state.copyWith(
         rides: [...state.rides, ...rides],
         isLoadingMore: false,

@@ -15,8 +15,16 @@ final homeRepositoryProvider = Provider<HomeRepository>((ref) {
   return HomeRepository(ref.watch(taxiApiClientProvider));
 });
 
-final appModulesProvider = FutureProvider<List<AppModuleModel>>((ref) {
-  return ref.watch(homeRepositoryProvider).getAppModules();
+final appModulesProvider = FutureProvider<List<AppModuleModel>>((ref) async {
+  final modules = await ref.watch(homeRepositoryProvider).getAppModules();
+  // Rental, outstation/intercity, bus and pooling were removed from the
+  // backend: drop them even if the admin's module
+  // list still has it, so no screen shows a Rental tile.
+  return modules.where((m) {
+    final type = '${m.serviceType} ${m.transportType} ${m.name}'.toLowerCase();
+    const removed = ['rental', 'outstation', 'intercity', 'bus', 'pool'];
+    return !removed.any(type.contains);
+  }).toList();
 });
 
 /// The whole catalog, fetched once and shared by every booking flow.
@@ -44,9 +52,6 @@ final setPricesProvider = FutureProvider<List<SetPriceModel>>((ref) {
   return ref.watch(homeRepositoryProvider).getSetPrices();
 });
 
-final bootstrapProvider = FutureProvider<Map<String, dynamic>>((ref) {
-  return ref.watch(homeRepositoryProvider).getBootstrap();
-});
 
 /// The rider's position, derived from the one app-wide location fix.
 ///
@@ -131,18 +136,37 @@ final nearbyDriversProvider = StreamProvider.autoDispose<List<NearbyDriver>>((re
 
   final repository = ref.watch(rideRepositoryProvider);
 
+  // The endpoint answers per vehicle type, so ask once per ride vehicle and
+  // merge (a driver appears once even if listed under two types).
+  List<String> vehicleTypeIds;
+  try {
+    vehicleTypeIds = (await ref.watch(vehicleTypesProvider.future))
+        .map((v) => v.id)
+        .where((id) => id.isNotEmpty)
+        .toList();
+  } catch (_) {
+    vehicleTypeIds = const [];
+  }
+
   Future<List<NearbyDriver>> fetch() async {
-    try {
-      final raw = await repository.getAvailableDrivers(
-        lat: position.latitude,
-        lng: position.longitude,
-      );
-      return raw.map(NearbyDriver.fromJson).whereType<NearbyDriver>().toList();
-    } catch (_) {
-      // A failed poll should leave the last known markers on screen rather
-      // than blanking the map.
-      return const [];
+    final perType = await Future.wait(vehicleTypeIds.map((typeId) async {
+      try {
+        return await repository.getAvailableDrivers(
+          lat: position.latitude,
+          lng: position.longitude,
+          vehicleTypeId: typeId,
+        );
+      } catch (_) {
+        // One failed type should not blank the others' markers.
+        return const <Map<String, dynamic>>[];
+      }
+    }));
+    final byId = <String, NearbyDriver>{};
+    for (final raw in perType.expand((list) => list)) {
+      final driver = NearbyDriver.fromJson(raw);
+      if (driver != null) byId[driver.id] = driver;
     }
+    return byId.values.toList();
   }
 
   yield await fetch();
@@ -194,6 +218,13 @@ final vehicleMarkerIconsProvider = FutureProvider<Map<String, BitmapDescriptor>>
 });
 
 final currentAddressProvider = FutureProvider<String>((ref) async {
+  // A picked saved address is shown as saved, so the pickup matches the
+  // home header instead of a re-geocoded approximation of the same point.
+  final location = await ref.watch(currentLocationProvider.future);
+  if (ref.watch(selectedLocationLabelProvider) != null &&
+      location.fullAddress.trim().isNotEmpty) {
+    return location.fullAddress.trim();
+  }
   final pos = await ref.watch(currentPositionProvider.future);
   if (pos == null) return 'Fetching location...';
   final service = ref.watch(taxiLocationServiceProvider);

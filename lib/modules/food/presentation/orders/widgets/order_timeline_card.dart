@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 import 'package:superapp_user/modules/food/data/models/order_model.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
@@ -19,7 +20,7 @@ class OrderTimelineCard extends StatelessWidget {
     // Partner name
     final partnerName = order.deliveryPartner?.name.isNotEmpty == true
         ? order.deliveryPartner!.name
-        : (order.dispatchStatus.isNotEmpty ? order.dispatchStatus : 'Delivery Partner');
+        : (order.dispatchStatus.isNotEmpty ? order.dispatchStatus : 'Delivery Partner'.tr);
 
     final statusLower = order.orderStatus.toLowerCase();
     final isDelivered = statusLower == 'delivered' || statusLower == 'completed';
@@ -65,11 +66,11 @@ class OrderTimelineCard extends StatelessWidget {
                     Text(
                       order.restaurantName.isNotEmpty
                           ? order.restaurantName
-                          : 'Restaurant Name',
+                          : 'Restaurant Name'.tr,
                       style: TextStyle(
-                        color: AppColors.primary,
+                        color: const Color(0xFFE5A600),
                         fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -79,7 +80,7 @@ class OrderTimelineCard extends StatelessWidget {
                     Text(
                       order.restaurantAddress.isNotEmpty
                           ? order.restaurantAddress
-                          : 'Restaurant address details',
+                          : 'Restaurant address details'.tr,
                       style: TextStyle(
                         color: secondaryTextColor,
                         fontSize: 13,
@@ -93,11 +94,11 @@ class OrderTimelineCard extends StatelessWidget {
                     Text(
                       order.customerName.isNotEmpty
                           ? order.customerName
-                          : 'Delivery Address',
+                          : 'Delivery Address'.tr,
                       style: TextStyle(
                         color: primaryTextColor,
                         fontSize: 15,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -107,7 +108,7 @@ class OrderTimelineCard extends StatelessWidget {
                     Text(
                       order.deliveryAddress.isNotEmpty
                           ? order.deliveryAddress
-                          : 'Delivery address details',
+                          : 'Delivery address details'.tr,
                       style: TextStyle(
                         color: secondaryTextColor,
                         fontSize: 13,
@@ -145,8 +146,8 @@ class OrderTimelineCard extends StatelessWidget {
                   children: [
                     Text(
                       isDelivered
-                          ? 'Order delivered'
-                          : 'Order status: ${order.orderStatus.toUpperCase()}',
+                          ? 'Order delivered'.tr
+                          : 'Order status: {status}'.trArgs({'status': order.orderStatus.toUpperCase()}),
                       style: TextStyle(
                         color: secondaryTextColor,
                         fontSize: 13,
@@ -156,11 +157,11 @@ class OrderTimelineCard extends StatelessWidget {
                     if (partnerName.isNotEmpty) ...[
                       const SizedBox(height: 2),
                       Text(
-                        'by ${partnerName.toUpperCase()}',
+                        'by {name}'.trArgs({'name': partnerName.toUpperCase()}),
                         style: TextStyle(
                           color: secondaryTextColor,
                           fontSize: 12,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w500,
                           letterSpacing: 0.2,
                         ),
                       ),

@@ -1,5 +1,6 @@
 import 'dart:ui' as ui;
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:superapp_user/core/maps/marker_icon_loader.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 /// Map markers for the vehicle families the backend reports on a driver
@@ -73,7 +74,10 @@ class VehicleMarkerIcons {
       return BitmapDescriptor.defaultMarker;
     }
 
-    final descriptor = BitmapDescriptor.bytes(bytes.buffer.asUint8List());
+    final descriptor = BitmapDescriptor.bytes(
+      bytes.buffer.asUint8List(),
+      width: MarkerIconLoader.markerLogicalWidth,
+    );
     _cache[family] = descriptor;
     return descriptor;
   }

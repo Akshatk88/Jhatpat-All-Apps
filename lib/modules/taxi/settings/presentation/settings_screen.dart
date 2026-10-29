@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:superapp_user/design_system/tokens/taxi_colors.dart';
 import 'package:superapp_user/design_system/components/ride/custom_app_bar.dart';
 import 'package:superapp_user/design_system/components/ride/profile_tile.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -10,26 +11,26 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Settings'),
+      appBar: CustomAppBar(title: 'Settings'.tr),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
           _Section(children: [
             ProfileTile(
               icon: Icons.notifications_outlined,
-              title: 'Notification settings',
+              title: 'Notification settings'.tr,
               onTap: () => context.push('/taxi/notifications/settings'),
             ),
             const Divider(height: 1),
             ProfileTile(
               icon: Icons.language_rounded,
-              title: 'Language',
+              title: 'Language'.tr,
               onTap: () => context.push('/taxi/language'),
             ),
             const Divider(height: 1),
             ProfileTile(
               icon: Icons.dark_mode_outlined,
-              title: 'App theme',
+              title: 'App theme'.tr,
               onTap: () => context.push('/taxi/theme'),
             ),
           ]),
@@ -37,25 +38,25 @@ class SettingsScreen extends StatelessWidget {
           _Section(children: [
             ProfileTile(
               icon: Icons.privacy_tip_outlined,
-              title: 'Privacy policy',
+              title: 'Privacy policy'.tr,
               onTap: () => context.push('/settings/legal/privacy'),
             ),
             const Divider(height: 1),
             ProfileTile(
               icon: Icons.security_rounded,
-              title: 'Security',
+              title: 'Security'.tr,
               onTap: () => context.push('/taxi/settings/security'),
             ),
             const Divider(height: 1),
             ProfileTile(
               icon: Icons.description_outlined,
-              title: 'Terms of service',
+              title: 'Terms of service'.tr,
               onTap: () => context.push('/settings/legal/terms'),
             ),
             const Divider(height: 1),
             ProfileTile(
               icon: Icons.info_outline_rounded,
-              title: 'About',
+              title: 'About'.tr,
               onTap: () => context.push('/settings/about'),
             ),
           ]),
@@ -63,7 +64,7 @@ class SettingsScreen extends StatelessWidget {
           _Section(children: [
             ProfileTile(
               icon: Icons.delete_outline_rounded,
-              title: 'Delete account',
+              title: 'Delete account'.tr,
               iconColor: TaxiColors.error,
               onTap: () => context.push('/taxi/delete-account'),
             ),

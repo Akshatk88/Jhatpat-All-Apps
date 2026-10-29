@@ -8,6 +8,7 @@ import 'package:superapp_user/design_system/components/ride/custom_bottom_sheet.
 import 'package:superapp_user/design_system/components/ride/empty_state.dart';
 import 'package:superapp_user/design_system/components/ride/primary_button.dart';
 import 'package:superapp_user/modules/taxi/home/application/saved_places_provider.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 class SavedPlacesScreen extends ConsumerWidget {
   const SavedPlacesScreen({super.key});
@@ -18,7 +19,7 @@ class SavedPlacesScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: CustomAppBar(
-        title: 'Saved places',
+        title: 'Saved places'.tr,
         actions: [
           IconButton(
             icon: const Icon(Icons.add_rounded),
@@ -29,9 +30,9 @@ class SavedPlacesScreen extends ConsumerWidget {
       body: places.isEmpty
           ? EmptyState(
               icon: Icons.bookmark_border_rounded,
-              title: 'No saved places yet',
-              message: 'Add your home, work, or favorite spots for faster booking.',
-              actionLabel: 'Add a place',
+              title: 'No saved places yet'.tr,
+              message: 'Add your home, work, or favorite spots for faster booking.'.tr,
+              actionLabel: 'Add a place'.tr,
               onAction: () => _showAddSheet(context, ref),
             )
           : ListView.builder(
@@ -48,7 +49,7 @@ class SavedPlacesScreen extends ConsumerWidget {
                             : Icons.bookmark_rounded,
                     color: TaxiColors.primary,
                   ),
-                  title: Text(place.label),
+                  title: Text(place.label.tr),
                   subtitle: Text(place.address, maxLines: 1, overflow: TextOverflow.ellipsis),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete_outline_rounded),
@@ -63,7 +64,7 @@ class SavedPlacesScreen extends ConsumerWidget {
   void _showAddSheet(BuildContext context, WidgetRef ref) {
     CustomBottomSheet.show(
       context,
-      title: 'Add a saved place',
+      title: 'Add a saved place'.tr,
       child: _AddPlaceForm(ref: ref),
     );
   }
@@ -93,28 +94,28 @@ class _AddPlaceFormState extends State<_AddPlaceForm> {
           spacing: 8,
           children: [
             ChoiceChip(
-              label: const Text('Home'),
+              label: Text('Home'.tr),
               selected: _type == 'home',
               onSelected: (_) => setState(() => _type = 'home'),
             ),
             ChoiceChip(
-              label: const Text('Work'),
+              label: Text('Work'.tr),
               selected: _type == 'work',
               onSelected: (_) => setState(() => _type = 'work'),
             ),
             ChoiceChip(
-              label: const Text('Other'),
+              label: Text('Other'.tr),
               selected: _type == 'other',
               onSelected: (_) => setState(() => _type = 'other'),
             ),
           ],
         ),
         const SizedBox(height: 16),
-        AppTextField(controller: _labelController, label: 'Label', hint: 'e.g. My apartment'),
+        AppTextField(controller: _labelController, label: 'Label'.tr, hint: 'e.g. My apartment'.tr),
         const SizedBox(height: 12),
-        AppTextField(controller: _addressController, label: 'Address', hint: 'Search or type an address'),
+        AppTextField(controller: _addressController, label: 'Address'.tr, hint: 'Search or type an address'.tr),
         const SizedBox(height: 20),
-        TaxiPrimaryButton(label: 'Save place', isLoading: _saving, onPressed: _save),
+        TaxiPrimaryButton(label: 'Save place'.tr, isLoading: _saving, onPressed: _save),
       ],
     );
   }
@@ -137,7 +138,7 @@ class _AddPlaceFormState extends State<_AddPlaceForm> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not resolve that address')),
+          SnackBar(content: Text('Could not resolve that address'.tr)),
         );
       }
     } finally {

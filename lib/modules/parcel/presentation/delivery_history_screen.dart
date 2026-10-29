@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/design_system/components/ride/custom_app_bar.dart';
 import 'package:superapp_user/design_system/components/ride/empty_state.dart';
 import 'package:superapp_user/design_system/components/ride/ride_card.dart';
@@ -14,14 +15,14 @@ class DeliveryHistoryScreen extends ConsumerWidget {
     final deliveriesAsync = ref.watch(myDeliveriesProvider);
 
     return Scaffold(
-      appBar: const CustomAppBar(title: 'My deliveries'),
+      appBar: CustomAppBar(title: 'My deliveries'.tr),
       body: deliveriesAsync.when(
         data: (deliveries) {
           if (deliveries.isEmpty) {
-            return const EmptyState(
+            return EmptyState(
               icon: Icons.local_shipping_outlined,
-              title: 'No deliveries yet',
-              message: 'Packages you send will show up here.',
+              title: 'No deliveries yet'.tr,
+              message: 'Packages you send will show up here.'.tr,
             );
           }
           return RefreshIndicator(
@@ -40,7 +41,7 @@ class DeliveryHistoryScreen extends ConsumerWidget {
                     date: ride.completedAt ?? ride.acceptedAt ?? DateTime.now(),
                     fare: ride.fare,
                     status: ride.status,
-                    vehicleType: delivery.parcel.category.isNotEmpty ? delivery.parcel.category : 'Parcel',
+                    vehicleType: delivery.parcel.category.isNotEmpty ? delivery.parcel.category : 'Parcel'.tr,
                     onTap: () => context.push('/taxi/rides/${ride.rideId}/track'),
                   ),
                 );
@@ -49,7 +50,7 @@ class DeliveryHistoryScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Could not load deliveries: $e')),
+        error: (e, _) => Center(child: Text('Could not load deliveries: {error}'.trArgs({'error': e}))),
       ),
     );
   }

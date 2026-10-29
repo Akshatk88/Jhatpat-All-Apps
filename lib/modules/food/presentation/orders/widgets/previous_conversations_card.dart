@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
 import 'package:superapp_user/modules/food/data/models/chat_model.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
@@ -35,11 +36,11 @@ class PreviousConversationsCard extends ConsumerWidget {
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 10),
           child: Text(
-            'ALL CONVERSATION THREADS',
+            'ALL CONVERSATION THREADS'.tr,
             style: TextStyle(
               color: secondaryTextColor,
               fontSize: 13,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
               letterSpacing: 0.8,
             ),
           ),
@@ -87,8 +88,8 @@ class _ConversationRow extends StatelessWidget {
   String get _title {
     if (conversation.title.isNotEmpty) return conversation.title;
     return conversation.peerRole == 'ADMIN'
-        ? 'Support conversation'
-        : 'Chat with delivery partner';
+        ? 'Support conversation'.tr
+        : 'Chat with delivery partner'.tr;
   }
 
   void _open(BuildContext context) {
@@ -98,8 +99,10 @@ class _ConversationRow extends StatelessWidget {
       extra: ChatArgs(
         orderId: conversation.orderId ?? orderId,
         peerId: conversation.peerId,
-        peerName: conversation.peerRole == 'ADMIN' ? 'Support' : 'Delivery Partner',
+        peerName: conversation.peerRole == 'ADMIN' ? 'Support'.tr : 'Delivery Partner'.tr,
         peerRole: conversation.peerRole.isEmpty ? 'ADMIN' : conversation.peerRole,
+        // Open exactly this thread rather than re-deriving it.
+        conversationId: conversation.conversationId,
       ),
     );
   }
@@ -110,7 +113,7 @@ class _ConversationRow extends StatelessWidget {
     final orderNum = conversation.orderId ?? orderId;
     final dateFormatted = created != null ? _stamp.format(created.toLocal()) : '';
 
-    final subtitle = 'Order #${orderNum.length > 15 ? orderNum.substring(orderNum.length - 15) : orderNum}${dateFormatted.isNotEmpty ? ' · $dateFormatted' : ''}';
+    final subtitle = '${'Order #{id}'.trArgs({'id': orderNum.length > 15 ? orderNum.substring(orderNum.length - 15) : orderNum})}${dateFormatted.isNotEmpty ? ' · $dateFormatted' : ''}';
 
     return InkWell(
       onTap: () => _open(context),
@@ -128,7 +131,7 @@ class _ConversationRow extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 15,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w500,
                       color: textColor,
                     ),
                   ),
@@ -147,6 +150,22 @@ class _ConversationRow extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
+            if (conversation.unread > 0) ...[
+              Container(
+                constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  conversation.unread > 99 ? '99+' : '${conversation.unread}',
+                  style: const TextStyle(color: Colors.black, fontSize: 11, fontWeight: FontWeight.w700),
+                ),
+              ),
+              const SizedBox(width: 6),
+            ],
             Icon(
               Icons.chevron_right_rounded,
               size: 22,

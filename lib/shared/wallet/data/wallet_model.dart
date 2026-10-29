@@ -1,4 +1,5 @@
 import 'package:superapp_user/core/config/api_config.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 /// A single wallet ledger row from `GET /food/user/wallet`.
 class WalletTransaction {
@@ -219,7 +220,11 @@ class CashbackSettings {
   /// settings only; never shown when disabled.
   String get bannerText {
     final value = cashbackType == 'percentage' ? '${cashbackValue.toStringAsFixed(0)}%' : '₹${cashbackValue.toStringAsFixed(0)}';
-    return 'Get $value cashback up to ₹${maxCashback.toStringAsFixed(0)} on orders above ₹${minOrderValue.toStringAsFixed(0)}';
+    return 'Get {value} cashback up to ₹{max} on orders above ₹{min}'.trArgs({
+      'value': value,
+      'max': maxCashback.toStringAsFixed(0),
+      'min': minOrderValue.toStringAsFixed(0),
+    });
   }
 
   factory CashbackSettings.fromApi(Map<String, dynamic> json) {

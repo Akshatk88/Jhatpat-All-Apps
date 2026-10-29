@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -24,8 +25,12 @@ class NearbyRestaurantsList extends ConsumerWidget {
     if (displayList.isEmpty) return const SizedBox.shrink();
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    // The two text lines under the image grow with the system font scale;
+    // reserve that extra room so the card doesn't overflow at large text.
+    final textGrowth = MediaQuery.textScalerOf(context).scale(30.sp) - 30.sp;
+
     return SizedBox(
-      height: 146.h,
+      height: 146.h + (textGrowth > 0 ? textGrowth : 0),
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -34,11 +39,11 @@ class NearbyRestaurantsList extends ConsumerWidget {
         itemBuilder: (context, index) {
           final target = displayList[index];
           final infoParts = <String>[
-            if (target.priceForOne > 0) '₹${target.priceForOne.toStringAsFixed(0)} for one',
+            if (target.priceForOne > 0) '₹{price} for one'.trArgs({'price': target.priceForOne.toStringAsFixed(0)}),
             if (target.isFreeDelivery || target.deliveryFee == 0)
-              'Free Delivery'
+              'Free Delivery'.tr
             else if (target.deliveryFee > 0)
-              '₹${target.deliveryFee.toStringAsFixed(0)} Delivery',
+              '₹{fee} Delivery'.trArgs({'fee': target.deliveryFee.toStringAsFixed(0)}),
             if (target.tags.isNotEmpty) target.tags.first,
           ];
           final info = infoParts.join(' • ');
@@ -81,7 +86,7 @@ class NearbyRestaurantsList extends ConsumerWidget {
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 9.5.sp,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
@@ -120,7 +125,7 @@ class NearbyRestaurantsList extends ConsumerWidget {
                           target.name,
                           style: TextStyle(
                             fontSize: 13.sp,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
                           ),
                           maxLines: 1,
@@ -143,7 +148,7 @@ class NearbyRestaurantsList extends ConsumerWidget {
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 9.5.sp,
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ],

@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/modules/food/application/providers/restaurant_providers.dart';
 import 'package:superapp_user/modules/food/data/models/food_model.dart';
 
@@ -8,6 +9,6 @@ final restaurantMenuProvider = FutureProvider.family<List<FoodModel>, String>((r
   if (response.isSuccess) {
     return response.data ?? [];
   } else {
-    throw Exception(response.message ?? 'Failed to load menu');
+    throw Exception(response.message ?? 'Failed to load menu'.tr);
   }
 });

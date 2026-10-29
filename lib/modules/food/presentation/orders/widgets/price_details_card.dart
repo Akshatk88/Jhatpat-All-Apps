@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/modules/food/data/models/order_model.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
 import 'package:superapp_user/modules/food/presentation/orders/widgets/gst_label.dart';
@@ -25,8 +26,8 @@ class PriceDetailsCard extends StatelessWidget {
     final totalDiscounts = order.couponDiscount + order.rewardDiscount;
 
     final paymentMethodText = order.paymentMethod.isNotEmpty
-        ? 'Paid Via ${order.paymentMethod.toUpperCase()}'
-        : 'Paid Via Online';
+        ? 'Paid Via {method}'.trArgs({'method': order.paymentMethod.toUpperCase()})
+        : 'Paid Via Online'.tr;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,11 +36,11 @@ class PriceDetailsCard extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 10),
           child: Text(
-            'BILL DETAILS',
+            'BILL DETAILS'.tr,
             style: TextStyle(
               color: secondaryTextColor,
               fontSize: 13,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
               letterSpacing: 0.8,
             ),
           ),
@@ -105,7 +106,7 @@ class PriceDetailsCard extends StatelessWidget {
                         style: TextStyle(
                           color: primaryTextColor,
                           fontSize: 14.5,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
@@ -154,7 +155,7 @@ class PriceDetailsCard extends StatelessWidget {
                   _buildBillRow(gstLabel('GST', order.itemGstRate),
                       '₹${order.itemGst.toStringAsFixed(2)}', primaryTextColor, secondaryTextColor),
                 if (order.deliveryFeeGst > 0)
-                  _buildBillRow(gstLabel('GST on Delivery Fee', order.deliveryFeeGstRate),
+                  _buildBillRow(gstLabel('GST on Delivery Fee'.tr, order.deliveryFeeGstRate),
                       '₹${order.deliveryFeeGst.toStringAsFixed(2)}', primaryTextColor, secondaryTextColor),
               ] else if (order.taxes > 0)
                 _buildBillRow('Taxes', '₹${order.taxes.toStringAsFixed(2)}', primaryTextColor, secondaryTextColor),
@@ -167,22 +168,27 @@ class PriceDetailsCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    paymentMethodText,
-                    style: TextStyle(
-                      color: secondaryTextColor,
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w500,
+                  Flexible(
+                    child: Text(
+                      paymentMethodText,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: secondaryTextColor,
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
+                  const SizedBox(width: 8),
                   Row(
                     children: [
                       Text(
-                        'Bill Total',
+                        'Bill Total'.tr,
                         style: TextStyle(
                           color: primaryTextColor,
                           fontSize: 14.5,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -191,7 +197,7 @@ class PriceDetailsCard extends StatelessWidget {
                         style: TextStyle(
                           color: primaryTextColor,
                           fontSize: 16,
-                          fontWeight: FontWeight.w900,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ],
@@ -211,14 +217,17 @@ class PriceDetailsCard extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: labelColor,
-              fontSize: 13.5,
-              fontWeight: FontWeight.w400,
+          Flexible(
+            child: Text(
+              label.tr,
+              style: TextStyle(
+                color: labelColor,
+                fontSize: 13.5,
+                fontWeight: FontWeight.w400,
+              ),
             ),
           ),
+          const SizedBox(width: 8),
           Text(
             value,
             style: TextStyle(
@@ -239,7 +248,7 @@ class PriceDetailsCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            label,
+            label.tr,
             style: TextStyle(
               color: labelColor,
               fontSize: 13.5,
@@ -263,11 +272,11 @@ class PriceDetailsCard extends StatelessWidget {
                 const SizedBox(width: 6),
               ],
               Text(
-                badgeText,
+                badgeText.tr,
                 style: TextStyle(
                   color: badgeColor,
                   fontSize: 13.5,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
 
-/// Shows a premium Material 3 Exit Confirmation Dialog for Suvio.
+/// Shows a premium Material 3 Exit Confirmation Dialog for Jhatpat.
 Future<bool?> showExitConfirmationDialog(BuildContext context) {
   Haptics.light();
   return showDialog<bool>(
@@ -50,10 +51,10 @@ Future<bool?> showExitConfirmationDialog(BuildContext context) {
               ),
               const SizedBox(height: 16),
               Text(
-                'Exit Suvio?',
+                'Exit Jhatpat?'.tr,
                 style: TextStyle(
                   fontSize: 19,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   color: textColor,
                   letterSpacing: -0.3,
                 ),
@@ -61,7 +62,7 @@ Future<bool?> showExitConfirmationDialog(BuildContext context) {
               ),
               const SizedBox(height: 8),
               Text(
-                'Are you sure you want to exit the app?',
+                'Are you sure you want to exit the app?'.tr,
                 style: TextStyle(
                   fontSize: 13.5,
                   color: secondaryTextColor,
@@ -90,10 +91,10 @@ Future<bool?> showExitConfirmationDialog(BuildContext context) {
                         Navigator.of(ctx).pop(false);
                       },
                       child: Text(
-                        'Cancel',
+                        'Cancel'.tr,
                         style: TextStyle(
                           fontSize: 14,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w500,
                           color: secondaryTextColor,
                         ),
                       ),
@@ -114,12 +115,12 @@ Future<bool?> showExitConfirmationDialog(BuildContext context) {
                         Haptics.light();
                         Navigator.of(ctx).pop(true);
                       },
-                      child: const Text(
-                        'Exit',
-                        style: TextStyle(
+                      child: Text(
+                        'Exit'.tr,
+                        style: const TextStyle(
                           fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
                         ),
                       ),
                     ),

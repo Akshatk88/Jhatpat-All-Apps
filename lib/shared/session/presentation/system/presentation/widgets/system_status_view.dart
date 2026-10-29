@@ -40,13 +40,13 @@ class SystemStatusView extends StatelessWidget {
                   gradient: LinearGradient(colors: TaxiColors.primaryGradient),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, size: 54, color: Colors.white),
+                child: Icon(icon, size: 54, color: Colors.black),
               ),
               const SizedBox(height: 28),
               Text(
                 title,
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 12),
               Text(

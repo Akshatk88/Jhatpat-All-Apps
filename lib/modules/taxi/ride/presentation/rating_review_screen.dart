@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:superapp_user/modules/taxi/ride/presentation/ride_completion_payment_sheet.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:confetti/confetti.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/core/utils/taxi_formatters.dart';
 import 'package:superapp_user/design_system/components/feedback/taxi_snackbar_utils.dart';
 import 'package:superapp_user/modules/taxi/ride/application/ride_tracking_controller.dart';
@@ -17,16 +19,19 @@ class RatingReviewScreen extends ConsumerStatefulWidget {
 }
 
 class _RatingReviewScreenState extends ConsumerState<RatingReviewScreen> {
-  int _rating = 4;
+  int _rating = 0;
   double _selectedTip = 0.0;
   final _commentController = TextEditingController();
   bool _submitting = false;
+  late ConfettiController _confettiController;
 
   final List<double> _tipOptions = [0, 10, 20, 50];
 
   @override
   void initState() {
     super.initState();
+    _confettiController = ConfettiController(duration: const Duration(seconds: 3));
+    _confettiController.play();
     // An `online` ride arrives here with the fare still uncollected — the
     // backend's complete-payment endpoints existed but nothing called them.
     WidgetsBinding.instance.addPostFrameCallback((_) => _collectFareIfDue());
@@ -48,6 +53,7 @@ class _RatingReviewScreenState extends ConsumerState<RatingReviewScreen> {
 
   @override
   void dispose() {
+    _confettiController.dispose();
     _commentController.dispose();
     super.dispose();
   }
@@ -64,7 +70,7 @@ class _RatingReviewScreenState extends ConsumerState<RatingReviewScreen> {
     if (mounted) {
       setState(() => _submitting = false);
       if (success) {
-        SnackbarUtils.success(context, 'Thank you for your feedback!');
+        SnackbarUtils.success(context, 'Thank you for your feedback!'.tr);
         context.go('/taxi');
       } else {
         context.go('/taxi');
@@ -75,24 +81,27 @@ class _RatingReviewScreenState extends ConsumerState<RatingReviewScreen> {
   void _shareReceipt(dynamic ride, String driverName, double totalFare) {
     final dateStr = Formatters.date(ride?.completedAt ?? DateTime.now());
     final fareStr = totalFare.toStringAsFixed(2);
-    final text = 'Trip Receipt\nDate: $dateStr\nDriver: $driverName\nFare: ₹$fareStr\nThank you for riding!';
+    final text = 'Trip Receipt\nDate: {date}\nDriver: {driver}\nFare: ₹{fare}\nThank you for riding!'
+        .trArgs({'date': dateStr, 'driver': driverName, 'fare': fareStr});
     Share.share(text);
   }
 
   String _getRatingFeedbackText(int rating) {
     switch (rating) {
+      case 0:
+        return '';
       case 1:
-        return 'Poor';
+        return 'Poor'.tr;
       case 2:
-        return 'Okay';
+        return 'Okay'.tr;
       case 3:
-        return 'Good';
+        return 'Good'.tr;
       case 4:
-        return 'Very Good';
+        return 'Very Good'.tr;
       case 5:
-        return 'Excellent';
+        return 'Excellent'.tr;
       default:
-        return 'Very Good';
+        return '';
     }
   }
 
@@ -101,26 +110,28 @@ class _RatingReviewScreenState extends ConsumerState<RatingReviewScreen> {
     final ride = ref.watch(rideTrackingControllerProvider(widget.rideId)).ride;
 
     final completedDate = ride?.completedAt ?? ride?.scheduledAt ?? ride?.acceptedAt ?? DateTime.now();
-    final pickup = (ride?.pickupAddress.isNotEmpty == true) ? ride!.pickupAddress : '17/C, New Palasia, Indore';
+    final pickup = (ride?.pickupAddress.isNotEmpty == true) ? ride!.pickupAddress : 'Pickup location'.tr;
     final drop = (ride?.dropAddress.isNotEmpty == true)
         ? ride!.dropAddress
-        : 'Chitawad Rd, Near Shani Mandir, Pavanpuri Colony, Indore';
-    final driverName = (ride?.driver?.name.isNotEmpty == true) ? ride!.driver!.name : 'RISHI';
-    final vehicleNo = (ride?.driver?.vehicleNumber.isNotEmpty == true) ? ride!.driver!.vehicleNumber : 'DL01AD1234';
+        : 'Drop location'.tr;
+    final driverName = (ride?.driver?.name.isNotEmpty == true) ? ride!.driver!.name : 'Your driver'.tr;
+    final vehicleNo = (ride?.driver?.vehicleNumber.isNotEmpty == true) ? ride!.driver!.vehicleNumber : '';
     final vehicleType = (ride?.driver?.vehicleMake.isNotEmpty == true)
         ? ride!.driver!.vehicleMake
         : (ride?.vehicleType?.isNotEmpty == true ? ride!.vehicleType! : 'Bike');
     final driverRating = (ride?.driver?.rating != null && ride!.driver!.rating > 0)
         ? ride.driver!.rating.toStringAsFixed(1)
-        : '3.0';
-    final baseFare = (ride?.fare != null && ride!.fare > 0) ? ride.fare : 32.0;
+        : 'New'.tr;
+    final baseFare = (ride?.fare != null && ride!.fare > 0) ? ride.fare : 0.0;
     final totalFare = baseFare + _selectedTip;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      body: Stack(
+        children: [
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           child: Column(
             children: [
               // --- TOP CONFETTI & CHECKMARK HEADER ---
@@ -149,21 +160,21 @@ class _RatingReviewScreenState extends ConsumerState<RatingReviewScreen> {
                       ),
                     ),
                     const SizedBox(height: 14),
-                    const Text(
-                      'You have arrived!',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w900,
+                    Text(
+                      'You have arrived!'.tr,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
                         color: Color(0xFF0F172A),
                         letterSpacing: -0.5,
                       ),
                     ),
                     const SizedBox(height: 4),
-                    const Text(
-                      'Thanks for riding with us 👋',
-                      style: TextStyle(
-                        fontSize: 13.5,
-                        fontWeight: FontWeight.w600,
+                    Text(
+                      'Thanks for riding with us 👋'.tr,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
                         color: Color(0xFF64748B),
                       ),
                     ),
@@ -197,18 +208,18 @@ class _RatingReviewScreenState extends ConsumerState<RatingReviewScreen> {
                         const Icon(
                           Icons.calendar_today_outlined,
                           size: 20,
-                          color: Color(0xFFF97316),
+                          color: Color(0xFFE5A600),
                         ),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Trip Receipt',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w900,
+                              Text(
+                                'Trip Receipt'.tr,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
                                   color: Color(0xFF0F172A),
                                 ),
                               ),
@@ -216,8 +227,8 @@ class _RatingReviewScreenState extends ConsumerState<RatingReviewScreen> {
                               Text(
                                 '${Formatters.date(completedDate)} • ${Formatters.time(completedDate)}',
                                 style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
                                   color: Color(0xFF64748B),
                                 ),
                               ),
@@ -233,16 +244,16 @@ class _RatingReviewScreenState extends ConsumerState<RatingReviewScreen> {
                               color: const Color(0xFFF1F5F9),
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            child: const Row(
+                            child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.share_outlined, size: 14, color: Color(0xFF0F172A)),
-                                SizedBox(width: 5),
+                                const Icon(Icons.share_outlined, size: 14, color: Color(0xFF0F172A)),
+                                const SizedBox(width: 5),
                                 Text(
-                                  'Share',
-                                  style: TextStyle(
-                                    fontSize: 12.5,
-                                    fontWeight: FontWeight.w800,
+                                  'Share'.tr,
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
                                     color: Color(0xFF0F172A),
                                   ),
                                 ),
@@ -289,8 +300,8 @@ class _RatingReviewScreenState extends ConsumerState<RatingReviewScreen> {
                                 Text(
                                   driverName,
                                   style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w900,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
                                     color: Color(0xFF0F172A),
                                   ),
                                 ),
@@ -298,8 +309,8 @@ class _RatingReviewScreenState extends ConsumerState<RatingReviewScreen> {
                                 Text(
                                   '$vehicleNo • $vehicleType',
                                   style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w500,
                                     color: Color(0xFF64748B),
                                   ),
                                 ),
@@ -311,8 +322,8 @@ class _RatingReviewScreenState extends ConsumerState<RatingReviewScreen> {
                                     Text(
                                       driverRating,
                                       style: const TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w800,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w600,
                                         color: Color(0xFF0F172A),
                                       ),
                                     ),
@@ -356,8 +367,8 @@ class _RatingReviewScreenState extends ConsumerState<RatingReviewScreen> {
                                 child: Text(
                                   pickup,
                                   style: const TextStyle(
-                                    fontSize: 13.5,
-                                    fontWeight: FontWeight.w700,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
                                     color: Color(0xFF0F172A),
                                   ),
                                   maxLines: 1,
@@ -371,11 +382,11 @@ class _RatingReviewScreenState extends ConsumerState<RatingReviewScreen> {
                                   color: const Color(0xFFDCFCE7),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
-                                child: const Text(
-                                  'PICKUP',
-                                  style: TextStyle(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w900,
+                                child: Text(
+                                  'PICKUP'.tr,
+                                  style: const TextStyle(
+                                    fontSize: 8,
+                                    fontWeight: FontWeight.w700,
                                     color: Color(0xFF15803D),
                                     letterSpacing: 0.5,
                                   ),
@@ -402,7 +413,7 @@ class _RatingReviewScreenState extends ConsumerState<RatingReviewScreen> {
                                 width: 10,
                                 height: 10,
                                 decoration: const BoxDecoration(
-                                  color: Color(0xFFF97316),
+                                  color: Color(0xFFE5A600),
                                   shape: BoxShape.circle,
                                 ),
                               ),
@@ -412,7 +423,7 @@ class _RatingReviewScreenState extends ConsumerState<RatingReviewScreen> {
                                   drop,
                                   style: const TextStyle(
                                     fontSize: 13.5,
-                                    fontWeight: FontWeight.w700,
+                                    fontWeight: FontWeight.w600,
                                     color: Color(0xFF0F172A),
                                   ),
                                   maxLines: 1,
@@ -423,15 +434,15 @@ class _RatingReviewScreenState extends ConsumerState<RatingReviewScreen> {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFFFEDD5),
+                                  color: const Color(0xFFFFF8E1),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
-                                child: const Text(
-                                  'DROP',
-                                  style: TextStyle(
+                                child: Text(
+                                  'DROP'.tr,
+                                  style: const TextStyle(
                                     fontSize: 9,
-                                    fontWeight: FontWeight.w900,
-                                    color: Color(0xFFC2410C),
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFF121212),
                                     letterSpacing: 0.5,
                                   ),
                                 ),
@@ -447,19 +458,19 @@ class _RatingReviewScreenState extends ConsumerState<RatingReviewScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'Base fare',
-                          style: TextStyle(
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.w600,
+                        Text(
+                          'Base fare'.tr,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
                             color: Color(0xFF64748B),
                           ),
                         ),
                         Text(
                           '₹${baseFare.toStringAsFixed(2)}',
                           style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w800,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
                             color: Color(0xFF0F172A),
                           ),
                         ),
@@ -469,19 +480,19 @@ class _RatingReviewScreenState extends ConsumerState<RatingReviewScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'Tip',
-                          style: TextStyle(
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.w600,
+                        Text(
+                          'Tip'.tr,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
                             color: Color(0xFF64748B),
                           ),
                         ),
                         Text(
                           '₹${_selectedTip.toStringAsFixed(2)}',
                           style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w800,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
                             color: Color(0xFF0F172A),
                           ),
                         ),
@@ -496,20 +507,20 @@ class _RatingReviewScreenState extends ConsumerState<RatingReviewScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'Total Amount',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w900,
+                        Text(
+                          'Total Amount'.tr,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
                             color: Color(0xFF0F172A),
                           ),
                         ),
                         Text(
                           '₹${totalFare.toStringAsFixed(2)}',
                           style: const TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w900,
-                            color: Color(0xFFFF5200),
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF121212),
                           ),
                         ),
                       ],
@@ -538,20 +549,20 @@ class _RatingReviewScreenState extends ConsumerState<RatingReviewScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Tip your driver',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w900,
+                    Text(
+                      'Tip your driver'.tr,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
                         color: Color(0xFF0F172A),
                       ),
                     ),
                     const SizedBox(height: 2),
-                    const Text(
-                      'Thank your driver with a tip',
-                      style: TextStyle(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w600,
+                    Text(
+                      'Thank your driver with a tip'.tr,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
                         color: Color(0xFF64748B),
                       ),
                     ),
@@ -562,7 +573,7 @@ class _RatingReviewScreenState extends ConsumerState<RatingReviewScreen> {
                       children: [
                         ..._tipOptions.map((amount) {
                           final isSelected = _selectedTip == amount;
-                          final label = amount == 0 ? 'No tip' : '₹${amount.toInt()}';
+                          final label = amount == 0 ? 'No tip'.tr : '₹${amount.toInt()}';
                           return Expanded(
                             child: Padding(
                               padding: const EdgeInsets.only(right: 6),
@@ -573,19 +584,19 @@ class _RatingReviewScreenState extends ConsumerState<RatingReviewScreen> {
                                   padding: const EdgeInsets.symmetric(vertical: 10),
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
-                                    color: isSelected ? const Color(0xFFFFEDD5) : const Color(0xFFF8FAFC),
+                                    color: isSelected ? const Color(0xFFFFF8E1) : const Color(0xFFF8FAFC),
                                     borderRadius: BorderRadius.circular(12),
                                     border: Border.all(
-                                      color: isSelected ? const Color(0xFFFF5200) : const Color(0xFFE2E8F0),
+                                      color: isSelected ? const Color(0xFFFFB800) : const Color(0xFFE2E8F0),
                                       width: isSelected ? 1.5 : 1,
                                     ),
                                   ),
                                   child: Text(
                                     label,
                                     style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
-                                      color: isSelected ? const Color(0xFFFF5200) : const Color(0xFF0F172A),
+                                      fontSize: 12,
+                                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                                      color: isSelected ? const Color(0xFF121212) : const Color(0xFF0F172A),
                                     ),
                                   ),
                                 ),
@@ -608,11 +619,11 @@ class _RatingReviewScreenState extends ConsumerState<RatingReviewScreen> {
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(color: const Color(0xFFE2E8F0)),
                               ),
-                              child: const Text(
-                                'Other',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
+                              child: Text(
+                                'Other'.tr,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
                                   color: Color(0xFF0F172A),
                                 ),
                               ),
@@ -645,41 +656,51 @@ class _RatingReviewScreenState extends ConsumerState<RatingReviewScreen> {
                 child: Column(
                   children: [
                     Text(
-                      'How was your trip with $driverName?',
+                      'How was your trip with {name}?'.trArgs({'name': driverName}),
                       style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w900,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
                         color: Color(0xFF0F172A),
                       ),
                     ),
                     const SizedBox(height: 16),
 
                     // 5 Star rating buttons
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(5, (index) {
-                        final starIndex = index + 1;
-                        final isFilled = _rating >= starIndex;
-                        return InkWell(
-                          onTap: () => setState(() => _rating = starIndex),
-                          borderRadius: BorderRadius.circular(8),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 6),
-                            child: Icon(
-                              isFilled ? Icons.star_rounded : Icons.star_border_rounded,
-                              size: 40,
-                              color: isFilled ? const Color(0xFFFF5200) : const Color(0xFFCBD5E1),
+                    // Each star gets an equal share of the card and shrinks to
+                    // fit, so five always fit — fixed 40px stars plus padding
+                    // overflowed on narrow phones / large display size.
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 300),
+                      child: Row(
+                        children: List.generate(5, (index) {
+                          final starIndex = index + 1;
+                          final isFilled = _rating >= starIndex;
+                          return Expanded(
+                            child: InkWell(
+                              onTap: () => setState(() => _rating = starIndex),
+                              borderRadius: BorderRadius.circular(8),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 4),
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Icon(
+                                    isFilled ? Icons.star_rounded : Icons.star_border_rounded,
+                                    size: 40,
+                                    color: isFilled ? const Color(0xFFFFB800) : const Color(0xFFCBD5E1),
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                        );
-                      }),
+                          );
+                        }),
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       _getRatingFeedbackText(_rating),
                       style: const TextStyle(
-                        fontSize: 13.5,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
                         color: Color(0xFF64748B),
                       ),
                     ),
@@ -695,7 +716,7 @@ class _RatingReviewScreenState extends ConsumerState<RatingReviewScreen> {
                 child: ElevatedButton(
                   onPressed: _submitting ? null : _submit,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFF5200),
+                    backgroundColor: const Color(0xFFFFB800),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
@@ -706,16 +727,16 @@ class _RatingReviewScreenState extends ConsumerState<RatingReviewScreen> {
                           height: 24,
                           width: 24,
                           child: CircularProgressIndicator(
-                            color: Colors.white,
+                            color: Color(0xFF121212),
                             strokeWidth: 2.5,
                           ),
                         )
-                      : const Text(
-                          'Done',
-                          style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.white,
+                      : Text(
+                          'Done'.tr,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF121212),
                           ),
                         ),
                 ),
@@ -724,7 +745,18 @@ class _RatingReviewScreenState extends ConsumerState<RatingReviewScreen> {
           ),
         ),
       ),
-    );
+      Align(
+          alignment: Alignment.topCenter,
+          child: ConfettiWidget(
+            confettiController: _confettiController,
+            blastDirectionality: BlastDirectionality.explosive,
+            shouldLoop: false,
+            colors: const [Colors.green, Colors.blue, Colors.pink, Colors.orange, Colors.purple],
+          ),
+        ),
+      ],
+    ),
+  );
   }
 
   Future<double?> _showCustomTipDialog(BuildContext context) async {
@@ -732,23 +764,23 @@ class _RatingReviewScreenState extends ConsumerState<RatingReviewScreen> {
     return showDialog<double>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Enter custom tip amount'),
+        title: Text('Enter custom tip amount'.tr),
         content: TextField(
           controller: controller,
           keyboardType: TextInputType.number,
-          decoration: const InputDecoration(hintText: 'e.g. 30'),
+          decoration: InputDecoration(hintText: 'e.g. 30'.tr),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text('Cancel'.tr),
           ),
           TextButton(
             onPressed: () {
               final val = double.tryParse(controller.text.trim());
               Navigator.pop(context, val);
             },
-            child: const Text('OK'),
+            child: Text('OK'.tr),
           ),
         ],
       ),

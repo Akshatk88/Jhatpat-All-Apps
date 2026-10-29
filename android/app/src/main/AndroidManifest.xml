@@ -68,7 +68,7 @@
         <!-- Google Maps SDK key for the live order-tracking map -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyArBbII2fgAuVaycfkEAm1GcuyvKPTSWyc" />
+            android:value="AIzaSyBbOTOv3KgTY__MAvPC1A7GZSO_5Wp1N88" />
 
         <!-- FCM default notification channel & metadata -->
         <meta-data
@@ -76,7 +76,7 @@
             android:value="default" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@mipmap/ic_launcher" />
+            android:resource="@drawable/ic_stat_jhatpat" />
 
         <!-- Scheduled Notification Receivers for flutter_local_notifications -->
         <receiver
@@ -101,6 +101,15 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+        <!-- Sweeps away blank notifications the system draws for backend data pushes. -->
+        <receiver
+            android:name=".EmptyPushCleaner"
+            android:exported="true"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            </intent-filter>
+        </receiver>
     </application>
 
     <!-- Required Permissions -->
@@ -126,6 +135,10 @@
         </intent>
         <intent>
             <action android:name="android.speech.RecognitionService" />
+        </intent>
+        <!-- flutter_tts: lets the app see the installed TTS engine on API 30+ -->
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE" />
         </intent>
     </queries>
 </manifest>

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -90,7 +91,7 @@ class RestaurantListViewModel extends Notifier<RestaurantListState> {
     } on Failure catch (f) {
       state = state.copyWith(isLoading: false, error: f.message);
     } catch (_) {
-      state = state.copyWith(isLoading: false, error: 'Could not load restaurants.');
+      state = state.copyWith(isLoading: false, error: 'Could not load restaurants.'.tr);
     }
   }
 
@@ -114,7 +115,7 @@ class RestaurantListViewModel extends Notifier<RestaurantListState> {
     } on Failure catch (f) {
       state = state.copyWith(isLoadingMore: false, error: f.message);
     } catch (_) {
-      state = state.copyWith(isLoadingMore: false, error: 'Could not load more.');
+      state = state.copyWith(isLoadingMore: false, error: 'Could not load more.'.tr);
     }
   }
 

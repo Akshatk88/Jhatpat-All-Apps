@@ -20,23 +20,31 @@ class TaxiSecondaryButton extends StatelessWidget {
       child: OutlinedButton(
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
+          foregroundColor: scheme.onSurface,
           side: BorderSide(color: scheme.outline.withValues(alpha: 0.4)),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (icon != null) ...[
-              Icon(icon, size: 20),
-              const SizedBox(width: 8),
+        // Text.rich rather than an icon + label Row so a long label
+        // ellipsises instead of overflowing (see TaxiPrimaryButton).
+        child: Text.rich(
+          TextSpan(
+            children: [
+              if (icon != null) ...[
+                WidgetSpan(
+                  alignment: PlaceholderAlignment.middle,
+                  child: Icon(icon, size: 20),
+                ),
+                const WidgetSpan(child: SizedBox(width: 8)),
+              ],
+              TextSpan(text: label),
             ],
-            Text(
-              label,
-              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
-            ),
-          ],
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
         ),
       ),
     );

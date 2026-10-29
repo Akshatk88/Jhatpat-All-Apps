@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -42,8 +43,8 @@ class _AllOffersScreenState extends ConsumerState<AllOffersScreen> {
           onPressed: () => context.backOr(),
         ),
         title: Text(
-          '99 Store',
-          style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.bold),
+          '99 Store'.tr,
+          style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.w600),
         ),
       ),
       body: Stack(
@@ -53,14 +54,14 @@ class _AllOffersScreenState extends ConsumerState<AllOffersScreen> {
               padding: EdgeInsets.all(20),
               child: SkeletonRestaurantList(count: 3),
             ),
-            error: (err, stack) => Center(child: Text('Error: $err')),
+            error: (err, stack) => Center(child: Text('Error: {error}'.trArgs({'error': err}))),
             data: (foods) {
               final eligibleFoods =
                   foods.where((f) => f.price <= 99.0).toList();
               if (eligibleFoods.isEmpty) {
-                return const EmptyStateWidget(
-                  title: 'No ₹99 Store deals available right now.',
-                  subtitle: 'Check back soon for meals at ₹99 with free delivery.',
+                return EmptyStateWidget(
+                  title: 'No ₹99 Store deals available right now.'.tr,
+                  subtitle: 'Check back soon for meals at ₹99 with free delivery.'.tr,
                   icon: Icons.local_offer_outlined,
                 );
               }

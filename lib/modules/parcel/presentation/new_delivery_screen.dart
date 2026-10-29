@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:go_router/go_router.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/modules/taxi/application/taxi_core_providers.dart';
 import 'package:superapp_user/design_system/tokens/taxi_colors.dart';
 import 'package:superapp_user/design_system/components/feedback/taxi_snackbar_utils.dart';
@@ -85,10 +86,10 @@ class _NewDeliveryScreenState extends ConsumerState<NewDeliveryScreen> {
           }
         });
       } else if (mounted) {
-        SnackbarUtils.error(context, 'Could not find that address');
+        SnackbarUtils.error(context, 'Could not find that address'.tr);
       }
     } catch (_) {
-      if (mounted) SnackbarUtils.error(context, 'Could not find that address');
+      if (mounted) SnackbarUtils.error(context, 'Could not find that address'.tr);
     } finally {
       if (mounted) setState(() => isDrop ? _resolvingDrop = false : _resolvingPickup = false);
     }
@@ -121,15 +122,15 @@ class _NewDeliveryScreenState extends ConsumerState<NewDeliveryScreen> {
 
   Future<void> _submit() async {
     if (_pickup == null || _drop == null) {
-      SnackbarUtils.error(context, 'Please set both pickup and drop addresses');
+      SnackbarUtils.error(context, 'Please set both pickup and drop addresses'.tr);
       return;
     }
     if (_selectedVehicle == null) {
-      SnackbarUtils.error(context, 'Please select a vehicle');
+      SnackbarUtils.error(context, 'Please select a vehicle'.tr);
       return;
     }
     if (_receiverNameController.text.trim().isEmpty || _receiverPhoneController.text.trim().isEmpty) {
-      SnackbarUtils.error(context, 'Please add receiver details');
+      SnackbarUtils.error(context, 'Please add receiver details'.tr);
       return;
     }
 
@@ -180,14 +181,14 @@ class _NewDeliveryScreenState extends ConsumerState<NewDeliveryScreen> {
   void _showPaymentSheet() {
     CustomBottomSheet.show(
       context,
-      title: 'Payment method',
+      title: 'Payment method'.tr,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           RadioListTile<String>(
             value: 'cash',
             groupValue: _paymentMethod,
-            title: const Text('Cash'),
+            title: Text('Cash'.tr),
             secondary: const Icon(Icons.money_rounded),
             onChanged: (v) {
               setState(() => _paymentMethod = v!);
@@ -197,23 +198,23 @@ class _NewDeliveryScreenState extends ConsumerState<NewDeliveryScreen> {
           RadioListTile<String>(
             value: 'wallet',
             groupValue: _paymentMethod,
-            title: const Text('Wallet'),
+            title: Text('Wallet'.tr),
             secondary: const Icon(Icons.account_balance_wallet_outlined),
             onChanged: (v) {
               setState(() => _paymentMethod = v!);
               Navigator.of(context).pop();
             },
           ),
-          RadioListTile<String>(
-            value: 'razorpay',
-            groupValue: _paymentMethod,
-            title: const Text('Card / UPI'),
-            secondary: const Icon(Icons.credit_card_rounded),
-            onChanged: (v) {
-              setState(() => _paymentMethod = v!);
-              Navigator.of(context).pop();
-            },
-          ),
+          // RadioListTile<String>(
+          //   value: 'razorpay',
+          //   groupValue: _paymentMethod,
+          //   title: const Text('Card'),
+          //   secondary: const Icon(Icons.credit_card_rounded),
+          //   onChanged: (v) {
+          //     setState(() => _paymentMethod = v!);
+          //     Navigator.of(context).pop();
+          //   },
+          // ),
         ],
       ),
     );
@@ -224,11 +225,11 @@ class _NewDeliveryScreenState extends ConsumerState<NewDeliveryScreen> {
     final vehicleTypesAsync = ref.watch(vehicleTypesProvider);
 
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Send a package'),
+      appBar: CustomAppBar(title: 'Send a package'.tr),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          const SectionTitle(title: 'Pickup & drop'),
+          SectionTitle(title: 'Pickup & drop'.tr),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -237,7 +238,7 @@ class _NewDeliveryScreenState extends ConsumerState<NewDeliveryScreen> {
               Expanded(
                 child: AppTextField(
                   controller: _pickupController,
-                  hint: 'Pickup address',
+                  hint: 'Pickup address'.tr,
                   suffix: _resolvingPickup
                       ? const Padding(
                           padding: EdgeInsets.all(12),
@@ -251,7 +252,7 @@ class _NewDeliveryScreenState extends ConsumerState<NewDeliveryScreen> {
           ),
           Align(
             alignment: Alignment.centerRight,
-            child: TextButton(onPressed: () => _resolve(isDrop: false), child: const Text('Locate pickup')),
+            child: TextButton(onPressed: () => _resolve(isDrop: false), child: Text('Locate pickup'.tr)),
           ),
           const SizedBox(height: 6),
           Row(
@@ -261,7 +262,7 @@ class _NewDeliveryScreenState extends ConsumerState<NewDeliveryScreen> {
               Expanded(
                 child: AppTextField(
                   controller: _dropController,
-                  hint: 'Drop address',
+                  hint: 'Drop address'.tr,
                   suffix: _resolvingDrop
                       ? const Padding(
                           padding: EdgeInsets.all(12),
@@ -275,32 +276,32 @@ class _NewDeliveryScreenState extends ConsumerState<NewDeliveryScreen> {
           ),
           Align(
             alignment: Alignment.centerRight,
-            child: TextButton(onPressed: () => _resolve(isDrop: true), child: const Text('Locate drop')),
+            child: TextButton(onPressed: () => _resolve(isDrop: true), child: Text('Locate drop'.tr)),
           ),
           const SizedBox(height: 20),
-          const SectionTitle(title: 'Sender details'),
+          SectionTitle(title: 'Sender details'.tr),
           const SizedBox(height: 12),
-          AppTextField(controller: _senderNameController, hint: 'Sender name'),
+          AppTextField(controller: _senderNameController, hint: 'Sender name'.tr),
           const SizedBox(height: 12),
           AppTextField(
             controller: _senderPhoneController,
-            hint: 'Sender phone',
+            hint: 'Sender phone'.tr,
             keyboardType: TextInputType.phone,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           ),
           const SizedBox(height: 20),
-          const SectionTitle(title: 'Receiver details'),
+          SectionTitle(title: 'Receiver details'.tr),
           const SizedBox(height: 12),
-          AppTextField(controller: _receiverNameController, hint: 'Receiver name'),
+          AppTextField(controller: _receiverNameController, hint: 'Receiver name'.tr),
           const SizedBox(height: 12),
           AppTextField(
             controller: _receiverPhoneController,
-            hint: 'Receiver phone',
+            hint: 'Receiver phone'.tr,
             keyboardType: TextInputType.phone,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           ),
           const SizedBox(height: 20),
-          const SectionTitle(title: 'Parcel details'),
+          SectionTitle(title: 'Parcel details'.tr),
           const SizedBox(height: 12),
           Wrap(
             spacing: 8,
@@ -308,7 +309,7 @@ class _NewDeliveryScreenState extends ConsumerState<NewDeliveryScreen> {
             children: parcelCategories
                 .map(
                   (c) => ChoiceChip(
-                    label: Text(c),
+                    label: Text(c.tr),
                     selected: _category == c,
                     onSelected: (_) => setState(() => _category = c),
                   ),
@@ -318,18 +319,18 @@ class _NewDeliveryScreenState extends ConsumerState<NewDeliveryScreen> {
           const SizedBox(height: 12),
           AppTextField(
             controller: _weightController,
-            hint: 'Approx. weight (kg)',
+            hint: 'Approx. weight (kg)'.tr,
             keyboardType: TextInputType.number,
           ),
           const SizedBox(height: 12),
-          AppTextField(controller: _descriptionController, hint: 'Item description', maxLines: 3),
+          AppTextField(controller: _descriptionController, hint: 'Item description'.tr, maxLines: 3),
           const SizedBox(height: 20),
-          const SectionTitle(title: 'Choose a vehicle'),
+          SectionTitle(title: 'Choose a vehicle'.tr),
           const SizedBox(height: 12),
           vehicleTypesAsync.when(
             data: (vehicles) {
               if (vehicles.isEmpty) {
-                return const Text('No vehicles available right now');
+                return Text('No vehicles available right now'.tr);
               }
               return Wrap(
                 spacing: 10,
@@ -346,14 +347,14 @@ class _NewDeliveryScreenState extends ConsumerState<NewDeliveryScreen> {
               );
             },
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, _) => Text('Could not load vehicles: $e'),
+            error: (e, _) => Text('Could not load vehicles: {error}'.trArgs({'error': e})),
           ),
           const SizedBox(height: 12),
           ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.payments_outlined, color: TaxiColors.primary),
-            title: const Text('Payment method'),
-            subtitle: Text(_paymentMethod == 'cash' ? 'Cash' : _paymentMethod.toUpperCase()),
+            title: Text('Payment method'.tr),
+            subtitle: Text(_paymentMethod == 'cash' ? 'Cash'.tr : _paymentMethod.toUpperCase()),
             trailing: const Icon(Icons.chevron_right_rounded),
             onTap: _showPaymentSheet,
           ),
@@ -364,7 +365,7 @@ class _NewDeliveryScreenState extends ConsumerState<NewDeliveryScreen> {
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: TaxiPrimaryButton(
-            label: 'Book delivery',
+            label: 'Book delivery'.tr,
             isLoading: _submitting,
             onPressed: _submit,
           ),

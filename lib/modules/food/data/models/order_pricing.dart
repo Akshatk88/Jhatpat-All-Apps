@@ -59,7 +59,7 @@ class OrderPricing {
       appliedCoupon != null ||
       ((couponCode?.isNotEmpty ?? false) && discount > 0);
 
-  static double _d(dynamic v) => (v as num?)?.toDouble() ?? 0.0;
+  static double _d(dynamic v) => num.tryParse('$v')?.toDouble() ?? 0.0;
 
   factory OrderPricing.fromApi(Map<String, dynamic> json) {
     final appliedCoupon = (json['appliedCoupon'] as Map?)?.cast<String, dynamic>();
@@ -83,7 +83,7 @@ class OrderPricing {
       deliveryMode: (json['deliveryMode'] ?? 'basic').toString(),
       couponCode: (json['couponCode'] ?? appliedCoupon?['code'])?.toString(),
       appliedCoupon: appliedCoupon,
-      roadDistanceKm: (json['roadDistanceKm'] as num?)?.toDouble(),
+      roadDistanceKm: num.tryParse('${json['roadDistanceKm']}')?.toDouble(),
       raw: json,
     );
   }
@@ -110,8 +110,8 @@ class PriceChange {
     return PriceChange(
       itemId: (json['itemId'] ?? '').toString(),
       name: (json['name'] ?? '').toString(),
-      previousPrice: (json['previousPrice'] as num?)?.toDouble() ?? 0.0,
-      price: (json['price'] as num?)?.toDouble() ?? 0.0,
+      previousPrice: num.tryParse('${json['previousPrice']}')?.toDouble() ?? 0.0,
+      price: num.tryParse('${json['price']}')?.toDouble() ?? 0.0,
     );
   }
 }

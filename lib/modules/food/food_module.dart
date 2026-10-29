@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:superapp_user/core/config/backend_ids.dart';
@@ -16,13 +17,16 @@ class FoodModule extends AppModule {
   ModuleId get id => ModuleId.food;
 
   @override
-  String get label => 'Food';
+  String get label => 'Food'.tr;
 
   @override
-  String get tagline => 'Delicious meals';
+  String get tagline => 'Food delivery'.tr;
 
   @override
   IconData get icon => Icons.restaurant_rounded;
+
+  @override
+  String get navIconAsset => 'assets/images/food.png';
 
   @override
   ModuleAccent get accent => ModuleAccent.food;
@@ -34,7 +38,7 @@ class FoodModule extends AppModule {
   String get entryRoute => FoodRoutePaths.home;
 
   @override
-  int get order => 0;
+  int get order => 2;
 
   @override
   bool get isEnabled => true;

@@ -22,6 +22,12 @@ class BookingState {
   final List<VehicleTypeModel> vehicleTypes;
   final List<SetPriceModel> setPrices;
   final Map<String, int> etaMinutesByVehicle;
+
+  /// Server quote per vehicle id (exact charge). Absent = not quoted yet.
+  final Map<String, FareBreakdown> quotedFares;
+
+  /// Vehicles the server quote reported as not bookable on this route.
+  final Set<String> quoteUnavailable;
   final VehicleTypeModel? selectedVehicle;
   final FareBreakdown? fareBreakdown;
   final String paymentMethod;
@@ -41,6 +47,8 @@ class BookingState {
     this.vehicleTypes = const [],
     this.setPrices = const [],
     this.etaMinutesByVehicle = const {},
+    this.quotedFares = const {},
+    this.quoteUnavailable = const {},
     this.selectedVehicle,
     this.fareBreakdown,
     this.paymentMethod = 'cash',
@@ -52,16 +60,32 @@ class BookingState {
     this.createdRide,
   });
 
-  /// Returns the price configured for [vehicleTypeId]. Falls back to any
-  /// other configured set-price when this vehicle type has no dedicated
-  /// row yet, so the fare shown/booked is still a real distance-based
-  /// estimate rather than a blank placeholder or a blocked booking.
+  /// Returns the price configured for [vehicleTypeId], or null when the
+  /// admin has not priced this vehicle.
+  ///
+  /// It used to fall back to the first price row of any other vehicle. That
+  /// showed a believable fare (e.g. ₹68) for a vehicle the server has no
+  /// price for — and the server then refused the booking with "This ride
+  /// type is not available here yet". An unpriced vehicle is now shown as
+  /// unavailable instead.
+  ///
+  /// Only rows the server can charge count: inactive or all-zero rows are
+  /// skipped, otherwise a ₹0 or stale row would be quoted for a vehicle the
+  /// server then refuses to book.
   SetPriceModel? pricingFor(String vehicleTypeId) {
     for (final p in setPrices) {
-      if (p.vehicleTypeId == vehicleTypeId) return p;
+      if (p.vehicleTypeId == vehicleTypeId && p.isBookable) return p;
     }
-    return setPrices.isNotEmpty ? setPrices.first : null;
+    return null;
   }
+
+  /// True once prices are loaded and [vehicleTypeId] has none — the server
+  /// will refuse to book it.
+  bool isUnpriced(String vehicleTypeId) =>
+      quoteUnavailable.contains(vehicleTypeId) ||
+      (!quotedFares.containsKey(vehicleTypeId) &&
+          setPrices.isNotEmpty &&
+          pricingFor(vehicleTypeId) == null);
 
   BookingState copyWith({
     BookingLocation? pickup,
@@ -72,6 +96,8 @@ class BookingState {
     List<VehicleTypeModel>? vehicleTypes,
     List<SetPriceModel>? setPrices,
     Map<String, int>? etaMinutesByVehicle,
+    Map<String, FareBreakdown>? quotedFares,
+    Set<String>? quoteUnavailable,
     VehicleTypeModel? selectedVehicle,
     FareBreakdown? fareBreakdown,
     String? paymentMethod,
@@ -94,6 +120,8 @@ class BookingState {
       vehicleTypes: vehicleTypes ?? this.vehicleTypes,
       setPrices: setPrices ?? this.setPrices,
       etaMinutesByVehicle: etaMinutesByVehicle ?? this.etaMinutesByVehicle,
+      quotedFares: quotedFares ?? this.quotedFares,
+      quoteUnavailable: quoteUnavailable ?? this.quoteUnavailable,
       selectedVehicle: selectedVehicle ?? this.selectedVehicle,
       fareBreakdown: fareBreakdown ?? this.fareBreakdown,
       paymentMethod: paymentMethod ?? this.paymentMethod,

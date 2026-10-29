@@ -2,9 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
 import 'package:superapp_user/modules/food/data/models/order_model.dart';
-import 'package:superapp_user/design_system/tokens/app_colors.dart';
 
 class FloatingActiveOrderCard extends StatefulWidget {
   final OrderModel order;
@@ -57,11 +57,6 @@ class _FloatingActiveOrderCardState extends State<FloatingActiveOrderCard>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark ? Colors.white : const Color(0xFF1E1E1E);
-    final secondaryColor = isDark ? AppColors.textSecondaryDark : const Color(0xFF6B7280);
-    final cardBg = isDark ? AppColors.cardDark : Colors.white;
-
     final order = widget.order;
     final etaText = order.etaLabel;
 
@@ -69,15 +64,15 @@ class _FloatingActiveOrderCardState extends State<FloatingActiveOrderCard>
     final double cardWidth = widget.isCompact ? 280.0 : MediaQuery.of(context).size.width - 32;
     final double iconContainerSize = widget.isCompact ? 32.0 : 42.0;
     final double iconSize = widget.isCompact ? 16.0 : 22.0;
-    final double titleFontSize = widget.isCompact ? 12.5 : 14.0;
-    final double statusFontSize = widget.isCompact ? 11.5 : 12.5;
-    final double chipPaddingHorizontal = widget.isCompact ? 8.0 : 12.0;
-    final double chipPaddingVertical = widget.isCompact ? 5.0 : 8.0;
-    final double chipFontSize = widget.isCompact ? 10.0 : 11.5;
-    final double spacingWidth = widget.isCompact ? 8.0 : 12.0;
-    final double itemSpacingHeight = widget.isCompact ? 0.0 : 2.0;
-    final double innerPaddingHorizontal = widget.isCompact ? 10.0 : 14.0;
-    final double innerPaddingVertical = widget.isCompact ? 8.0 : 12.0;
+    final double titleFontSize = widget.isCompact ? 13.0 : 15.0;
+    final double statusFontSize = widget.isCompact ? 11.5 : 13.0;
+    final double chipPaddingHorizontal = widget.isCompact ? 10.0 : 14.0;
+    final double chipPaddingVertical = widget.isCompact ? 6.0 : 8.0;
+    final double chipFontSize = widget.isCompact ? 11.0 : 12.0;
+    final double spacingWidth = widget.isCompact ? 10.0 : 12.0;
+    final double itemSpacingHeight = widget.isCompact ? 2.0 : 4.0;
+    final double innerPaddingHorizontal = widget.isCompact ? 12.0 : 16.0;
+    final double innerPaddingVertical = widget.isCompact ? 10.0 : 12.0;
 
     return SlideTransition(
       position: _slideAnim,
@@ -85,158 +80,196 @@ class _FloatingActiveOrderCardState extends State<FloatingActiveOrderCard>
         opacity: _fadeAnim,
         child: Align(
           alignment: Alignment.bottomCenter,
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () {
-                Haptics.medium();
-                if (kDebugMode) {
-                  debugPrint('[HOME] Widget clicked');
-                  debugPrint('[TRACKING] Tracking page opened');
-                }
-                context.push('/orders/track/${order.id}');
-              },
-              borderRadius: BorderRadius.circular(24),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-                width: cardWidth,
-                padding: EdgeInsets.symmetric(
-                  horizontal: innerPaddingHorizontal,
-                  vertical: innerPaddingVertical,
-                ),
-                decoration: BoxDecoration(
-                  color: cardBg,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: isDark ? AppColors.borderDark : const Color(0xFFE5E7EB),
-                    width: 1,
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 12.0), // Extra padding from bottom nav
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  Haptics.medium();
+                  if (kDebugMode) {
+                    debugPrint('[HOME] Widget clicked');
+                    debugPrint('[TRACKING] Tracking page opened');
+                  }
+                  context.push('/food/orders/${order.id}/track');
+                },
+                borderRadius: BorderRadius.circular(24),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                  width: cardWidth,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: innerPaddingHorizontal,
+                    vertical: innerPaddingVertical,
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF013621), Color(0xFF0C2B1C)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    // Icon
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      width: iconContainerSize,
-                      height: iconContainerSize,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFF5700).withValues(alpha: 0.12),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        order.isOutForDelivery
-                            ? Icons.two_wheeler_rounded
-                            : Icons.soup_kitchen_rounded,
-                        color: const Color(0xFFFF5700),
-                        size: iconSize,
-                      ),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color: const Color(0xFF38B255).withValues(alpha: 0.3),
+                      width: 1,
                     ),
-                    SizedBox(width: spacingWidth),
-
-                    // Restaurant & Status Column
-                    Expanded(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          AnimatedDefaultTextStyle(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                            style: TextStyle(
-                              fontSize: titleFontSize,
-                              fontWeight: FontWeight.bold,
-                              color: textColor,
-                              letterSpacing: -0.2,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            child: Text(
-                              order.restaurantName.isNotEmpty
-                                  ? order.restaurantName
-                                  : 'Food Order',
-                            ),
-                          ),
-                          SizedBox(height: itemSpacingHeight),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Flexible(
-                                child: AnimatedDefaultTextStyle(
-                                  duration: const Duration(milliseconds: 300),
-                                  curve: Curves.easeInOut,
-                                  style: TextStyle(
-                                    fontSize: statusFontSize,
-                                    fontWeight: FontWeight.w500,
-                                    color: secondaryColor,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  child: Text(order.statusLabel),
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              const Icon(
-                                Icons.play_arrow_rounded,
-                                size: 14,
-                                color: Color(0xFFFF5700),
-                              ),
-                            ],
-                          ),
-                        ],
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF013621).withValues(alpha: 0.4),
+                        blurRadius: 20,
+                        spreadRadius: 2,
+                        offset: const Offset(0, 8),
                       ),
-                    ),
-
-                    const SizedBox(width: 8),
-
-                    // Green ETA Pill
-                    if (etaText != null && etaText.isNotEmpty)
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      // Premium Icon
                       AnimatedContainer(
                         duration: const Duration(milliseconds: 300),
                         curve: Curves.easeInOut,
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 120),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                            padding: EdgeInsets.symmetric(
-                              horizontal: chipPaddingHorizontal,
-                              vertical: chipPaddingVertical,
+                        width: iconContainerSize,
+                        height: iconContainerSize,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.white.withValues(alpha: 0.2),
+                              Colors.white.withValues(alpha: 0.05),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.1),
+                            width: 1,
+                          ),
+                        ),
+                        child: Icon(
+                          order.isOutForDelivery
+                              ? Icons.two_wheeler_rounded
+                              : Icons.soup_kitchen_rounded,
+                          color: const Color(0xFF38B255),
+                          size: iconSize,
+                        ),
+                      ),
+                      SizedBox(width: spacingWidth),
+
+                      // Restaurant & Status Column
+                      Expanded(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            AnimatedDefaultTextStyle(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                              style: TextStyle(
+                                fontSize: titleFontSize,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                                letterSpacing: -0.2,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              child: Text(
+                                order.restaurantName.isNotEmpty
+                                    ? order.restaurantName
+                                    : 'Food Order'.tr,
+                              ),
                             ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF00B562),
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(0xFF00B562).withValues(alpha: 0.25),
-                                  blurRadius: 6,
-                                  offset: const Offset(0, 2),
+                            SizedBox(height: itemSpacingHeight),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Flexible(
+                                  child: AnimatedDefaultTextStyle(
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.easeInOut,
+                                    style: TextStyle(
+                                      fontSize: statusFontSize,
+                                      fontWeight: FontWeight.w500,
+                                      color: const Color(0xFFE5E7EB),
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    child: Text(order.statusLabel.tr),
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                const Icon(
+                                  Icons.arrow_forward_ios_rounded,
+                                  size: 10,
+                                  color: Color(0xFF38B255),
                                 ),
                               ],
                             ),
-                            child: Text(
-                              order.compactEtaLabel ?? etaText,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(width: 8),
+
+                      // Vibrant ETA Pill
+                      if (etaText != null && etaText.isNotEmpty)
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 120),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: chipPaddingHorizontal,
+                                vertical: chipPaddingVertical,
+                              ),
+                              decoration: BoxDecoration(
                                 color: Colors.white,
-                                fontSize: chipFontSize,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.2,
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.1),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (order.compactEtaLabel == null)
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 6),
+                                      child: SizedBox(
+                                        width: 10,
+                                        height: 10,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor: AlwaysStoppedAnimation<Color>(const Color(0xFF013621)),
+                                        ),
+                                      ),
+                                    ),
+                                  Flexible(
+                                    child: Text(
+                                      order.compactEtaLabel ?? 'Calculating...'.tr,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: const Color(0xFF013621),
+                                        fontSize: chipFontSize,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: 0.2,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

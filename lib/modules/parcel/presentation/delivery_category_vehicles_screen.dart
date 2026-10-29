@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 import 'package:superapp_user/design_system/tokens/taxi_colors.dart';
 import 'package:superapp_user/design_system/components/ride/empty_state.dart';
@@ -37,20 +38,20 @@ class DeliveryCategoryVehiclesScreen extends ConsumerWidget {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'PARCEL DELIVERY',
-              style: TextStyle(
+            Text(
+              'PARCEL DELIVERY'.tr,
+              style: const TextStyle(
                 fontSize: 9.5,
                 letterSpacing: 0.7,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w600,
                 color: Color(0xFF94A3B8),
               ),
             ),
             Text(
-              category?.title ?? 'Choose a vehicle',
+              category?.title.tr ?? 'Choose a vehicle'.tr,
               style: const TextStyle(
                 fontSize: 17,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w600,
                 color: Color(0xFF0F172A),
               ),
             ),
@@ -58,22 +59,22 @@ class DeliveryCategoryVehiclesScreen extends ConsumerWidget {
         ),
       ),
       body: vehiclesAsync.when(
-        loading: () => const LoadingWidget(message: 'Loading vehicles…'),
+        loading: () => LoadingWidget(message: 'Loading vehicles…'.tr),
         error: (e, _) => EmptyState(
           icon: Icons.error_outline,
-          title: 'Could not load vehicles',
-          message: 'Please check your connection and try again.',
-          actionLabel: 'Retry',
+          title: 'Could not load vehicles'.tr,
+          message: 'Please check your connection and try again.'.tr,
+          actionLabel: 'Retry'.tr,
           onAction: () => ref.invalidate(allVehicleTypesProvider),
         ),
         data: (vehicles) {
           if (vehicles.isEmpty) {
             return EmptyState(
               icon: category?.icon ?? Icons.local_shipping_outlined,
-              title: 'No ${category?.title ?? 'vehicles'} available',
+              title: 'No {name} available'.trArgs({'name': category?.title.tr ?? 'vehicles'.tr}),
               message:
-                  'No vehicle is set up for this category yet. Please choose another option.',
-              actionLabel: 'Go back',
+                  'No vehicle is set up for this category yet. Please choose another option.'.tr,
+              actionLabel: 'Go back'.tr,
               onAction: () => Navigator.of(context).maybePop(),
             );
           }
@@ -151,7 +152,7 @@ class _VehicleRow extends StatelessWidget {
                     name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14.5),
+                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14.5),
                   ),
                   if (subtitle.isNotEmpty) ...[
                     const SizedBox(height: 2),
@@ -165,11 +166,11 @@ class _VehicleRow extends StatelessWidget {
                   if (capacity > 0) ...[
                     const SizedBox(height: 4),
                     Text(
-                      'Up to $capacity kg',
+                      'Up to {capacity} kg'.trArgs({'capacity': capacity}),
                       style: const TextStyle(
                         fontSize: 10.5,
-                        fontWeight: FontWeight.w700,
-                        color: TaxiColors.primary,
+                        fontWeight: FontWeight.w600,
+                        color: TaxiColors.primaryDark,
                       ),
                     ),
                   ],

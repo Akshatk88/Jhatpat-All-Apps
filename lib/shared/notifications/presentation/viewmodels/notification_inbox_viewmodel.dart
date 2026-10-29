@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:superapp_user/core/error/failures.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/shared/wallet/data/wallet_model.dart';
 import 'package:superapp_user/shared/profile/application/account_providers.dart';
 import 'package:superapp_user/shared/auth/presentation/viewmodels/auth_viewmodel.dart';
@@ -91,7 +92,7 @@ class NotificationInboxViewModel extends Notifier<NotificationInboxState> {
     } on Failure catch (f) {
       state = state.copyWith(isLoading: false, error: f.message);
     } catch (_) {
-      state = state.copyWith(isLoading: false, error: 'Could not load notifications.');
+      state = state.copyWith(isLoading: false, error: 'Could not load notifications.'.tr);
     }
   }
 
@@ -111,7 +112,7 @@ class NotificationInboxViewModel extends Notifier<NotificationInboxState> {
     } on Failure catch (f) {
       state = state.copyWith(isLoadingMore: false, error: f.message);
     } catch (_) {
-      state = state.copyWith(isLoadingMore: false, error: 'Could not load more.');
+      state = state.copyWith(isLoadingMore: false, error: 'Could not load more.'.tr);
     }
   }
 
@@ -161,6 +162,10 @@ class NotificationInboxViewModel extends Notifier<NotificationInboxState> {
     } catch (_) {
       state = previous;
     }
+  }
+
+  void clearUnreadCount() {
+    state = state.copyWith(unreadCount: 0);
   }
 }
 

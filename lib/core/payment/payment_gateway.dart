@@ -5,6 +5,7 @@ import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 import 'package:superapp_user/core/config/app_constants.dart';
 import 'package:superapp_user/core/error/failures.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/shared/profile/data/account_remote_datasource.dart';
 import 'package:superapp_user/core/payment/payment_verifier.dart';
 
@@ -83,12 +84,16 @@ class PaymentGateway {
   }) async {
     final key = (razorpay?['key'] ?? AppConstants.razorpayKey).toString();
     if (razorpay == null || razorpay['orderId'] == null || key.isEmpty) {
-      // TODO(backend): RAZORPAY_KEY_ID is unset on this deployment, so the API
-      // returns `razorpay: null`. Until it's configured the order stays in
-      // `pending_payment` and is swept by the expiry job.
-      return const PaymentResult(
+      // The keys are set on the deployment but the pair is rejected by
+      // Razorpay with 401 Authentication failed, so order creation cannot
+      // produce a real gateway order and the API returns `razorpay: null`.
+      // Until valid credentials are installed the order stays in
+      // `pending_payment` and is swept by the expiry job. Reaching this branch
+      // is the correct outcome — it is the fabricated `mock_order_*` id that
+      // used to get through here that made the checkout fail confusingly.
+      return PaymentResult(
         PaymentOutcome.pending,
-        'Online payment is not available right now. Your order was not charged.',
+        'Online payment is not available right now. Your order was not charged.'.tr,
       );
     }
 
@@ -119,9 +124,9 @@ class PaymentGateway {
 
     final key = (razorpay['key'] ?? AppConstants.razorpayKey).toString();
     if (razorpay['orderId'] == null || key.isEmpty) {
-      return const PaymentResult(
+      return PaymentResult(
         PaymentOutcome.pending,
-        'Wallet top-up is unavailable right now.',
+        'Wallet top-up is unavailable right now.'.tr,
       );
     }
 
@@ -158,18 +163,18 @@ class PaymentGateway {
         'theme': {'color': '#FF7A00'},
         'order_id': razorpay['orderId'],
         // Already paise from the backend — never re-multiply.
-        'amount': razorpay['amount'],
+        'amount': int.tryParse(razorpay['amount'].toString()) ?? 0,
         'currency': razorpay['currency'] ?? 'INR',
         'description': description,
         'prefill': {
-          'contact': customerPhone,
+          if (customerPhone.isNotEmpty) 'contact': customerPhone,
           if (customerEmail != null && customerEmail.isNotEmpty) 'email': customerEmail,
-          'name': customerName,
+          if (customerName.isNotEmpty) 'name': customerName,
         },
         'retry': {'enabled': true, 'max_count': 3},
       });
     } catch (e) {
-      _settle(const PaymentResult(PaymentOutcome.failed, 'Could not open the payment screen.'));
+      _settle(PaymentResult(PaymentOutcome.failed, 'Could not open the payment screen.'.tr));
     }
 
     return _pending!.future;
@@ -187,12 +192,12 @@ class PaymentGateway {
           razorpaySignature: response.signature ?? '',
           amount: topUp,
         );
-        _settle(const PaymentResult(PaymentOutcome.success, 'Wallet topped up successfully.'));
+        _settle(PaymentResult(PaymentOutcome.success, 'Wallet topped up successfully.'.tr));
         return;
       }
 
       if (orderId == null) {
-        _settle(const PaymentResult(PaymentOutcome.failed, 'Missing order reference.'));
+        _settle(PaymentResult(PaymentOutcome.failed, 'Missing order reference.'.tr));
         return;
       }
 
@@ -204,7 +209,7 @@ class PaymentGateway {
       );
       _settle(PaymentResult(
         PaymentOutcome.success,
-        'Payment successful.',
+        'Payment successful.'.tr,
         order: verified,
       ));
     } catch (_) {
@@ -214,16 +219,16 @@ class PaymentGateway {
         try {
           final order = await _verifier.fetchJob(orderId);
           if (_verifier.isPaid(order)) {
-            _settle(PaymentResult(PaymentOutcome.success, 'Payment successful.', order: order));
+            _settle(PaymentResult(PaymentOutcome.success, 'Payment successful.'.tr, order: order));
             return;
           }
         } catch (_) {
           // fall through to pending
         }
       }
-      _settle(const PaymentResult(
+      _settle(PaymentResult(
         PaymentOutcome.pending,
-        'We are confirming your payment. This can take a moment.',
+        'We are confirming your payment. This can take a moment.'.tr,
       ));
     }
   }
@@ -233,14 +238,14 @@ class PaymentGateway {
     final cancelled = response.code == Razorpay.PAYMENT_CANCELLED;
     _settle(PaymentResult(
       cancelled ? PaymentOutcome.cancelled : PaymentOutcome.failed,
-      cancelled ? 'Payment cancelled.' : (response.message ?? 'Payment failed.'),
+      cancelled ? 'Payment cancelled.'.tr : (response.message ?? 'Payment failed.'.tr),
     ));
   }
 
   void _onExternalWallet(ExternalWalletResponse response) {
-    _settle(const PaymentResult(
+    _settle(PaymentResult(
       PaymentOutcome.pending,
-      'Completing payment in your wallet app.',
+      'Completing payment in your wallet app.'.tr,
     ));
   }
 

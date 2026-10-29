@@ -1,4 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/design_system/tokens/taxi_colors.dart';
 import 'package:intl/intl.dart';
 
@@ -12,6 +14,9 @@ class RecentActivityCard extends StatelessWidget {
   final String status;
   final String serviceType;
   final String? vehicleIconType;
+
+  /// Admin-uploaded vehicle picture; the bundled art shows when empty or broken.
+  final String vehicleImageUrl;
   final VoidCallback onTap;
 
   const RecentActivityCard({
@@ -25,6 +30,7 @@ class RecentActivityCard extends StatelessWidget {
     required this.status,
     required this.serviceType,
     this.vehicleIconType,
+    this.vehicleImageUrl = '',
     required this.onTap,
   });
 
@@ -81,6 +87,14 @@ class RecentActivityCard extends StatelessWidget {
     final boxBg = isDark ? TaxiColors.darkSurface : Colors.white;
     final boxBorder = isDark ? TaxiColors.darkBorder : const Color(0xFFE2E8F0);
     final badgeBorderColor = isDark ? TaxiColors.darkCard : Colors.white;
+    final bundled = Image.asset(
+      imageAsset,
+      fit: BoxFit.contain,
+      errorBuilder: (_, _, _) => Icon(
+        isParcel ? Icons.local_shipping_rounded : Icons.directions_car_rounded,
+        color: isDark ? TaxiColors.darkTextSecondary : const Color(0xFF94A3B8),
+      ),
+    );
 
     return Stack(
       children: [
@@ -95,14 +109,14 @@ class RecentActivityCard extends StatelessWidget {
           alignment: Alignment.center,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Image.asset(
-              imageAsset,
-              fit: BoxFit.contain,
-              errorBuilder: (_, _, _) => Icon(
-                isParcel ? Icons.local_shipping_rounded : Icons.directions_car_rounded,
-                color: isDark ? TaxiColors.darkTextSecondary : const Color(0xFF94A3B8),
-              ),
-            ),
+            child: vehicleImageUrl.isEmpty
+                ? bundled
+                : CachedNetworkImage(
+                    imageUrl: vehicleImageUrl,
+                    fit: BoxFit.contain,
+                    placeholder: (_, _) => bundled,
+                    errorWidget: (_, _, _) => bundled,
+                  ),
           ),
         ),
         Positioned(
@@ -120,7 +134,7 @@ class RecentActivityCard extends StatelessWidget {
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 8,
-                fontWeight: FontWeight.w900,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),
@@ -191,10 +205,10 @@ class RecentActivityCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          title,
+                          title.tr,
                           style: TextStyle(
                             fontSize: 15,
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.w600,
                             color: textPrimary,
                             letterSpacing: -0.2,
                           ),
@@ -203,10 +217,10 @@ class RecentActivityCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 3),
                         Text(
-                          finalSubtitle,
+                          finalSubtitle.tr,
                           style: TextStyle(
                             fontSize: 10,
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w600,
                             color: subtitleColor,
                             letterSpacing: 0.5,
                           ),
@@ -224,7 +238,7 @@ class RecentActivityCard extends StatelessWidget {
                         formattedFare,
                         style: TextStyle(
                           fontSize: 14,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w600,
                           color: textPrimary,
                         ),
                       ),
@@ -243,7 +257,7 @@ class RecentActivityCard extends StatelessWidget {
               // Location Row
               if (pickup.isNotEmpty || drop.isNotEmpty) ...[
                 Text(
-                  '$pickup${pickup.isNotEmpty && drop.isNotEmpty ? ' to ' : ''}$drop',
+                  '$pickup${pickup.isNotEmpty && drop.isNotEmpty ? ' ${'to'.tr} ' : ''}$drop',
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
@@ -272,7 +286,7 @@ class RecentActivityCard extends StatelessWidget {
                         dateStr,
                         style: TextStyle(
                           fontSize: 12,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w500,
                           color: textSecondary,
                         ),
                       ),
@@ -287,25 +301,30 @@ class RecentActivityCard extends StatelessWidget {
                         timeStr,
                         style: TextStyle(
                           fontSize: 12,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w500,
                           color: textSecondary,
                         ),
                       ),
                     ],
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: statusBg,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      statusLabel,
-                      style: TextStyle(
-                        color: statusColor,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 10,
-                        letterSpacing: 0.5,
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: statusBg,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        statusLabel.tr,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: statusColor,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 10,
+                          letterSpacing: 0.5,
+                        ),
                       ),
                     ),
                   ),

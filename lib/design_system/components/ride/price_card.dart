@@ -28,8 +28,11 @@ class PriceCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(label, style: Theme.of(context).textTheme.bodyMedium),
-              Text(Formatters.currency(amount), style: AppTextStylesPrice.style),
+              Flexible(
+                child: Text(label, style: Theme.of(context).textTheme.bodyMedium),
+              ),
+              const SizedBox(width: 12),
+              Text(Formatters.currency(amount), style: AppTextStylesPrice.style.copyWith(color: Theme.of(context).colorScheme.onSurface)),
             ],
           ),
           if (breakdown != null) ...[
@@ -40,7 +43,10 @@ class PriceCard extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(entry.key, style: Theme.of(context).textTheme.bodySmall),
+                    Flexible(
+                      child: Text(entry.key, style: Theme.of(context).textTheme.bodySmall),
+                    ),
+                    const SizedBox(width: 12),
                     Text(
                       Formatters.currency(entry.value),
                       style: Theme.of(context).textTheme.bodySmall,
@@ -58,7 +64,7 @@ class PriceCard extends StatelessWidget {
 
 class AppTextStylesPrice {
   static const style = TextStyle(
-    fontWeight: FontWeight.w800,
+    fontWeight: FontWeight.w600,
     fontSize: 20,
     color: TaxiColors.primary,
   );

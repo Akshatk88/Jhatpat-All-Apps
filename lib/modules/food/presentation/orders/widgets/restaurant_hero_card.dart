@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/modules/food/data/models/order_model.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
 import 'package:superapp_user/design_system/components/media/smart_image.dart';
@@ -92,7 +93,7 @@ class RestaurantHeroCard extends StatelessWidget {
                                   order.restaurantName,
                                   style: const TextStyle(
                                     fontSize: 20,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.w600,
                                     color: Colors.white,
                                   ),
                                   maxLines: 1,
@@ -112,16 +113,20 @@ class RestaurantHeroCard extends StatelessWidget {
                               const Icon(Icons.star_rounded, color: Colors.amber, size: 16),
                               const SizedBox(width: 4),
                               Text(
-                                order.restaurantRating > 0 ? order.restaurantRating.toStringAsFixed(1) : 'New',
-                                style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+                                order.restaurantRating > 0 ? order.restaurantRating.toStringAsFixed(1) : 'New'.tr,
+                                style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500),
                               ),
                               if (order.compactEtaLabel != null) ...[
                                 const Text('  •  ', style: TextStyle(color: Colors.white70, fontSize: 13)),
                                 const Icon(Icons.access_time_rounded, color: Colors.white70, size: 14),
                                 const SizedBox(width: 4),
-                                Text(
-                                  order.compactEtaLabel!,
-                                  style: const TextStyle(color: Colors.white, fontSize: 13),
+                                Flexible(
+                                  child: Text(
+                                    order.compactEtaLabel!,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(color: Colors.white, fontSize: 13),
+                                  ),
                                 ),
                               ],
                             ],
@@ -152,9 +157,9 @@ class RestaurantHeroCard extends StatelessWidget {
                             color: Colors.green.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Text(
-                            'Open',
-                            style: TextStyle(color: Colors.green, fontSize: 11, fontWeight: FontWeight.bold),
+                          child: Text(
+                            'Open'.tr,
+                            style: const TextStyle(color: Colors.green, fontSize: 11, fontWeight: FontWeight.w600),
                           ),
                         )
                       else
@@ -164,9 +169,9 @@ class RestaurantHeroCard extends StatelessWidget {
                             color: Colors.red.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Text(
-                            'Closed',
-                            style: TextStyle(color: Colors.red, fontSize: 11, fontWeight: FontWeight.bold),
+                          child: Text(
+                            'Closed'.tr,
+                            style: const TextStyle(color: Colors.red, fontSize: 11, fontWeight: FontWeight.w600),
                           ),
                         ),
                     ],

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:superapp_user/app/routing/back_navigation.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/shared/wallet/data/wallet_model.dart';
 import 'package:superapp_user/shared/profile/application/account_providers.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
@@ -40,17 +41,17 @@ class NotificationsScreen extends ConsumerWidget {
             onPressed: () => context.backOr(),
           ),
           title: Text(
-            'Notifications',
-            style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.bold),
+            'Notifications'.tr,
+            style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.w600),
           ),
         ),
         body: SafeArea(
           child: Column(
             children: [
-              const Expanded(
+              Expanded(
                 child: EmptyStateWidget(
-                  title: 'Login to View Notifications',
-                  subtitle: 'Please log in to receive updates on your orders and exclusive offers.',
+                  title: 'Login to View Notifications'.tr,
+                  subtitle: 'Please log in to receive updates on your orders and exclusive offers.'.tr,
                   icon: Icons.notifications_none_rounded,
                 ),
               ),
@@ -61,7 +62,7 @@ class NotificationsScreen extends ConsumerWidget {
                   height: 50,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFF7A00),
+                      backgroundColor: const Color(0xFFFFB800),
                       elevation: 0,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
                     ),
@@ -69,9 +70,9 @@ class NotificationsScreen extends ConsumerWidget {
                       Haptics.light();
                       context.push('${RouteNames.login}?from=${Uri.encodeComponent(RouteNames.orders)}');
                     },
-                    child: const Text(
-                      'LOG IN TO CONTINUE',
-                      style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+                    child: Text(
+                      'LOG IN TO CONTINUE'.tr,
+                      style: const TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.w600),
                     ),
                   ),
                 ),
@@ -94,8 +95,8 @@ class NotificationsScreen extends ConsumerWidget {
           onPressed: () => context.backOr(),
         ),
         title: Text(
-          'Notifications',
-          style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.bold),
+          'Notifications'.tr,
+          style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.w600),
         ),
       ),
       body: SafeArea(
@@ -110,11 +111,11 @@ class NotificationsScreen extends ConsumerWidget {
               children: [
                 const Icon(Icons.error_outline_rounded, size: 48, color: Colors.redAccent),
                 const SizedBox(height: 12),
-                Text('Could not load notifications', style: TextStyle(color: textColor, fontSize: 16)),
+                Text('Could not load notifications'.tr, style: TextStyle(color: textColor, fontSize: 16)),
                 const SizedBox(height: 12),
                 ElevatedButton(
                   onPressed: () => ref.invalidate(notificationsInboxProvider),
-                  child: const Text('Retry'),
+                  child: Text('Retry'.tr),
                 ),
               ],
             ),
@@ -122,9 +123,9 @@ class NotificationsScreen extends ConsumerWidget {
           data: (inbox) {
             final items = inbox.items;
             if (items.isEmpty) {
-              return const EmptyStateWidget(
-                title: "You're all caught up! 🎉",
-                subtitle: 'No notifications at this time. Check back later for updates.',
+              return EmptyStateWidget(
+                title: "You're all caught up! 🎉".tr,
+                subtitle: 'No notifications at this time. Check back later for updates.'.tr,
                 icon: Icons.notifications_off_outlined,
               );
             }
@@ -137,13 +138,15 @@ class NotificationsScreen extends ConsumerWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Notifications', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: textColor)),
-                          const SizedBox(height: 4),
-                          Text('Stay updated with your orders & offers', style: TextStyle(fontSize: 13, color: secondaryColor)),
-                        ],
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Notifications'.tr, style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: textColor)),
+                            const SizedBox(height: 4),
+                            Text('Stay updated with your orders & offers'.tr, style: TextStyle(fontSize: 13, color: secondaryColor)),
+                          ],
+                        ),
                       ),
                       if (items.isNotEmpty)
                         TextButton(
@@ -154,7 +157,7 @@ class NotificationsScreen extends ConsumerWidget {
                               ref.invalidate(notificationsInboxProvider);
                             } catch (_) {}
                           },
-                          child: const Text('Clear All', style: TextStyle(color: Color(0xFFFF7A00), fontWeight: FontWeight.bold)),
+                          child: Text('Clear All'.tr, style: const TextStyle(color: Color(0xFFE5A600), fontWeight: FontWeight.w700)),
                         ),
                     ],
                   ),
@@ -227,7 +230,7 @@ class _NotificationCard extends StatelessWidget {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: isUnread
-                ? const Color(0xFFFF7A00).withValues(alpha: isDark ? 0.14 : 0.08)
+                ? const Color(0xFFFFB800).withValues(alpha: isDark ? 0.14 : 0.08)
                 : (isDark ? AppColors.cardDark : Colors.white),
             borderRadius: BorderRadius.circular(18),
             boxShadow: isDark || isUnread
@@ -241,10 +244,10 @@ class _NotificationCard extends StatelessWidget {
                 width: 42,
                 height: 42,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFF7A00).withValues(alpha: 0.12),
+                  color: const Color(0xFFFFB800).withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.notifications_active_rounded, color: Color(0xFFFF7A00), size: 20),
+                child: const Icon(Icons.notifications_active_rounded, color: Color(0xFFFFB800), size: 20),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -257,7 +260,7 @@ class _NotificationCard extends StatelessWidget {
                         Expanded(
                           child: Text(
                             item.title,
-                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: textColor),
+                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: textColor),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),

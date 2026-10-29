@@ -1,4 +1,5 @@
 import 'package:superapp_user/modules/food/application/providers/fee_settings_providers.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -14,6 +15,7 @@ import 'package:superapp_user/modules/food/data/models/order_pricing.dart';
 import 'package:superapp_user/modules/food/data/models/restaurant_model.dart';
 import 'package:superapp_user/shared/auth/presentation/viewmodels/auth_viewmodel.dart';
 import 'package:superapp_user/shared/address/presentation/viewmodels/address_viewmodel.dart';
+import 'package:superapp_user/shared/location/application/current_location_provider.dart';
 import 'package:superapp_user/shared/address/data/address_model.dart';
 import 'package:superapp_user/modules/food/application/providers/catalog_providers.dart';
 import 'package:superapp_user/modules/food/presentation/cart/viewmodels/cart_viewmodel.dart';
@@ -43,7 +45,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
   // Values are the API's own payment method strings, so they can be sent as-is.
   // This used to be 'cod', which the backend never accepted -- the enum is
   // razorpay | razorpay_qr | card | wallet | cash -- so the COD button always failed.
-  String _selectedPaymentMethod = 'razorpay'; // 'razorpay' | 'cash' | 'wallet'
+  String _selectedPaymentMethod = 'cash'; // 'cash' | 'wallet'
   String? _selectedAddressId;
   final Set<String> _selectedInstructions = {};
 
@@ -53,6 +55,14 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     if (_selectedAddressId != null) {
       for (final a in addresses) {
         if (a.id == _selectedAddressId) return a;
+      }
+    }
+    // Nothing picked in the cart yet: start from the address picked app-wide
+    // (home header), so checkout delivers where the home screen says.
+    final current = ref.read(currentLocationProvider).value;
+    if (current != null && ref.read(selectedLocationLabelProvider) != null) {
+      for (final a in addresses) {
+        if (a.fullAddress.trim() == current.fullAddress.trim()) return a;
       }
     }
     for (final a in addresses) {
@@ -108,10 +118,10 @@ class _CartScreenState extends ConsumerState<CartScreen> {
         AppSnackbar.error(
           context,
           loadFailed
-              ? 'Could not load your saved address. Check your connection and try again.'
+              ? 'Could not load your saved address. Check your connection and try again.'.tr
               : hasSavedAddress
-                  ? 'Please select a delivery address to proceed.'
-                  : 'Add a delivery address to place your order.',
+                  ? 'Please select a delivery address to proceed.'.tr
+                  : 'Add a delivery address to place your order.'.tr,
         );
         // With nothing saved, the picker would just be an empty list.
         if (!loadFailed && !hasSavedAddress) {
@@ -140,7 +150,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
         if (!mounted) return;
         AppSnackbar.error(
           context,
-          checkoutState.error ?? 'Could not calculate bill. Please try again.',
+          checkoutState.error ?? 'Could not calculate bill. Please try again.'.tr,
         );
         return;
       }
@@ -149,7 +159,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
         await ref.read(checkoutViewModelProvider.notifier).acceptPriceChanges();
       }
 
-      // Suvio Wallet balance validation
+      // Jhatpat Wallet balance validation
       if (_selectedPaymentMethod == 'wallet') {
         final walletState = ref.read(walletViewModelProvider);
         final walletBalance = walletState.wallet.balance;
@@ -158,9 +168,9 @@ class _CartScreenState extends ConsumerState<CartScreen> {
           if (!mounted) return;
           AppSnackbar.warning(
             context,
-            'Insufficient wallet balance (₹${walletBalance.toStringAsFixed(2)}). Need ₹${totalToPay.toStringAsFixed(2)}.',
+            'Insufficient wallet balance (₹{balance}). Need ₹{total}.'.trArgs({'balance': walletBalance.toStringAsFixed(2), 'total': totalToPay.toStringAsFixed(2)}),
             action: SnackBarAction(
-              label: 'Add Money',
+              label: 'Add Money'.tr,
               textColor: Colors.white,
               onPressed: () {
                 context.push(RouteNames.wallet);
@@ -183,8 +193,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
           if (!mounted) return;
           AppSnackbar.warning(
             context,
-            'Cash on Delivery is not available for orders of '
-            '₹${fees.codOrderLimit!.toStringAsFixed(0)} or more. Please pay online.',
+            'Cash on Delivery is not available for orders of ₹{limit} or more. Please pay online.'.trArgs({'limit': fees.codOrderLimit!.toStringAsFixed(0)}),
           );
           return;
         }
@@ -195,11 +204,11 @@ class _CartScreenState extends ConsumerState<CartScreen> {
         if (!mounted) return;
         AppSnackbar.warning(
           context,
-          'Your delivery address is missing a $missing. Please complete it to place the order.',
+          'Your delivery address is missing a {field}. Please complete it to place the order.'.trArgs({'field': missing}),
           action: SnackBarAction(
-            label: 'Edit',
+            label: 'Edit'.tr,
             textColor: Colors.white,
-            onPressed: () => context.push(RouteNames.addAddress),
+            onPressed: () => context.push('${RouteNames.addAddress}?return=1'),
           ),
         );
         return;
@@ -270,10 +279,10 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Cooking requests',
+                      'Cooking requests'.tr,
                       style: TextStyle(
                         fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                         color: isDark
                             ? Colors.white
                             : AppColors.textPrimaryLight,
@@ -294,7 +303,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                     color: isDark ? Colors.white : AppColors.textPrimaryLight,
                   ),
                   decoration: InputDecoration(
-                    hintText: 'e.g. Make it less spicy, no onions...',
+                    hintText: 'e.g. Make it less spicy, no onions...'.tr,
                     hintStyle: TextStyle(
                       color: isDark
                           ? AppColors.textSecondaryDark
@@ -336,11 +345,11 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                       });
                       Navigator.pop(context);
                     },
-                    child: const Text(
-                      'Save Request',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                    child: Text(
+                      'Save Request'.tr,
+                      style: const TextStyle(
+                        color: Color(0xFF121212),
+                        fontWeight: FontWeight.w600,
                         fontSize: 15,
                       ),
                     ),
@@ -526,9 +535,9 @@ class _CartScreenState extends ConsumerState<CartScreen> {
           Row(
             children: [
               IconButton(
-                icon: const Icon(
+                icon: Icon(
                   Icons.arrow_back_rounded,
-                  color: Colors.white,
+                  color: isDark ? Colors.white : const Color(0xFF121212),
                   size: 22,
                 ),
                 onPressed: () {
@@ -565,10 +574,10 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                   Expanded(
                     child: Text(
                       restaurantName,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: isDark ? Colors.white : const Color(0xFF121212),
                         fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -644,7 +653,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                 // Add Items Chip
                 _buildActionChip(
                   icon: Icons.add_rounded,
-                  label: 'Add Items',
+                  label: 'Add Items'.tr,
                   isDark: isDark,
                   onTap: () {
                     Haptics.light();
@@ -671,8 +680,8 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                 _buildActionChip(
                   icon: Icons.edit_note_rounded,
                   label: _cookingRequest == null
-                      ? 'Cooking requests'
-                      : 'Request: $_cookingRequest',
+                      ? 'Cooking requests'.tr
+                      : 'Request: {request}'.trArgs({'request': _cookingRequest}),
                   isDark: isDark,
                   isSelected: _cookingRequest != null,
                   onTap: () {
@@ -697,11 +706,11 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     final food = item.food;
     final stepperBg = isDark
         ? const Color(0xFF2A2A2A)
-        : const Color(0xFFFFF7F2);
+        : const Color(0xFFFFF8E1);
     final stepperBorder = isDark
         ? const Color(0xFF3D3D3D)
         : AppColors.primary.withValues(alpha: 0.3);
-    final stepperTextColor = isDark ? Colors.white : AppColors.primary;
+    final stepperTextColor = isDark ? Colors.white : const Color(0xFFE5A600);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -767,7 +776,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                       food.name,
                       style: TextStyle(
                         fontSize: 15,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                         color: textColor,
                         letterSpacing: -0.2,
                         height: 1.2,
@@ -819,7 +828,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                       '−',
                       style: TextStyle(
                         fontSize: 18,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                         color: stepperTextColor,
                       ),
                     ),
@@ -832,7 +841,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                     '${item.quantity}',
                     style: TextStyle(
                       fontSize: 14,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       color: stepperTextColor,
                     ),
                   ),
@@ -856,7 +865,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                       '+',
                       style: TextStyle(
                         fontSize: 18,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                         color: stepperTextColor,
                       ),
                     ),
@@ -872,7 +881,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
             '₹${item.totalPrice.toStringAsFixed(0)}',
             style: TextStyle(
               fontSize: 15,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
               color: textColor,
             ),
             textAlign: TextAlign.right,
@@ -892,7 +901,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     final chipBg = isSelected
         ? (isDark
               ? AppColors.primary.withValues(alpha: 0.15)
-              : const Color(0xFFFFF5F0))
+              : const Color(0xFFFFF8E1))
         : (isDark ? const Color(0xFF222222) : Colors.white);
     final chipBorder = isSelected
         ? AppColors.primary.withValues(alpha: 0.6)
@@ -901,7 +910,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
         ? AppColors.primary
         : (isDark ? AppColors.textSecondaryDark : const Color(0xFF6B7280));
     final chipLabelColor = isSelected
-        ? (isDark ? AppColors.primary : const Color(0xFFD96300))
+        ? (isDark ? AppColors.primary : const Color(0xFF121212))
         : (isDark ? Colors.white : const Color(0xFF374151));
 
     return InkWell(
@@ -933,7 +942,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               label,
               style: TextStyle(
                 fontSize: 13,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 color: chipLabelColor,
                 letterSpacing: 0.1,
               ),
@@ -1004,18 +1013,22 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
-                            'Delivery Modes',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: _selectedTab == 0
-                                  ? FontWeight.bold
-                                  : FontWeight.w500,
-                              color: _selectedTab == 0
-                                  ? (isDark
-                                        ? Colors.white
-                                        : AppColors.textPrimaryLight)
-                                  : secondaryColor,
+                          Flexible(
+                            child: Text(
+                              'Delivery Modes'.tr,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: _selectedTab == 0
+                                    ? FontWeight.w600
+                                    : FontWeight.w500,
+                                color: _selectedTab == 0
+                                    ? (isDark
+                                          ? Colors.white
+                                          : AppColors.textPrimaryLight)
+                                    : secondaryColor,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 6),
@@ -1028,12 +1041,12 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                               color: const Color(0xFF00875A),
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            child: const Text(
-                              'NEW',
-                              style: TextStyle(
+                            child: Text(
+                              'NEW'.tr,
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 9,
-                                fontWeight: FontWeight.w800,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
@@ -1069,11 +1082,11 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                             : [],
                       ),
                       child: Text(
-                        'Instructions',
+                        'Instructions'.tr,
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: _selectedTab == 1
-                              ? FontWeight.bold
+                              ? FontWeight.w600
                               : FontWeight.w500,
                           color: _selectedTab == 1
                               ? (isDark
@@ -1112,10 +1125,10 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                           Row(
                             children: [
                               Text(
-                                'Quick ',
+                                'Quick '.tr,
                                 style: TextStyle(
                                   fontSize: 14,
-                                  fontWeight: FontWeight.w600,
+                                  fontWeight: FontWeight.w500,
                                   color: textColor,
                                 ),
                               ),
@@ -1124,7 +1137,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            'Add address to check delivery time',
+                            'Add address to check delivery time'.tr,
                             style: TextStyle(
                               fontSize: 11.5,
                               color: secondaryColor,
@@ -1137,7 +1150,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                       '+₹5',
                       style: TextStyle(
                         fontSize: 13,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                         color: textColor,
                       ),
                     ),
@@ -1169,16 +1182,16 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Basic',
+                            'Basic'.tr,
                             style: TextStyle(
                               fontSize: 14,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.w500,
                               color: textColor,
                             ),
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            'Add address to check delivery time',
+                            'Add address to check delivery time'.tr,
                             style: TextStyle(
                               fontSize: 11.5,
                               color: secondaryColor,
@@ -1201,7 +1214,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                 children: _availableInstructions.map((inst) {
                   final isSelected = _selectedInstructions.contains(inst);
                   return FilterChip(
-                    label: Text(inst),
+                    label: Text(inst.tr),
                     selected: isSelected,
                     onSelected: (selected) {
                       Haptics.light();
@@ -1218,10 +1231,10 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                     labelStyle: TextStyle(
                       fontSize: 12,
                       fontWeight: isSelected
-                          ? FontWeight.bold
+                          ? FontWeight.w600
                           : FontWeight.normal,
                       color: isSelected
-                          ? AppColors.primary
+                          ? const Color(0xFFE5A600)
                           : (isDark
                                 ? Colors.white
                                 : AppColors.textPrimaryLight),
@@ -1265,8 +1278,8 @@ class _CartScreenState extends ConsumerState<CartScreen> {
   ) {
     final applied = pricing?.hasCouponApplied ?? false;
     final label = applied
-        ? '$couponCode applied · You saved ₹${pricing!.discount.toStringAsFixed(0)}'
-        : 'Payment offers & more';
+        ? '{code} applied · You saved ₹{amount}'.trArgs({'code': couponCode, 'amount': pricing!.discount.toStringAsFixed(0)})
+        : 'Payment offers & more'.tr;
 
     return InkWell(
       onTap: () {
@@ -1313,7 +1326,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                 label,
                 style: TextStyle(
                   fontSize: 14.5,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w500,
                   color: applied ? const Color(0xFF00875A) : textColor,
                 ),
               ),
@@ -1417,20 +1430,20 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Bill Details',
+                        'Bill Details'.tr,
                         style: TextStyle(
                           fontSize: 14,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w500,
                           color: secondaryColor,
                           letterSpacing: 0.2,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'To Pay  ₹${toPay.toStringAsFixed(0)}',
+                        'To Pay  ₹{amount}'.trArgs({'amount': toPay.toStringAsFixed(0)}),
                         style: TextStyle(
                           fontSize: 18,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w600,
                           color: textColor,
                         ),
                       ),
@@ -1451,11 +1464,11 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                         color: const Color(0xFF10B981).withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Text(
-                        'Incl. taxes',
-                        style: TextStyle(
+                      child: Text(
+                        'Incl. taxes'.tr,
+                        style: const TextStyle(
                           fontSize: 10,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: Color(0xFF059669),
                           letterSpacing: 0.3,
                         ),
@@ -1488,7 +1501,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
             const SizedBox(height: 16),
 
             _buildBillRow(
-              'Item Total',
+              'Item Total'.tr,
               '₹${itemTotal.toStringAsFixed(0)}',
               secondaryColor,
               textColor,
@@ -1496,15 +1509,15 @@ class _CartScreenState extends ConsumerState<CartScreen> {
             const SizedBox(height: 12),
 
             _buildBillRow(
-              'Delivery Fee',
-              deliveryFee == 0 ? 'FREE' : '₹${deliveryFee.toStringAsFixed(0)}',
+              'Delivery Fee'.tr,
+              deliveryFee == 0 ? 'FREE'.tr : '₹${deliveryFee.toStringAsFixed(0)}',
               secondaryColor,
               deliveryFee == 0 ? const Color(0xFF059669) : textColor,
             ),
             const SizedBox(height: 12),
 
             _buildBillRow(
-              'Platform Fee',
+              'Platform Fee'.tr,
               '₹${platformFee.toStringAsFixed(0)}',
               secondaryColor,
               textColor,
@@ -1514,7 +1527,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
             if (packingCharges > 0) ...[
               const SizedBox(height: 12),
               _buildBillRow(
-                'Packing Charges',
+                'Packing Charges'.tr,
                 '₹${packingCharges.toStringAsFixed(0)}',
                 secondaryColor,
                 textColor,
@@ -1537,7 +1550,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
             if ((pricing?.deliveryFeeGst ?? 0) > 0) ...[
               const SizedBox(height: 12),
               _buildBillRow(
-                _gstLabel('GST on Delivery Fee', pricing?.deliveryFeeGstRate ?? 0),
+                _gstLabel('GST on Delivery Fee'.tr, pricing?.deliveryFeeGstRate ?? 0),
                 '₹${pricing!.deliveryFeeGst.toStringAsFixed(2)}',
                 secondaryColor,
                 textColor,
@@ -1547,7 +1560,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
             if (savings > 0) ...[
               const SizedBox(height: 12),
               _buildBillRow(
-                couponApplied ? 'Coupon Discount' : 'Discount',
+                couponApplied ? 'Coupon Discount'.tr : 'Discount'.tr,
                 '−₹${savings.toStringAsFixed(0)}',
                 const Color(0xFF059669),
                 const Color(0xFF059669),
@@ -1566,10 +1579,10 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Grand Total',
+                  'Grand Total'.tr,
                   style: TextStyle(
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: textColor,
                   ),
                 ),
@@ -1577,8 +1590,8 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                   '₹${toPay.toStringAsFixed(0)}',
                   style: TextStyle(
                     fontSize: 19,
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.primary,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFFE5A600),
                   ),
                 ),
               ],
@@ -1599,14 +1612,17 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            color: labelColor,
-            fontWeight: FontWeight.w500,
+        Flexible(
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              color: labelColor,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
+        const SizedBox(width: 8),
         Row(
           children: [
             if (originalAmount != null) ...[
@@ -1625,7 +1641,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               value,
               style: TextStyle(
                 fontSize: 14.5,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w500,
                 color: valueColor,
               ),
             ),
@@ -1643,16 +1659,16 @@ class _CartScreenState extends ConsumerState<CartScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Cancellation policy:',
+            'Cancellation policy:'.tr,
             style: TextStyle(
               fontSize: 12.5,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
               color: secondaryColor.withValues(alpha: 0.9),
             ),
           ),
           const SizedBox(height: 3),
           Text(
-            'Please double-check your order and address details. Orders are non-refundable once placed.',
+            'Please double-check your order and address details. Orders are non-refundable once placed.'.tr,
             style: TextStyle(
               fontSize: 12,
               color: secondaryColor.withValues(alpha: 0.8),
@@ -1669,12 +1685,14 @@ class _CartScreenState extends ConsumerState<CartScreen> {
   /// AddAddressScreen already persists through addressViewModelProvider before
   /// popping, so the newly appended entry is the one to select.
   Future<void> _openAddAddressScreen() async {
-    final result = await context.push<dynamic>(RouteNames.addAddress);
+    // `?return=1`: come back here after saving, not to the home screen.
+    final result = await context.push<dynamic>('${RouteNames.addAddress}?return=1');
     if (result == null || !mounted) return;
 
     final saved = ref.read(addressViewModelProvider);
     if (saved.isEmpty) return;
     setState(() => _selectedAddressId = saved.last.id);
+    unawaited(ref.read(currentLocationProvider.notifier).selectAddress(saved.last));
     Haptics.medium();
     // The bill is priced against the chosen address, so it is now stale.
     unawaited(ref.read(checkoutViewModelProvider.notifier).setAddress(saved.last.id));
@@ -1713,12 +1731,14 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'Choose a delivery address',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: textColor,
+                      Flexible(
+                        child: Text(
+                          'Choose a delivery address'.tr,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: textColor,
+                          ),
                         ),
                       ),
                       InkWell(
@@ -1788,11 +1808,11 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                           ),
                           const SizedBox(width: 14),
                           Text(
-                            'Add new Address',
+                            'Add new Address'.tr,
                             style: TextStyle(
                               fontSize: 15.5,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFFE5A600),
                             ),
                           ),
                         ],
@@ -1815,7 +1835,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       child: Text(
-                        'No saved addresses yet. Add one to continue.',
+                        'No saved addresses yet. Add one to continue.'.tr,
                         style: TextStyle(fontSize: 13.5, color: secondaryColor),
                       ),
                     )
@@ -1823,7 +1843,6 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                     Flexible(
                       child: ListView.separated(
                         shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
                         itemCount: addresses.length,
                         separatorBuilder: (context, index) => Column(
                           children: [
@@ -1882,7 +1901,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                   if (!context.mounted) return;
                                   AppSnackbar.success(
                                     context,
-                                    '"${addr.title}" deleted',
+                                    '"{title}" deleted'.trArgs({'title': addr.title}),
                                     duration: const Duration(seconds: 2),
                                   );
                                 },
@@ -1915,12 +1934,12 @@ class _CartScreenState extends ConsumerState<CartScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          title: const Text(
-            'Delete Address',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          title: Text(
+            'Delete Address'.tr,
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
           ),
           content: Text(
-            'Are you sure you want to delete "$title"?',
+            'Are you sure you want to delete "{title}"?'.trArgs({'title': title}),
             style: TextStyle(
               fontSize: 14,
               color: isDark
@@ -1932,10 +1951,10 @@ class _CartScreenState extends ConsumerState<CartScreen> {
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
               child: Text(
-                'Cancel',
+                'Cancel'.tr,
                 style: TextStyle(
                   color: isDark ? Colors.white70 : Colors.black54,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
@@ -1951,11 +1970,11 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                 Navigator.pop(dialogContext);
                 onConfirm();
               },
-              child: const Text(
-                'Delete',
-                style: TextStyle(
+              child: Text(
+                'Delete'.tr,
+                style: const TextStyle(
                   color: Colors.white,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
@@ -1981,6 +2000,13 @@ class _CartScreenState extends ConsumerState<CartScreen> {
       onTap: () {
         Haptics.light();
         setState(() => _selectedAddressId = addressId);
+        // Picking a delivery address here also moves the app-wide location.
+        for (final a in ref.read(addressViewModelProvider)) {
+          if (a.id == addressId) {
+            unawaited(ref.read(currentLocationProvider.notifier).selectAddress(a));
+            break;
+          }
+        }
         Navigator.pop(sheetContext);
       },
       borderRadius: BorderRadius.circular(12),
@@ -2019,12 +2045,16 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                 children: [
                   Row(
                     children: [
-                      Text(
-                        title,
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: isSelected ? AppColors.primary : textColor,
+                      Flexible(
+                        child: Text(
+                          title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: isSelected ? const Color(0xFFE5A600) : textColor,
+                          ),
                         ),
                       ),
                       if (isSelected) ...[
@@ -2039,11 +2069,11 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            'Selected',
+                            'Selected'.tr,
                             style: TextStyle(
                               fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFFE5A600),
                             ),
                           ),
                         ),
@@ -2074,7 +2104,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                 color: Colors.redAccent,
                 size: 20,
               ),
-              tooltip: 'Delete address',
+              tooltip: 'Delete address'.tr,
             ),
           ],
         ),
@@ -2086,12 +2116,12 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     final amount = toPay.toStringAsFixed(0);
     switch (_selectedPaymentMethod) {
       case 'cash':
-        return 'PLACE COD ORDER (₹$amount)';
+        return 'PLACE COD ORDER (₹{amount})'.trArgs({'amount': amount});
       case 'wallet':
-        return 'PAY WITH WALLET (₹$amount)';
+        return 'PAY WITH WALLET (₹{amount})'.trArgs({'amount': amount});
       case 'razorpay':
       default:
-        return 'PROCEED TO PAYMENT (₹$amount)';
+        return 'PROCEED TO PAYMENT (₹{amount})'.trArgs({'amount': amount});
     }
   }
 
@@ -2106,14 +2136,14 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     // an empty list. Send these customers straight to the add screen instead.
     final hasSavedAddress = ref.watch(addressViewModelProvider).isNotEmpty;
     final addressTitle = resolvedAddress?.title ??
-        (hasSavedAddress ? 'Delivery Address' : 'No address added yet');
+        (hasSavedAddress ? 'Delivery Address'.tr : 'No address added yet'.tr);
     final addressDisplay = resolvedAddress != null
         ? (resolvedAddress.city.isNotEmpty
             ? '${resolvedAddress.title} · ${resolvedAddress.city}, ${resolvedAddress.fullAddress}'
             : '${resolvedAddress.title} · ${resolvedAddress.fullAddress}')
         : (hasSavedAddress
-            ? 'Select a delivery address'
-            : 'Add a delivery address to see the delivery fee and place your order');
+            ? 'Select a delivery address'.tr
+            : 'Add a delivery address to see the delivery fee and place your order'.tr);
 
     void openAddressPicker() {
       Haptics.light();
@@ -2154,10 +2184,10 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Delivery Address',
+                    'Delivery Address'.tr,
                     style: TextStyle(
                       fontSize: 15,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       color: textColor,
                     ),
                   ),
@@ -2166,13 +2196,13 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               InkWell(
                 onTap: openAddressPicker,
                 child: Text(
-                  hasSavedAddress ? 'CHANGE' : '+ ADD',
+                  hasSavedAddress ? 'CHANGE'.tr : '+ ADD'.tr,
                   // Not const: AppColors.primary is a mutable static, reassigned
                   // by ThemeColorNotifier when the user picks a theme colour.
                   style: TextStyle(
-                    color: AppColors.primary,
+                    color: const Color(0xFFE5A600),
                     fontSize: 13,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
@@ -2217,7 +2247,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                           addressTitle,
                           style: TextStyle(
                             fontSize: 14,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: textColor,
                           ),
                         ),
@@ -2272,7 +2302,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
             final codLimit = feeSettings.codOrderLimit;
             final codDisabledReason = feeSettings.allowsCodFor(toPay)
                 ? null
-                : 'Not available above ₹${codLimit!.toStringAsFixed(0)} — please pay online';
+                : 'Not available above ₹{limit} — please pay online'.trArgs({'limit': codLimit!.toStringAsFixed(0)});
 
             final modalTextColor = isDark
                 ? AppColors.textPrimaryDark
@@ -2305,16 +2335,16 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Select Payment Method',
+                      'Select Payment Method'.tr,
                       style: TextStyle(
                         fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                         color: modalTextColor,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Total Payable Amount: ₹${toPay.toStringAsFixed(2)}',
+                      'Total Payable Amount: ₹{amount}'.trArgs({'amount': toPay.toStringAsFixed(2)}),
                       style: TextStyle(
                         fontSize: 13,
                         color: modalSecondaryColor,
@@ -2322,28 +2352,27 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                     ),
                     const SizedBox(height: 20),
 
-                    // Option 1: Online Payment (Razorpay / UPI / Cards)
-                    _paymentOptionTile(
-                      ctx: modalCtx,
-                      methodKey: 'razorpay',
-                      icon: Icons.credit_card_rounded,
-                      title: 'Online Payment (UPI, Cards, NetBanking)',
-                      subtitle: 'Pay securely via Razorpay payment gateway',
-                      isDark: isDark,
-                      modalTextColor: modalTextColor,
-                      modalSecondaryColor: modalSecondaryColor,
-                    ),
-
-                    const SizedBox(height: 10),
+                    // Option 1: Online Payment (Commented out)
+                    // _paymentOptionTile(
+                    //   ctx: modalCtx,
+                    //   methodKey: 'razorpay',
+                    //   icon: Icons.credit_card_rounded,
+                    //   title: 'Online Payment (Cards, NetBanking)',
+                    //   subtitle: 'Pay securely via Razorpay payment gateway',
+                    //   isDark: isDark,
+                    //   modalTextColor: modalTextColor,
+                    //   modalSecondaryColor: modalSecondaryColor,
+                    // ),
+                    // const SizedBox(height: 10),
 
                     // Option 2: Cash on Delivery (COD)
                     _paymentOptionTile(
                       ctx: modalCtx,
                       methodKey: 'cash',
                       icon: Icons.payments_outlined,
-                      title: 'Cash on Delivery (COD)',
+                      title: 'Cash on Delivery (COD)'.tr,
                       subtitle: codDisabledReason ??
-                          'Pay in cash when your food is delivered',
+                          'Pay in cash when your food is delivered'.tr,
                       disabledReason: codDisabledReason,
                       isDark: isDark,
                       modalTextColor: modalTextColor,
@@ -2352,18 +2381,18 @@ class _CartScreenState extends ConsumerState<CartScreen> {
 
                     const SizedBox(height: 10),
 
-                    // Option 3: Suvio Wallet
+                    // Option 3: Jhatpat Wallet
                     _paymentOptionTile(
                       ctx: modalCtx,
                       methodKey: 'wallet',
                       icon: Icons.account_balance_wallet_outlined,
-                      title: 'Suvio Wallet',
+                      title: 'JhatPat Wallet'.tr,
                       subtitle: walletBalance >= toPay
-                          ? 'Available balance: ₹${walletBalance.toStringAsFixed(2)}'
-                          : 'Balance: ₹${walletBalance.toStringAsFixed(2)} (Insufficient balance)',
+                          ? 'Available balance: ₹{amount}'.trArgs({'amount': walletBalance.toStringAsFixed(2)})
+                          : 'Balance: ₹{amount} (Insufficient balance)'.trArgs({'amount': walletBalance.toStringAsFixed(2)}),
                       badgeText: walletBalance < toPay
-                          ? 'LOW BALANCE'
-                          : 'INSTANT',
+                          ? 'LOW BALANCE'.tr
+                          : 'INSTANT'.tr,
                       badgeColor: walletBalance < toPay
                           ? AppColors.error
                           : AppColors.success,
@@ -2438,7 +2467,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               ),
               child: Icon(
                 icon,
-                color: isSelected ? Colors.white : AppColors.primary,
+                color: isSelected ? const Color(0xFF121212) : AppColors.primary,
                 size: 20,
               ),
             ),
@@ -2454,7 +2483,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                           title,
                           style: TextStyle(
                             fontSize: 14,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: modalTextColor,
                           ),
                         ),
@@ -2476,8 +2505,8 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                             badgeText,
                             style: TextStyle(
                               fontSize: 9.5,
-                              fontWeight: FontWeight.bold,
-                              color: badgeColor ?? AppColors.primary,
+                              fontWeight: FontWeight.w600,
+                              color: badgeColor ?? const Color(0xFFE5A600),
                             ),
                           ),
                         ),
@@ -2523,16 +2552,16 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     switch (_selectedPaymentMethod) {
       case 'cash':
         paymentIcon = Icons.payments_outlined;
-        paymentDisplay = 'Cash on Delivery (COD)';
+        paymentDisplay = 'Cash on Delivery (COD)'.tr;
         break;
       case 'wallet':
         paymentIcon = Icons.account_balance_wallet_outlined;
-        paymentDisplay = 'Suvio Wallet (₹${walletBalance.toStringAsFixed(0)})';
+        paymentDisplay = 'JhatPat Wallet (₹{amount})'.trArgs({'amount': walletBalance.toStringAsFixed(0)});
         break;
       case 'razorpay':
       default:
         paymentIcon = Icons.credit_card_rounded;
-        paymentDisplay = 'Online Payment (UPI/Cards)';
+        paymentDisplay = 'Online Payment (Cards/NetBanking)'.tr;
         break;
     }
 
@@ -2610,7 +2639,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                         paymentDisplay,
                         style: TextStyle(
                           fontSize: 13.5,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w500,
                           color: textColor,
                           letterSpacing: 0.1,
                         ),
@@ -2620,11 +2649,11 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'Change',
+                      'Change'.tr,
                       style: TextStyle(
-                        color: AppColors.primary,
+                        color: const Color(0xFFE5A600),
                         fontSize: 13,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
@@ -2641,7 +2670,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
+                  foregroundColor: const Color(0xFF121212),
                   elevation: 4,
                   shadowColor: AppColors.primary.withValues(alpha: 0.6),
                   shape: RoundedRectangleBorder(
@@ -2654,26 +2683,32 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                         width: 24,
                         height: 24,
                         child: CircularProgressIndicator(
-                          color: Colors.white,
+                          color: Color(0xFF121212),
                           strokeWidth: 3,
                         ),
                       )
                     : Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
-                            _getPaymentButtonLabel(toPay),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.5,
+                          Flexible(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                _getPaymentButtonLabel(toPay),
+                                maxLines: 1,
+                                style: const TextStyle(
+                                  color: Color(0xFF121212),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
                             ),
                           ),
                           const SizedBox(width: 8),
                           const Icon(
                             Icons.arrow_forward_rounded,
-                            color: Colors.white,
+                            color: Color(0xFF121212),
                             size: 18,
                           ),
                         ],

@@ -122,8 +122,8 @@ class _CelebrationEffectState extends State<CelebrationEffect> with SingleTicker
   void _initParticles() {
     final size = MediaQuery.of(context).size;
     final colors = [
-      const Color(0xFFFF7A00),
-      const Color(0xFFFFB039),
+      const Color(0xFFFFB800),
+      const Color(0xFFE5A600),
       const Color(0xFFFFD56F),
       Colors.white,
     ];

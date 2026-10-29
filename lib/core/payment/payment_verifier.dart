@@ -4,7 +4,7 @@
 /// the signature triple has to be verified by the backend before money is
 /// treated as received. This interface is what lets `core/payment` do that
 /// without knowing whether the thing being paid for is a food order, a ride,
-/// a parcel or a rental advance.
+/// a parcel.
 ///
 /// Each module supplies its own implementation against its own endpoint
 /// (`/food/orders/verify-payment`, `/taxi/rides/:id/complete-payment/...`).

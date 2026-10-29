@@ -1,3 +1,4 @@
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:superapp_user/design_system/components/feedback/taxi_snackbar_utils.dart';
@@ -23,7 +24,7 @@ class _NoInternetScreenState extends State<NoInternetScreen> {
     if (connected) {
       widget.onConnected?.call();
     } else if (mounted) {
-      SnackbarUtils.error(context, 'Still no internet connection');
+      SnackbarUtils.error(context, 'Still no internet connection'.tr);
     }
   }
 
@@ -31,9 +32,9 @@ class _NoInternetScreenState extends State<NoInternetScreen> {
   Widget build(BuildContext context) {
     return SystemStatusView(
       icon: Icons.wifi_off_rounded,
-      title: 'No internet connection',
-      message: 'Please check your Wi-Fi or mobile data settings and try again.',
-      primaryActionLabel: 'Retry',
+      title: 'No internet connection'.tr,
+      message: 'Please check your Wi-Fi or mobile data settings and try again.'.tr,
+      primaryActionLabel: 'Retry'.tr,
       primaryActionLoading: _checking,
       onPrimaryAction: _retry,
     );

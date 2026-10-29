@@ -1,11 +1,18 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:superapp_user/design_system/components/feedback/cancel_reason_sheet.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/core/maps/app_map_style.dart';
+import 'package:superapp_user/core/speech/hindi_announcer.dart';
+import 'package:superapp_user/design_system/components/buttons/announce_button.dart';
 import 'package:superapp_user/design_system/components/feedback/taxi_snackbar_utils.dart';
 import 'package:superapp_user/modules/taxi/ride/application/ride_providers.dart';
 import 'package:superapp_user/modules/taxi/home/application/booking_controller.dart';
+import 'package:superapp_user/modules/taxi/home/application/booking_state.dart';
+import 'package:superapp_user/modules/taxi/home/application/vehicle_image.dart';
 import 'package:superapp_user/modules/taxi/home/application/ride_search_controller.dart';
 import 'package:superapp_user/modules/taxi/home/application/ride_search_state.dart';
 import 'package:superapp_user/modules/taxi/home/presentation/nearby_driver_markers.dart';
@@ -23,6 +30,7 @@ class _FindingDriverScreenState extends ConsumerState<FindingDriverScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _pulseController;
   bool _leaving = false;
+  bool _announced = false;
 
   @override
   void initState() {
@@ -43,6 +51,7 @@ class _FindingDriverScreenState extends ConsumerState<FindingDriverScreen>
       _handlePhase(search);
       return;
     }
+    _announceOnce(search);
     try {
       final activeRide = await ref.read(rideRepositoryProvider).getMyActiveRide();
       if (activeRide != null && !_leaving && mounted) {
@@ -59,7 +68,45 @@ class _FindingDriverScreenState extends ConsumerState<FindingDriverScreen>
   @override
   void dispose() {
     _pulseController.dispose();
+    HindiAnnouncer.instance.stop();
     super.dispose();
+  }
+
+  /// Speaks the booking once the server has created the ride (phase
+  /// `searching`) — not while it is still being created, so a failed booking
+  /// is never announced as booked.
+  void _announceOnce(RideSearchState search) {
+    if (_announced || _leaving || !mounted) return;
+    if (search.phase != RideSearchPhase.searching) return;
+    if (!HindiAnnouncer.appInForeground) return;
+    final booking = ref.read(bookingControllerProvider);
+    if (booking.pickup == null || booking.drop == null) return;
+    _announced = true;
+    HindiAnnouncer.instance.speak(_announcementText(booking));
+  }
+
+  String _announcementText(BookingState booking) {
+    final vehicle = booking.selectedVehicle;
+    final fare = (vehicle != null
+            ? ref.read(bookingControllerProvider.notifier).fareForVehicle(vehicle)?.total
+            : null) ??
+        booking.fareBreakdown?.total;
+    final distance = booking.distanceMeters;
+    final parts = <String>[
+      vehicle != null && vehicle.name.isNotEmpty
+          ? 'आपकी ${vehicle.name} राइड बुक हो गई है।'
+          : 'आपकी राइड बुक हो गई है।',
+      if (booking.pickup != null && booking.drop != null)
+        '${HindiAnnouncer.address(booking.pickup!.address)} से '
+            '${HindiAnnouncer.address(booking.drop!.address)} तक।',
+      if (distance != null && distance > 0)
+        'दूरी लगभग ${HindiAnnouncer.kilometers(distance / 1000)}।',
+      if (fare != null && fare > 0)
+        'किराया ${HindiAnnouncer.rupees(fare)}, भुगतान '
+            '${booking.paymentMethod == 'cash' ? 'कैश में' : booking.paymentMethod == 'wallet' ? 'वॉलेट से' : 'ऑनलाइन'}।',
+      'हम आपके लिए ड्राइवर ढूंढ रहे हैं।',
+    ];
+    return parts.join(' ');
   }
 
   /// The search phase is decided entirely by the server: `rideSearchUpdate`
@@ -82,7 +129,7 @@ class _FindingDriverScreenState extends ConsumerState<FindingDriverScreen>
         break;
       case RideSearchPhase.failed:
         _leaving = true;
-        SnackbarUtils.error(context, next.message ?? 'Could not create your booking');
+        SnackbarUtils.error(context, next.message ?? 'Could not create your booking'.tr);
         context.pushReplacement('/taxi/no-driver');
         break;
       case RideSearchPhase.cancelled:
@@ -98,17 +145,25 @@ class _FindingDriverScreenState extends ConsumerState<FindingDriverScreen>
 
   Future<void> _cancelSearch() async {
     if (_leaving) return;
+    final reason = await askCancelReason(
+      context,
+      title: 'Cancel this ride?',
+      reasons: CancelReasons.ride,
+      confirmLabel: 'Cancel ride',
+      keepLabel: 'Keep searching',
+    );
+    if (reason == null || !mounted || _leaving) return;
     // Claim the exit up front so the phase listener doesn't also navigate when
     // cancelSearch flips the state to `cancelled`.
     _leaving = true;
 
     final ok = await ref.read(rideSearchControllerProvider.notifier).cancelSearch(
-          reason: 'Cancelled while searching for a driver',
+          reason: reason,
         );
     if (!mounted) return;
     if (!ok) {
       _leaving = false;
-      SnackbarUtils.error(context, 'Could not cancel the ride. Please try again.');
+      SnackbarUtils.error(context, 'Could not cancel the ride. Please try again.'.tr);
       return;
     }
     ref.read(bookingControllerProvider.notifier).reset();
@@ -153,7 +208,7 @@ class _FindingDriverScreenState extends ConsumerState<FindingDriverScreen>
               text,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF0F172A)),
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Color(0xFF0F172A)),
             ),
           ),
         ],
@@ -170,7 +225,10 @@ class _FindingDriverScreenState extends ConsumerState<FindingDriverScreen>
     final vehicle = booking.selectedVehicle;
     final pickupLatLng = pickup != null ? LatLng(pickup.lat, pickup.lng) : _fallbackLatLng;
 
-    ref.listen(rideSearchControllerProvider, (previous, next) => _handlePhase(next));
+    ref.listen(rideSearchControllerProvider, (previous, next) {
+      _handlePhase(next);
+      _announceOnce(next);
+    });
 
     // Progress reflects the server's real dispatch attempts, so the bar can
     // only reach the end when the backend has genuinely run out of drivers.
@@ -178,10 +236,10 @@ class _FindingDriverScreenState extends ConsumerState<FindingDriverScreen>
         ? (search.attempt / search.maxAttempts).clamp(0.0, 1.0)
         : null;
     final searchLabel = search.radiusMeters > 0
-        ? 'Searching ${(search.radiusMeters / 1000).toStringAsFixed(1)} km around you'
-        : 'Contacting nearby drivers…';
+        ? 'Searching {km} km around you'.trArgs({'km': (search.radiusMeters / 1000).toStringAsFixed(1)})
+        : 'Contacting nearby drivers…'.tr;
     final paymentLabel =
-        booking.paymentMethod == 'cash' ? 'Cash' : booking.paymentMethod.toUpperCase();
+        booking.paymentMethod == 'cash' ? 'Cash'.tr : booking.paymentMethod.toUpperCase();
 
     return PopScope(
       canPop: false,
@@ -234,7 +292,7 @@ class _FindingDriverScreenState extends ConsumerState<FindingDriverScreen>
               flex: 6,
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+                padding: EdgeInsets.fromLTRB(20, 16, 20, 20 + MediaQuery.of(context).padding.bottom),
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -263,9 +321,9 @@ class _FindingDriverScreenState extends ConsumerState<FindingDriverScreen>
                             child: Icon(Icons.person, color: Color(0xFF94A3B8)),
                           ),
                           const SizedBox(width: 10),
-                          const Text(
-                            'Discover your Driver',
-                            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
+                          Text(
+                            'Discover your Driver'.tr,
+                            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: Color(0xFF0F172A)),
                           ),
                         ],
                       ),
@@ -276,24 +334,29 @@ class _FindingDriverScreenState extends ConsumerState<FindingDriverScreen>
                           value: progress,
                           minHeight: 6,
                           backgroundColor: const Color(0xFFE2E8F0),
-                          valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
+                          valueColor: const AlwaysStoppedAnimation(Color(0xFFFFB800)),
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         searchLabel,
-                        style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
+                        style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500, color: Color(0xFF64748B)),
                       ),
                       if (search.totalNotifiedDrivers > 0)
                         Padding(
                           padding: const EdgeInsets.only(top: 2),
                           child: Text(
-                            '${search.totalNotifiedDrivers} driver(s) notified',
+                            '{count} driver(s) notified'.trArgs({'count': search.totalNotifiedDrivers}),
                             style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
                           ),
                         ),
                       const SizedBox(height: 20),
-                      const Text('Booking Details', style: _sectionTitleStyle),
+                      Row(
+                        children: [
+                          Expanded(child: Text('Booking Details'.tr, style: _sectionTitleStyle)),
+                          AnnounceButton(text: _announcementText(booking)),
+                        ],
+                      ),
                       const SizedBox(height: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -309,7 +372,7 @@ class _FindingDriverScreenState extends ConsumerState<FindingDriverScreen>
                             const Divider(height: 1, color: Color(0xFFF1F5F9)),
                             _addressRow(
                               icon: Icons.location_on,
-                              iconColor: const Color(0xFFFF5C2B),
+                              iconColor: const Color(0xFFE5A600),
                               iconSize: 18,
                               text: drop?.address ?? '—',
                             ),
@@ -317,29 +380,31 @@ class _FindingDriverScreenState extends ConsumerState<FindingDriverScreen>
                         ),
                       ),
                       const SizedBox(height: 16),
-                      const Text('Ride details', style: _sectionTitleStyle),
+                      Text('Ride details'.tr, style: _sectionTitleStyle),
                       const SizedBox(height: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                         decoration: _cardDecoration,
                         child: Row(
                           children: [
-                            Image.asset(
-                              _assetForVehicle(vehicle?.iconType ?? '', vehicle?.name ?? ''),
-                              width: 28,
-                              height: 28,
-                              fit: BoxFit.contain,
+                            _VehicleThumb(
+                              imageUrl: adminVehicleImage(vehicle),
+                              asset: _assetForVehicle(vehicle?.iconType ?? '', vehicle?.name ?? ''),
                             ),
                             const SizedBox(width: 10),
-                            Text(
-                              vehicle?.name ?? 'Ride',
-                              style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+                            Flexible(
+                              child: Text(
+                                vehicle?.name ?? 'Ride'.tr,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600, color: Color(0xFF0F172A)),
+                              ),
                             ),
                           ],
                         ),
                       ),
                       const SizedBox(height: 16),
-                      const Text('Payment', style: _sectionTitleStyle),
+                      Text('Payment'.tr, style: _sectionTitleStyle),
                       const SizedBox(height: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -350,13 +415,13 @@ class _FindingDriverScreenState extends ConsumerState<FindingDriverScreen>
                             const SizedBox(width: 10),
                             Text(
                               paymentLabel,
-                              style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+                              style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600, color: Color(0xFF0F172A)),
                             ),
                           ],
                         ),
                       ),
                       const SizedBox(height: 16),
-                      const Text('Manage Ride', style: _sectionTitleStyle),
+                      Text('Manage Ride'.tr, style: _sectionTitleStyle),
                       const SizedBox(height: 8),
                       SizedBox(
                         width: double.infinity,
@@ -370,9 +435,9 @@ class _FindingDriverScreenState extends ConsumerState<FindingDriverScreen>
                           ),
                           onPressed: _cancelSearch,
                           icon: const Icon(Icons.cancel_outlined),
-                          label: const Text(
-                            'Cancel Ride',
-                            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                          label: Text(
+                            'Cancel Ride'.tr,
+                            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
                           ),
                         ),
                       ),
@@ -388,10 +453,32 @@ class _FindingDriverScreenState extends ConsumerState<FindingDriverScreen>
   }
 }
 
-const _sectionTitleStyle = TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Color(0xFF0F172A));
+const _sectionTitleStyle = TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF0F172A));
 
 const _cardDecoration = BoxDecoration(
   color: Colors.white,
   borderRadius: BorderRadius.all(Radius.circular(12)),
   border: Border.fromBorderSide(BorderSide(color: Color(0xFFF1F5F9))),
 );
+
+/// Admin vehicle picture, with the bundled art while loading or on failure.
+class _VehicleThumb extends StatelessWidget {
+  const _VehicleThumb({required this.imageUrl, required this.asset});
+
+  final String imageUrl;
+  final String asset;
+
+  @override
+  Widget build(BuildContext context) {
+    final bundled = Image.asset(asset, width: 28, height: 28, fit: BoxFit.contain);
+    if (imageUrl.isEmpty) return bundled;
+    return CachedNetworkImage(
+      imageUrl: imageUrl,
+      width: 28,
+      height: 28,
+      fit: BoxFit.contain,
+      placeholder: (_, _) => bundled,
+      errorWidget: (_, _, _) => bundled,
+    );
+  }
+}

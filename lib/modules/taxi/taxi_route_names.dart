@@ -78,7 +78,6 @@ class TaxiSubRoutePaths {
   static const String notifications = '/taxi/notifications';
   static const String notificationSettings = '/taxi/notifications/settings';
 
-  static const String subscription = '/taxi/subscription';
   static const String rewards = '/taxi/rewards';
 
   static String ticketOf(String code) => '/taxi/support/tickets/$code';
@@ -103,6 +102,5 @@ class TaxiSubRouteNames {
   static const String editProfile = 'taxi.profile.edit';
   static const String notifications = 'taxi.notifications';
   static const String notificationSettings = 'taxi.notifications.settings';
-  static const String subscription = 'taxi.subscription';
   static const String rewards = 'taxi.rewards';
 }

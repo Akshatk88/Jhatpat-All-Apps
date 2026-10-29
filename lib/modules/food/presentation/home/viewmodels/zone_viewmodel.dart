@@ -18,7 +18,18 @@ final zoneViewModelProvider =
 
 class ZoneViewModel extends AsyncNotifier<ZoneModel> {
   @override
-  FutureOr<ZoneModel> build() => _detect();
+  FutureOr<ZoneModel> build() {
+      // Reload when the app-wide location moves (address picked or fetched).
+      ref.listen(currentLocationProvider, (previous, next) {
+        final a = previous?.value;
+        final b = next.value;
+        if (b == null || (a?.latitude == b.latitude && a?.longitude == b.longitude)) {
+          return;
+        }
+        refresh();
+      });
+    return _detect();
+  }
 
   Future<ZoneModel> _detect() async {
     final position = await _currentPosition();

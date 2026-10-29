@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -25,7 +26,7 @@ class FoodDetailLoaderScreen extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     if (foodId.isEmpty) {
-      return _buildErrorState(context, isDark, 'Invalid product link.');
+      return _buildErrorState(context, isDark, 'Invalid product link.'.tr);
     }
 
     final foodAsync = ref.watch(
@@ -47,14 +48,14 @@ class FoodDetailLoaderScreen extends ConsumerWidget {
       error: (err, stack) => _buildErrorState(
         context,
         isDark,
-        'Unable to load product. Link may be expired.',
+        'Unable to load product. Link may be expired.'.tr,
       ),
       data: (food) {
         if (food == null) {
           return _buildErrorState(
             context,
             isDark,
-            'This dish is currently unavailable.',
+            'This dish is currently unavailable.'.tr,
           );
         }
         return FoodDetailScreen(food: food);
@@ -107,10 +108,10 @@ class FoodDetailLoaderScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 20),
               Text(
-                'Product Not Found',
+                'Product Not Found'.tr,
                 style: TextStyle(
                   fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   color: textColor,
                 ),
               ),
@@ -127,7 +128,7 @@ class FoodDetailLoaderScreen extends ConsumerWidget {
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
+                  foregroundColor: const Color(0xFF121212),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24,
                     vertical: 12,
@@ -138,9 +139,9 @@ class FoodDetailLoaderScreen extends ConsumerWidget {
                 ),
                 onPressed: () => context.go(RouteNames.home),
                 icon: const Icon(Icons.home_rounded, size: 18),
-                label: const Text(
-                  'GO TO HOME',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                label: Text(
+                  'GO TO HOME'.tr,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
               ),
             ],

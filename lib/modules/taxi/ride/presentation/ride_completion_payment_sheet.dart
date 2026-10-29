@@ -9,6 +9,7 @@ import 'package:superapp_user/design_system/tokens/taxi_colors.dart';
 import 'package:superapp_user/design_system/components/feedback/taxi_snackbar_utils.dart';
 import 'package:superapp_user/modules/taxi/auth/application/auth_providers.dart';
 import 'package:superapp_user/modules/taxi/ride/application/ride_providers.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 /// Collects the fare for a completed ride booked as `online`.
 ///
@@ -64,7 +65,7 @@ class _RideCompletionPaymentSheetState
     try {
       await ref.read(rideRepositoryProvider).payCompletionWithWallet(widget.rideId);
       if (!mounted) return;
-      SnackbarUtils.success(context, 'Paid from wallet');
+      SnackbarUtils.success(context, 'Paid from wallet'.tr);
       Navigator.of(context).pop(true);
     } on TaxiApiException catch (e) {
       // Most often an insufficient balance — the rider can still use the card.
@@ -85,7 +86,7 @@ class _RideCompletionPaymentSheetState
       final keyId = (order['keyId'] ?? order['key_id'] ?? order['key'] ?? '').toString();
       final orderId = (order['orderId'] ?? order['order_id'] ?? order['id'] ?? '').toString();
       if (keyId.isEmpty || orderId.isEmpty) {
-        throw TaxiApiException('Could not start the payment. Please try again.');
+        throw TaxiApiException('Could not start the payment. Please try again.'.tr);
       }
 
       ref.read(razorpayServiceProvider).open(
@@ -95,8 +96,8 @@ class _RideCompletionPaymentSheetState
               // Rupees — the service converts to paise. The order's own
               // `amount` is already in paise and would charge 100x.
               amount: widget.amount,
-              name: 'Ride payment',
-              description: 'Fare for your trip',
+              name: 'Ride payment'.tr,
+              description: 'Fare for your trip'.tr,
               contact: user?.phone,
               email: user?.email,
             ),
@@ -112,18 +113,18 @@ class _RideCompletionPaymentSheetState
                   },
                 );
                 if (!mounted) return;
-                SnackbarUtils.success(context, 'Payment successful');
+                SnackbarUtils.success(context, 'Payment successful'.tr);
                 Navigator.of(context).pop(true);
               } on TaxiApiException catch (e) {
                 if (mounted) {
-                  SnackbarUtils.error(context, 'Paid but not confirmed: ${e.message}');
+                  SnackbarUtils.error(context, 'Paid but not confirmed: {message}'.trArgs({'message': e.message}));
                 }
                 _setBusy(false);
               }
             },
             onError: (PaymentFailureResponse response) {
               if (mounted) {
-                SnackbarUtils.error(context, response.message ?? 'Payment failed or cancelled');
+                SnackbarUtils.error(context, response.message ?? 'Payment failed or cancelled'.tr);
               }
               _setBusy(false);
             },
@@ -148,7 +149,7 @@ class _RideCompletionPaymentSheetState
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'Pay for your ride',
+            'Pay for your ride'.tr,
             style: Theme.of(context).textTheme.titleLarge,
             textAlign: TextAlign.center,
           ),
@@ -157,8 +158,8 @@ class _RideCompletionPaymentSheetState
             '₹${widget.amount.toStringAsFixed(2)}',
             style: const TextStyle(
               fontSize: 34,
-              fontWeight: FontWeight.w800,
-              color: TaxiColors.primary,
+              fontWeight: FontWeight.w600,
+              color: TaxiColors.primaryDark,
             ),
             textAlign: TextAlign.center,
           ),
@@ -166,13 +167,13 @@ class _RideCompletionPaymentSheetState
           FilledButton.icon(
             onPressed: _busy ? null : _payWithRazorpay,
             icon: const Icon(Icons.credit_card),
-            label: const Text('Pay online'),
+            label: Text('Pay online'.tr),
           ),
           const SizedBox(height: 10),
           OutlinedButton.icon(
             onPressed: _busy ? null : _payWithWallet,
             icon: const Icon(Icons.account_balance_wallet_outlined),
-            label: const Text('Pay from wallet'),
+            label: Text('Pay from wallet'.tr),
           ),
           if (_busy) ...[
             const SizedBox(height: 18),

@@ -67,17 +67,44 @@ class ApiClient {
         options.headers['Authorization'] = 'Bearer $token';
       }
     }
-    _log('→ ${options.method} ${options.path}');
+    final fullUrl = options.uri.toString();
+    final logText = '''
+==================== 🚀 [API REQUEST] ====================
+🌐 METHOD & URL : ${options.method} $fullUrl
+🔑 HEADERS      : ${options.headers}
+${options.data != null ? '📦 BODY         : ${options.data}\n' : ''}=========================================================
+''';
+    print(logText);
+    if (kDebugMode) developer.log(logText, name: 'API');
     handler.next(options);
   }
 
   void _onResponse(Response response, ResponseInterceptorHandler handler) {
-    _log('← ${response.statusCode} ${response.requestOptions.path}');
+    final fullUrl = response.requestOptions.uri.toString();
+    final logText = '''
+==================== ✅ [API RESPONSE] ====================
+🌐 METHOD & URL : ${response.requestOptions.method} $fullUrl
+🔢 STATUS CODE  : ${response.statusCode}
+📄 RESPONSE DATA: ${response.data}
+==========================================================
+''';
+    print(logText);
+    if (kDebugMode) developer.log(logText, name: 'API');
     handler.next(response);
   }
 
   void _onError(DioException e, ErrorInterceptorHandler handler) {
-    _log('✗ ${e.requestOptions.path} — ${e.type} ${e.message}');
+    final fullUrl = e.requestOptions.uri.toString();
+    final logText = '''
+==================== ❌ [API ERROR] ====================
+🌐 METHOD & URL : ${e.requestOptions.method} $fullUrl
+🔢 STATUS CODE  : ${e.response?.statusCode ?? 'NO_RESPONSE'}
+⚠️ ERROR TYPE   : ${e.type}
+💬 MESSAGE      : ${e.message}
+${e.response?.data != null ? '📄 ERROR DATA   : ${e.response?.data}\n' : ''}========================================================
+''';
+    print(logText);
+    if (kDebugMode) developer.log(logText, name: 'API');
     handler.next(e);
   }
 

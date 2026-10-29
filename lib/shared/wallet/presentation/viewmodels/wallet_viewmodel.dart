@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:superapp_user/modules/food/application/providers/payment_providers.dart';
 import 'package:superapp_user/shared/wallet/application/wallet_providers.dart';
 import 'package:superapp_user/shared/auth/presentation/viewmodels/auth_viewmodel.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/core/payment/payment_gateway.dart';
 import 'package:superapp_user/shared/wallet/presentation/viewmodels/wallet_state.dart';
 
@@ -47,7 +48,7 @@ class WalletViewModel extends Notifier<WalletState> {
       state = state.copyWith(
         status: WalletStatus.error,
         errorMessage:
-            'Failed to load wallet information. Please check your connection.',
+            'Failed to load wallet information. Please check your connection.'.tr,
       );
     }
   }
@@ -102,7 +103,7 @@ class WalletViewModel extends Notifier<WalletState> {
   Future<String> addMoney(double amount) async {
     final service = ref.read(walletServiceProvider);
     if (!service.isValidTopupAmount(amount)) {
-      return 'Enter an amount between ₹10 and ₹10,000.';
+      return 'Enter an amount between ₹10 and ₹10,000.'.tr;
     }
 
     final user = ref.read(authViewModelProvider).value;

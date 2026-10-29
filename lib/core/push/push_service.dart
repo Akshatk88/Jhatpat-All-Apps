@@ -9,8 +9,10 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'package:superapp_user/core/config/app_constants.dart';
+import 'package:superapp_user/core/push/push_token_sink.dart';
 import 'package:superapp_user/shared/profile/data/account_remote_datasource.dart';
 import 'package:superapp_user/shared/profile/data/user_model.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 /// Fired when a push should navigate somewhere. The router listens to this
 /// rather than the service reaching into navigation itself.
@@ -27,12 +29,22 @@ class PushDeepLink {
   final String? orderMongoId;
   final String? link;
 
+  /// Taxi ride pushes (`ride_accepted`, `ride_cancelled_by_driver`, ...) and
+  /// the app's own ride-status notifications carry `rideId` (+ `status`).
+  final String? rideId;
+  final String? status;
+
   const PushDeepLink({
     required this.type,
     this.orderId,
     this.orderMongoId,
     this.link,
+    this.rideId,
+    this.status,
   });
+
+  bool get isRideEvent =>
+      type.startsWith('ride_') && rideId != null && rideId!.isNotEmpty;
 
   /// The id to open a tracking screen with — the Mongo id is what
   /// `GET /food/orders/:orderId` expects.
@@ -50,6 +62,8 @@ class PushDeepLink {
       orderId: data['orderId']?.toString(),
       orderMongoId: data['orderMongoId']?.toString(),
       link: data['link']?.toString(),
+      rideId: data['rideId']?.toString(),
+      status: data['status']?.toString(),
     );
   }
 }
@@ -134,6 +148,56 @@ class PushService {
   String? _token;
   String? get token => _token;
 
+  /// Backends other than food that must also hold this device's token.
+  ///
+  /// See [PushTokenSink]. Kept as a set so a double registration (hot reload,
+  /// a re-run of the app-level wiring) cannot mirror the same token twice.
+  final Set<PushTokenSink> _tokenSinks = {};
+
+  /// Registers [sink] and immediately back-fills it if a token already exists.
+  ///
+  /// The back-fill matters: sinks are registered from the app layer during the
+  /// first build, which can land *after* login has already fetched the token.
+  /// Without it, the sink would stay empty until the next token rotation.
+  void addTokenSink(PushTokenSink sink) {
+    if (!_tokenSinks.add(sink)) return;
+    final token = _token;
+    if (token != null && token.isNotEmpty) {
+      unawaited(_pushToSink(sink, token));
+    }
+  }
+
+  void removeTokenSink(PushTokenSink sink) => _tokenSinks.remove(sink);
+
+  Future<void> _pushToSink(PushTokenSink sink, String token) async {
+    try {
+      await sink.saveToken(token);
+      _log('mirrored token to ${sink.debugLabel}');
+    } catch (e) {
+      // One backend refusing must not stop the others, and must not surface
+      // to a user who was only logging in.
+      _log('sink ${sink.debugLabel} save failed: $e');
+    }
+  }
+
+  /// Mirrors [token] to every registered sink, in parallel.
+  Future<void> _fanOutToken(String token) async {
+    if (_tokenSinks.isEmpty) return;
+    await Future.wait([
+      for (final sink in _tokenSinks.toList()) _pushToSink(sink, token),
+    ]);
+  }
+
+  Future<void> _clearSinks(String token) async {
+    if (_tokenSinks.isEmpty) return;
+    await Future.wait([
+      for (final sink in _tokenSinks.toList())
+        sink.clearToken(token).catchError((Object e) {
+          _log('sink ${sink.debugLabel} clear failed: $e');
+        }),
+    ]);
+  }
+
   bool _firebaseInitialized = false;
   bool _permissionGranted = false;
   bool _backendSaveSuccess = false;
@@ -173,7 +237,7 @@ Notification Type: ${link.type}''');
         enableVibration: true,
       );
 
-      const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+      const androidSettings = AndroidInitializationSettings('@drawable/ic_stat_jhatpat');
       const initSettings = InitializationSettings(android: androidSettings);
 
       await _localNotifications.initialize(
@@ -184,7 +248,8 @@ Notification Type: ${link.type}''');
             try {
               final Map<String, dynamic> data = jsonDecode(response.payload!);
               final link = PushDeepLink.fromData(data);
-              if (link.isOrderEvent && link.trackableOrderId != null) {
+              if (link.isRideEvent ||
+                  (link.isOrderEvent && link.trackableOrderId != null)) {
                 _log('Opening Order Tracking screen.');
                 _onDeepLink?.call(link);
               }
@@ -249,7 +314,7 @@ Notification Type: ${link.type}''');
           _foreground.add(message);
         }
 
-        final title = message.notification?.title ?? message.data['title'] ?? 'Order Update';
+        final title = message.notification?.title ?? message.data['title'] ?? 'Order Update'.tr;
         final body = message.notification?.body ?? message.data['body'] ?? '';
         final notificationId = message.hashCode;
 
@@ -264,7 +329,7 @@ Notification Type: ${link.type}''');
             ticker: 'ticker',
             playSound: true,
             enableVibration: true,
-            icon: '@mipmap/ic_launcher',
+            icon: '@drawable/ic_stat_jhatpat',
           );
           const notificationDetails = NotificationDetails(android: androidDetails);
 
@@ -302,6 +367,7 @@ Notification Type: ${link.type}''');
         _log('Token Refreshed\nOld Token:\n${oldToken ?? "NULL"}\nNew Token:\n$newToken');
         unawaited(_saveTokenLocally(newToken));
         unawaited(_save(newToken));
+        unawaited(_fanOutToken(newToken));
       });
 
       debugPrint('[APP] Notification Service Initialized');
@@ -327,6 +393,8 @@ Notification Type: ${link.type}''');
       _log('FCM Token Generated:\n$token');
       await _saveTokenLocally(token);
       _backendSaveSuccess = await _save(token, user: user);
+      // Every other backend that keeps its own token list — see PushTokenSink.
+      await _fanOutToken(token);
       _printDebugSummary();
     } catch (e) {
       _log('registerToken failed: $e');
@@ -373,6 +441,10 @@ Notification Type: ${link.type}''');
     } catch (e) {
       _log('backend unregisterToken failed: $e');
     }
+    // Clear the other backends BEFORE deleting the Firebase token below —
+    // once it is deleted we no longer know which token to un-register, and the
+    // device would stay targeted by whichever module still held it.
+    await _clearSinks(token);
     try {
       await ensureFirebaseInitialized();
       await _messaging.deleteToken();
@@ -419,7 +491,8 @@ Notification Type: ${link.type}''');
     if (data.isEmpty) return;
     final link = PushDeepLink.fromData(Map<String, dynamic>.from(data));
     _log('Notification clicked.');
-    if (link.isOrderEvent && link.trackableOrderId != null) {
+    if (link.isRideEvent ||
+        (link.isOrderEvent && link.trackableOrderId != null)) {
       _log('Opening Order Tracking screen.');
       _onDeepLink?.call(link);
     }
@@ -442,6 +515,40 @@ Foreground Handler Registered: ${_onMessageSub != null ? "YES" : "NO"}
 Background Handler Registered: YES
 =========================
 ''');
+  }
+
+  /// Shows a heads-up notification raised by the app itself (not FCM), on the
+  /// same high-importance channel. Used for ride-status changes the backend
+  /// does not push. [data] is the tap payload (see [PushDeepLink]).
+  Future<void> showLocal({
+    required int id,
+    required String title,
+    required String body,
+    Map<String, dynamic> data = const {},
+  }) async {
+    try {
+      const details = NotificationDetails(
+        android: AndroidNotificationDetails(
+          'default',
+          'High Importance Notifications',
+          channelDescription: 'This channel is used for order status push notifications.',
+          importance: Importance.max,
+          priority: Priority.high,
+          playSound: true,
+          enableVibration: true,
+          icon: '@drawable/ic_stat_jhatpat',
+        ),
+      );
+      await _localNotifications.show(
+        id: id,
+        title: title,
+        body: body,
+        notificationDetails: details,
+        payload: jsonEncode(data),
+      );
+    } catch (e) {
+      _log('Failed to display local notification: $e');
+    }
   }
 
   void dispose() {

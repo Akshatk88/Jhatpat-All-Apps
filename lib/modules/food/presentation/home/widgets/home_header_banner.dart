@@ -55,6 +55,8 @@ class _HomeHeaderBannerState extends ConsumerState<HomeHeaderBanner> {
 
   @override
   Widget build(BuildContext context) {
+    // Commented out as requested: hero banner image, order now button, inner location & profile section
+    /*
     final topInset = MediaQuery.of(context).padding.top;
     final rowTop = topInset + 6.h;
     final headerHeight = topInset + 315.h;
@@ -144,15 +146,15 @@ class _HomeHeaderBannerState extends ConsumerState<HomeHeaderBanner> {
                   iconAlignment: IconAlignment.end,
                   icon: Icon(
                     Icons.arrow_forward_rounded,
-                    color: Colors.white,
+                    color: const Color(0xFF121212),
                     size: 13.sp,
                   ),
                   label: Text(
                     'ORDER NOW',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: const Color(0xFF121212),
                       fontSize: 10.5.sp,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w600,
                       letterSpacing: 0.3,
                     ),
                   ),
@@ -177,6 +179,8 @@ class _HomeHeaderBannerState extends ConsumerState<HomeHeaderBanner> {
         ),
       ),
     );
+    */
+    return const SizedBox.shrink();
   }
 
   /// Top Row: Red Pin, "17/C", "New Palasia, Indore >", Bell Notification, Profile Avatar
@@ -198,14 +202,14 @@ class _HomeHeaderBannerState extends ConsumerState<HomeHeaderBanner> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Suvio Primary Color Location Pin Icon
+                // Jhatpat Primary Color Location Pin Icon
                 Container(
                   padding: EdgeInsets.all(5.r),
                   decoration: BoxDecoration(
                     color: AppColors.primary,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.location_on, color: Colors.white, size: 18.sp),
+                  child: Icon(Icons.location_on, color: const Color(0xFF121212), size: 18.sp),
                 ),
                 SizedBox(width: 8.w),
 
@@ -224,7 +228,7 @@ class _HomeHeaderBannerState extends ConsumerState<HomeHeaderBanner> {
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 16.sp,
-                                fontWeight: FontWeight.w800,
+                                fontWeight: FontWeight.w600,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -300,21 +304,6 @@ class _HomeHeaderBannerState extends ConsumerState<HomeHeaderBanner> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _dot(bool isActive) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      margin: EdgeInsets.symmetric(horizontal: 3.w),
-      width: isActive ? 16.w : 6.w,
-      height: 6.h,
-      decoration: BoxDecoration(
-        color: isActive
-            ? AppColors.primary
-            : Colors.white.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(3.r),
-      ),
     );
   }
 }

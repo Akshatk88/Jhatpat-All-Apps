@@ -19,7 +19,7 @@ class AuthHeader extends StatelessWidget {
           title,
           style: TextStyle(
             fontSize: 32,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
             color: Theme.of(context).textTheme.bodyLarge?.color,
             height: 1.2,
           ),

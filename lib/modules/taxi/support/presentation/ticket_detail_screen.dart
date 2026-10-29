@@ -4,6 +4,7 @@ import 'package:superapp_user/design_system/tokens/taxi_colors.dart';
 import 'package:superapp_user/core/utils/taxi_formatters.dart';
 import 'package:superapp_user/design_system/components/ride/custom_app_bar.dart';
 import 'package:superapp_user/modules/taxi/support/application/support_providers.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 class TicketDetailScreen extends ConsumerStatefulWidget {
   final String ticketCode;
@@ -38,7 +39,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                       children: [
                         Text(ticket.title, style: Theme.of(context).textTheme.titleMedium),
                         const SizedBox(height: 2),
-                        Text('Opened ${Formatters.date(ticket.createdAt)}',
+                        Text('Opened {date}'.trArgs({'date': Formatters.date(ticket.createdAt)}),
                             style: Theme.of(context).textTheme.bodySmall),
                       ],
                     ),
@@ -69,19 +70,19 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                         children: [
                           if (!isUser)
                             Text(
-                              message.senderName.isNotEmpty ? message.senderName : 'Support',
-                              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+                              message.senderName.isNotEmpty ? message.senderName : 'Support'.tr,
+                              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
                             ),
                           Text(
                             message.message,
-                            style: TextStyle(color: isUser ? Colors.white : TaxiColors.lightTextPrimary),
+                            style: TextStyle(color: isUser ? const Color(0xFF121212) : TaxiColors.lightTextPrimary),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             Formatters.time(message.createdAt),
                             style: TextStyle(
                               fontSize: 10,
-                              color: isUser ? Colors.white70 : TaxiColors.lightTextSecondary,
+                              color: isUser ? Colors.black54 : TaxiColors.lightTextSecondary,
                             ),
                           ),
                         ],
@@ -102,7 +103,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                         child: TextField(
                           controller: _replyController,
                           decoration: InputDecoration(
-                            hintText: 'Type a reply…',
+                            hintText: 'Type a reply…'.tr,
                             filled: true,
                             fillColor: TaxiColors.lightBackground,
                             border: OutlineInputBorder(
@@ -122,9 +123,9 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                               ? const SizedBox(
                                   height: 18,
                                   width: 18,
-                                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF121212)),
                                 )
-                              : const Icon(Icons.send_rounded, color: Colors.white),
+                              : const Icon(Icons.send_rounded, color: Color(0xFF121212)),
                           onPressed: _sending ? null : _reply,
                         ),
                       ),
@@ -135,7 +136,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
           ],
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, _) => const Center(child: Text('Could not load this ticket')),
+        error: (_, _) => Center(child: Text('Could not load this ticket'.tr)),
       ),
     );
   }
@@ -150,7 +151,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not send reply')),
+          SnackBar(content: Text('Could not send reply'.tr)),
         );
       }
     } finally {

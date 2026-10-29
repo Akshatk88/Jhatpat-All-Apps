@@ -5,6 +5,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:superapp_user/design_system/tokens/taxi_colors.dart';
 import 'package:superapp_user/modules/taxi/auth/application/auth_providers.dart';
 import 'package:superapp_user/design_system/components/ride/custom_app_bar.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 class RewardsScreen extends ConsumerWidget {
   const RewardsScreen({super.key});
@@ -15,7 +16,7 @@ class RewardsScreen extends ConsumerWidget {
     final code = user?.referralCode ?? '';
 
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Rewards'),
+      appBar: CustomAppBar(title: 'Rewards'.tr),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
@@ -28,14 +29,14 @@ class RewardsScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Invite friends, earn rewards',
-                  style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: TaxiColors.primary),
+                Text(
+                  'Invite friends, earn rewards'.tr,
+                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18, color: TaxiColors.primary),
                 ),
                 const SizedBox(height: 6),
-                const Text(
-                  'Share your code — you both get ride credit when they complete their first trip.',
-                  style: TextStyle(color: TaxiColors.primary),
+                Text(
+                  'Share your code — you both get ride credit when they complete their first trip.'.tr,
+                  style: const TextStyle(color: TaxiColors.primary),
                 ),
                 const SizedBox(height: 18),
                 Container(
@@ -50,7 +51,7 @@ class RewardsScreen extends ConsumerWidget {
                         child: Text(
                           code.isNotEmpty ? code : '—',
                           style: const TextStyle(
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w600,
                             fontSize: 18,
                             letterSpacing: 2,
                             color: TaxiColors.primary,
@@ -64,7 +65,7 @@ class RewardsScreen extends ConsumerWidget {
                             : () {
                                 Clipboard.setData(ClipboardData(text: code));
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Referral code copied')),
+                                  SnackBar(content: Text('Referral code copied'.tr)),
                                 );
                               },
                       ),
@@ -73,7 +74,7 @@ class RewardsScreen extends ConsumerWidget {
                         onPressed: code.isEmpty
                             ? null
                             : () => Share.share(
-                                  'Book rides with this app! Use my referral code $code to get ride credit on your first trip.',
+                                  'Book rides with this app! Use my referral code {code} to get ride credit on your first trip.'.trArgs({'code': code}),
                                 ),
                       ),
                     ],
@@ -103,7 +104,7 @@ class RewardsScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 24),
-          Text('How it works', style: Theme.of(context).textTheme.titleLarge),
+          Text('How it works'.tr, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 12),
           const _StepTile(number: '1', text: 'Share your referral code with friends'),
           const _StepTile(number: '2', text: 'They sign up and enter your code'),
@@ -134,8 +135,8 @@ class _StatCard extends StatelessWidget {
         children: [
           Icon(icon, color: TaxiColors.primary),
           const SizedBox(height: 10),
-          Text(value, style: Theme.of(context).textTheme.titleMedium),
-          Text(label, style: Theme.of(context).textTheme.bodySmall),
+          Text(value.tr, style: Theme.of(context).textTheme.titleMedium),
+          Text(label.tr, style: Theme.of(context).textTheme.bodySmall),
         ],
       ),
     );
@@ -157,10 +158,10 @@ class _StepTile extends StatelessWidget {
           CircleAvatar(
             radius: 14,
             backgroundColor: TaxiColors.primary.withValues(alpha: 0.1),
-            child: Text(number, style: const TextStyle(color: TaxiColors.primary, fontWeight: FontWeight.w700)),
+            child: Text(number, style: const TextStyle(color: TaxiColors.primaryDark, fontWeight: FontWeight.w600)),
           ),
           const SizedBox(width: 12),
-          Expanded(child: Text(text, style: Theme.of(context).textTheme.bodyMedium)),
+          Expanded(child: Text(text.tr, style: Theme.of(context).textTheme.bodyMedium)),
         ],
       ),
     );

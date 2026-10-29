@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/modules/food/data/models/food_model.dart';
 import 'package:superapp_user/modules/food/data/models/restaurant_model.dart';
 import 'package:superapp_user/shared/search/data/search_result.dart';
@@ -149,7 +150,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
     AppSnackbar.success(
       context,
-      'Added "${item.title}" to cart!',
+      'Added "{item}" to cart!'.trArgs({'item': item.title}),
       duration: const Duration(seconds: 1),
     );
   }
@@ -294,15 +295,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       onSubmitted: vm.submitQuery,
                       style: TextStyle(
                         fontSize: 14.5.sp,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                         color: isDark
                             ? AppColors.textPrimaryDark
                             : AppColors.textPrimaryLight,
                       ),
                       decoration: InputDecoration(
                         hintText: state.mode == SearchMode.home
-                            ? 'Search "Burger", "Pizza", "Suvio"...'
-                            : 'Search 99 Store deals, dishes...',
+                            ? 'Search "Burger", "Pizza", "JhatPat"...'.tr
+                            : 'Search 99 Store deals, dishes...'.tr,
                         hintStyle: TextStyle(
                           fontSize: 14.sp,
                           color: (isDark
@@ -355,12 +356,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     child: Container(
                       padding: EdgeInsets.all(7.r),
                       decoration: const BoxDecoration(
-                        color: Color(0xFFFFF3E0),
+                        color: Color(0xFFFFF8E1),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
                         Icons.mic_rounded,
-                        color: const Color(0xFFFF6D00),
+                        color: const Color(0xFFFFB800),
                         size: 20.sp,
                       ),
                     ),
@@ -418,7 +419,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           return Padding(
             padding: EdgeInsets.only(right: 8.w),
             child: _buildTabChip(
-              label: c.label,
+              label: c.label.tr,
               emoji: c.icon,
               isSelected: isSelected,
               isDark: isDark,
@@ -485,9 +486,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               label,
               style: TextStyle(
                 fontSize: 12.5.sp,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 color: isSelected
-                    ? Colors.white
+                    ? Colors.black
                     : (isDark
                           ? AppColors.textSecondaryDark
                           : AppColors.textPrimaryLight),
@@ -524,10 +525,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Recent Searches',
+                  'Recent Searches'.tr,
                   style: TextStyle(
                     fontSize: 15.sp,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: textColor,
                   ),
                 ),
@@ -537,11 +538,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     vm.clearRecentSearches();
                   },
                   child: Text(
-                    'Clear All',
+                    'Clear All'.tr,
                     style: TextStyle(
                       fontSize: 12.sp,
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFFE5A600),
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
@@ -580,10 +581,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           ],
 
           Text(
-            'Popular Keywords',
+            'Popular Keywords'.tr,
             style: TextStyle(
               fontSize: 15.sp,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
               color: textColor,
             ),
           ),
@@ -603,7 +604,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   'Fries',
                 ].map((kw) {
                   return ActionChip(
-                    label: Text(kw),
+                    label: Text(kw.tr),
                     labelStyle: TextStyle(
                       fontSize: 12.5.sp,
                       color: isDark
@@ -660,10 +661,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             ),
             SizedBox(height: 16.h),
             Text(
-              'No results found',
+              'No results found'.tr,
               style: TextStyle(
                 fontSize: 17.sp,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
                 color: isDark
                     ? AppColors.textPrimaryDark
                     : AppColors.textPrimaryLight,
@@ -671,7 +672,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             ),
             SizedBox(height: 8.h),
             Text(
-              'We couldn\'t find any matches for "$query". Try searching for another food item or restaurant.',
+              'We couldn\'t find any matches for "{query}". Try searching for another food item or restaurant.'.trArgs({'query': query}),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 12.5.sp,
@@ -710,10 +711,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Results',
+                'Results'.tr,
                 style: TextStyle(
                   fontSize: 18.sp,
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.w600,
                   color: textColor,
                   letterSpacing: -0.3,
                 ),
@@ -729,13 +730,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   children: [
                     TextSpan(
                       text:
-                          'Showing ${results.length} ${results.length == 1 ? 'result' : 'results'} for ',
+                          (results.length == 1 ? 'Showing {count} result for ' : 'Showing {count} results for ').trArgs({'count': results.length}),
                     ),
                     TextSpan(
                       text: '"$query"',
                       style: TextStyle(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFFE5A600),
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
@@ -829,15 +830,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                           vertical: 2.h,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFFECE0),
+                          color: const Color(0xFFFFF0C2),
                           borderRadius: BorderRadius.circular(6.r),
                         ),
                         child: Text(
-                          isRestaurant ? 'Restaurant' : 'Dish',
+                          isRestaurant ? 'Restaurant'.tr : 'Dish'.tr,
                           style: TextStyle(
                             fontSize: 10.sp,
-                            fontWeight: FontWeight.w800,
-                            color: const Color(0xFFFF6D00),
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFFE5A600),
                           ),
                         ),
                       ),
@@ -852,7 +853,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                         '${item.rating ?? 4.0}',
                         style: TextStyle(
                           fontSize: 12.sp,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: const Color(0xFF16A34A),
                         ),
                       ),
@@ -871,7 +872,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 15.5.sp,
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.w600,
                             color: textColor,
                           ),
                         ),
@@ -882,8 +883,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                           '₹${item.price!.toInt()}',
                           style: TextStyle(
                             fontSize: 16.sp,
-                            fontWeight: FontWeight.w900,
-                            color: AppColors.primary,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFFE5A600),
                           ),
                         ),
                       ],
@@ -924,12 +925,16 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                 color: secondaryTextColor,
                               ),
                               SizedBox(width: 3.w),
-                              Text(
-                                r.deliveryTime,
-                                style: TextStyle(
-                                  fontSize: 11.sp,
-                                  fontWeight: FontWeight.w500,
-                                  color: secondaryTextColor,
+                              Flexible(
+                                child: Text(
+                                  r.deliveryTime,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 11.sp,
+                                    fontWeight: FontWeight.w500,
+                                    color: secondaryTextColor,
+                                  ),
                                 ),
                               ),
                             ],
@@ -951,14 +956,18 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                 color: secondaryTextColor,
                               ),
                               SizedBox(width: 3.w),
-                              Text(
-                                r.isFreeDelivery || r.deliveryFee == 0
-                                    ? 'Free Delivery'
-                                    : '₹${r.deliveryFee.toStringAsFixed(0)} Delivery',
-                                style: TextStyle(
-                                  fontSize: 11.sp,
-                                  fontWeight: FontWeight.w500,
-                                  color: secondaryTextColor,
+                              Flexible(
+                                child: Text(
+                                  r.isFreeDelivery || r.deliveryFee == 0
+                                      ? 'Free Delivery'.tr
+                                      : '₹{fee} Delivery'.trArgs({'fee': r.deliveryFee.toStringAsFixed(0)}),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 11.sp,
+                                    fontWeight: FontWeight.w500,
+                                    color: secondaryTextColor,
+                                  ),
                                 ),
                               ),
                             ],
@@ -996,11 +1005,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                               ),
                               SizedBox(width: 4.w),
                               Text(
-                                'Veg',
+                                'Veg'.tr,
                                 style: TextStyle(
                                   color: const Color(0xFF16A34A),
                                   fontSize: 9.5.sp,
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ],
@@ -1043,11 +1052,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                 ),
                                 SizedBox(width: 2.w),
                                 Text(
-                                  'Add',
+                                  'Add'.tr,
                                   style: TextStyle(
                                     fontSize: 12.5.sp,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xFFE5A600),
                                   ),
                                 ),
                               ],

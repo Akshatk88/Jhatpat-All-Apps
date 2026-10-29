@@ -55,13 +55,15 @@ class AuthRemoteDataSource {
   /// `GET /food/user/profile` → `{ user }`
   Future<UserModel> getProfile() async {
     final data = await _client.get<Map<String, dynamic>>(ApiPaths.profile);
-    return UserModel.fromJson((data['user'] as Map).cast<String, dynamic>());
+    final user = data['user'];
+    return UserModel.fromJson((user is Map ? user : data).cast<String, dynamic>());
   }
 
   /// `PATCH /food/user/profile` — every field optional.
   Future<UserModel> updateProfile(Map<String, dynamic> payload) async {
     final data = await _client.patch<Map<String, dynamic>>(ApiPaths.profile, body: payload);
-    return UserModel.fromJson((data['user'] as Map).cast<String, dynamic>());
+    final user = data['user'];
+    return UserModel.fromJson((user is Map ? user : data).cast<String, dynamic>());
   }
 
   /// `POST /food/user/profile/profile-image` — multipart, field name `file`.

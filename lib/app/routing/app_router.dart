@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 import 'package:superapp_user/app/hub/hub_screen.dart';
 import 'package:superapp_user/app/routing/app_route_names.dart';
@@ -139,7 +140,10 @@ List<RouteBase> _sharedRoutes() => [
         name: AppRouteNames.addresses,
         path: AppRoutePaths.addresses,
         parentNavigatorKey: rootNavigatorKey,
-        builder: (context, state) => const AddAddressScreen(),
+        builder: (context, state) => AddAddressScreen(
+          // `?return=1`: the opener (food cart) awaits the saved address.
+          returnToCaller: state.uri.queryParameters['return'] == '1',
+        ),
       ),
       GoRoute(
         name: AppRouteNames.editProfile,
@@ -170,8 +174,10 @@ List<RouteBase> _sharedRoutes() => [
         path: AppRoutePaths.supportChat,
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) {
-          final args = state.extra as ChatArgs? ??
-              const ChatArgs(orderId: '', peerName: 'Support', peerRole: 'ADMIN');
+          final extra = state.extra;
+          final args = extra is ChatArgs
+              ? extra
+              : ChatArgs(orderId: '', peerName: 'Support'.tr, peerRole: 'ADMIN');
           return ChatScreen(args: args);
         },
       ),
@@ -202,7 +208,7 @@ List<RouteBase> _sharedRoutes() => [
           return WebViewScreen(
             title: extra?['title']?.toString() ??
                 state.uri.queryParameters['title'] ??
-                'Web View',
+                'Web View'.tr,
             url: extra?['url']?.toString() ??
                 state.uri.queryParameters['url'] ??
                 '',
@@ -307,7 +313,7 @@ class _NotFoundScreen extends StatelessWidget {
               const Icon(Icons.explore_off_rounded, size: 56),
               const SizedBox(height: 16),
               Text(
-                'Page not found',
+                'Page not found'.tr,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 8),
@@ -319,7 +325,7 @@ class _NotFoundScreen extends StatelessWidget {
               const SizedBox(height: 24),
               FilledButton(
                 onPressed: () => context.go(AppRoutePaths.hub),
-                child: const Text('Go to home'),
+                child: Text('Go to home'.tr),
               ),
             ],
           ),

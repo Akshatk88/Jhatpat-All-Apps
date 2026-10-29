@@ -48,6 +48,8 @@ class AppSnackbar {
         AppSnackbarType.info => (AppColors.primary, Icons.info_rounded),
       };
 
+      // Black on the yellow brand fill; white on the semantic fills.
+      final fg = type == AppSnackbarType.info ? Colors.black : Colors.white;
       final messenger = ScaffoldMessenger.of(context);
       messenger.hideCurrentSnackBar();
       messenger.showSnackBar(
@@ -55,13 +57,13 @@ class AppSnackbar {
           content: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(icon, color: Colors.white, size: 22),
+              Icon(icon, color: fg, size: 22),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   message,
                   style: GoogleFonts.poppins(
-                    color: Colors.white,
+                    color: fg,
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                     height: 1.35,

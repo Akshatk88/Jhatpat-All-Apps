@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/design_system/tokens/taxi_colors.dart';
 import 'package:superapp_user/core/utils/taxi_formatters.dart';
 
@@ -106,10 +107,10 @@ class RideCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      statusLabel,
+                      statusLabel.tr,
                       style: TextStyle(
                         color: statusColor,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w600,
                         fontSize: 11,
                       ),
                     ),
@@ -138,7 +139,7 @@ class RideCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 14,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w600,
                         color: textPrimary,
                       ),
                     ),
@@ -193,19 +194,24 @@ class RideCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    vehicleType,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: textSecondary,
+                  Flexible(
+                    child: Text(
+                      vehicleType,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: textSecondary,
+                      ),
                     ),
                   ),
+                  const SizedBox(width: 12),
                   Text(
                     Formatters.currency(fare),
                     style: TextStyle(
                       fontSize: 16,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w600,
                       color: textPrimary,
                     ),
                   ),

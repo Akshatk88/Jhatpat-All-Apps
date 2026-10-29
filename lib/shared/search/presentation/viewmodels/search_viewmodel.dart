@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/shared/search/application/search_providers.dart';
 import 'package:superapp_user/shared/search/data/search_service.dart';
 import 'package:superapp_user/core/speech/speech_service.dart';
@@ -70,7 +71,7 @@ class SearchViewModel extends Notifier<SearchState> {
           results: const [],
           suggestions: const [],
           isSearching: false,
-          errorMessage: response.message ?? 'Search failed.',
+          errorMessage: response.message ?? 'Search failed.'.tr,
         );
       }
     });

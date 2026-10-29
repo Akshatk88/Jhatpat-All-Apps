@@ -63,7 +63,14 @@ class VehicleCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Text(name, style: Theme.of(context).textTheme.titleMedium),
+                        Flexible(
+                          child: Text(
+                            name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ),
                         if (seats != null) ...[
                           const SizedBox(width: 6),
                           Icon(Icons.person, size: 13, color: scheme.onSurface.withValues(alpha: 0.5)),
@@ -78,7 +85,7 @@ class VehicleCard extends StatelessWidget {
                       eta,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: TaxiColors.success,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w500,
                           ),
                     ),
                   ],

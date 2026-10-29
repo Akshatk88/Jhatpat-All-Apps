@@ -1,3 +1,4 @@
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -15,9 +16,9 @@ class ForceLogoutScreen extends ConsumerWidget {
       canPop: false,
       child: SystemStatusView(
         icon: Icons.gpp_bad_rounded,
-        title: 'You have been signed out',
-        message: reason ?? 'Your account was signed out remotely. Please log in again to continue using the app.',
-        primaryActionLabel: 'Log in again',
+        title: 'You have been signed out'.tr,
+        message: reason ?? 'Your account was signed out remotely. Please log in again to continue using the app.'.tr,
+        primaryActionLabel: 'Log in again'.tr,
         onPrimaryAction: () async {
           await ref.read(authControllerProvider.notifier).logout();
           if (context.mounted) context.go('/auth/phone');

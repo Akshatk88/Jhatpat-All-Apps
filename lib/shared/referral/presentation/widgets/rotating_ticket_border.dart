@@ -76,9 +76,9 @@ class _RotatingTicketBorderPainter extends CustomPainter {
       transform: GradientRotation(progress * 2 * math.pi),
       colors: const [
         Colors.transparent,
-        Color(0xFFFF7A00),
+        Color(0xFFFFB800),
         Colors.white,
-        Color(0xFFFF7A00),
+        Color(0xFFFFB800),
         Colors.transparent,
       ],
       stops: const [0.0, 0.45, 0.5, 0.55, 1.0],

@@ -1,9 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:go_router/go_router.dart';
+import 'package:superapp_user/app/routing/app_route_names.dart';
+import 'package:superapp_user/core/utils/haptics.dart';
 import 'package:superapp_user/design_system/tokens/taxi_colors.dart';
 
+/// Bottom bar for the rides side of the app, in the shared Jhatpat theme:
+/// yellow strip, outline icons, and the active tab going solid, black and bold.
 class AppBottomNavigationBar extends StatelessWidget {
   final int currentIndex;
+
+  static const int ride = 0;
+  static const int services = 1;
+  static const int parcel = 2;
+  static const int history = 3;
+  static const int profile = 4;
 
   const AppBottomNavigationBar({
     super.key,
@@ -13,61 +24,74 @@ class AppBottomNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final navBgColor = isDark ? TaxiColors.darkCard : Colors.white;
+    final navBgColor = isDark ? TaxiColors.darkCard : const Color(0xFFFFB800);
+
+    void goTo(int index, String path) {
+      if (currentIndex != index) context.go(path);
+    }
 
     return Container(
-      color: navBgColor,
+      decoration: BoxDecoration(
+        color: navBgColor,
+        border: Border(
+          top: BorderSide(
+            color: isDark ? Colors.white12 : Colors.black.withValues(alpha: 0.08),
+            width: 0.8,
+          ),
+        ),
+      ),
       child: SafeArea(
         top: false,
-        child: Container(
-          height: 64,
-          decoration: BoxDecoration(
-            color: navBgColor,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
-                blurRadius: 16,
-                offset: const Offset(0, -4),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          // Five tabs spread across a tablet / desktop width look scattered;
+          // keep them in a phone-sized band in the middle.
+          child: Center(
+            heightFactor: 1,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 640),
+              child: Row(
             children: [
               _BottomNavItem(
-                icon: currentIndex == 0 ? Icons.home_rounded : Icons.home_outlined,
-                label: 'Home',
-                isActive: currentIndex == 0,
-                onTap: () {
-                  if (currentIndex != 0) context.go('/taxi');
-                },
+                icon: Icons.near_me_outlined,
+                activeIcon: Icons.near_me,
+                label: 'Ride',
+                isActive: currentIndex == ride,
+                onTap: () => goTo(ride, '/taxi'),
               ),
               _BottomNavItem(
-                icon: Icons.navigation_outlined,
-                label: 'All Services',
-                isActive: currentIndex == 1,
-                onTap: () {
-                  if (currentIndex != 1) context.go('/taxi/services');
-                },
+                icon: Icons.grid_view_outlined,
+                activeIcon: Icons.grid_view_rounded,
+                label: 'Services',
+                isActive: currentIndex == services,
+                onTap: () => goTo(services, '/taxi/services'),
               ),
               _BottomNavItem(
-                icon: currentIndex == 2 ? Icons.access_time_rounded : Icons.access_time_outlined,
+                icon: Icons.inventory_2_outlined,
+                activeIcon: Icons.inventory_2,
+                label: 'Parcel',
+                isActive: currentIndex == parcel,
+                onTap: () => goTo(parcel, '/parcel'),
+              ),
+              _BottomNavItem(
+                icon: Icons.access_time_outlined,
+                activeIcon: Icons.access_time_filled_rounded,
                 label: 'History',
-                isActive: currentIndex == 2,
-                onTap: () {
-                  if (currentIndex != 2) context.go('/taxi/rides');
-                },
+                isActive: currentIndex == history,
+                onTap: () => goTo(history, '/taxi/rides'),
               ),
               _BottomNavItem(
-                icon: currentIndex == 3 ? Icons.person_rounded : Icons.person_outline_rounded,
+                icon: Icons.person_outline_rounded,
+                activeIcon: Icons.person_rounded,
                 label: 'Profile',
-                isActive: currentIndex == 3,
-                onTap: () {
-                  if (currentIndex != 3) context.go('/profile');
-                },
+                isActive: currentIndex == profile,
+                // Pushed, not gone to: profile is a root page, and back should
+                // land the user where they were rather than exit the app.
+                onTap: () => context.push(AppRoutePaths.profile),
               ),
             ],
+              ),
+            ),
           ),
         ),
       ),
@@ -77,12 +101,14 @@ class AppBottomNavigationBar extends StatelessWidget {
 
 class _BottomNavItem extends StatelessWidget {
   final IconData icon;
+  final IconData activeIcon;
   final String label;
   final bool isActive;
   final VoidCallback onTap;
 
   const _BottomNavItem({
     required this.icon,
+    required this.activeIcon,
     required this.label,
     required this.isActive,
     required this.onTap,
@@ -91,26 +117,32 @@ class _BottomNavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final activeColor = TaxiColors.primary; // Brand orange
-    final inactiveColor = isDark ? TaxiColors.darkTextSecondary : const Color(0xFF94A3B8);
+    final activeColor = isDark ? Colors.white : Colors.black;
+    final inactiveColor = isDark
+        ? TaxiColors.darkTextSecondary
+        : Colors.black.withValues(alpha: 0.72);
     final color = isActive ? activeColor : inactiveColor;
 
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          Haptics.light();
+          onTap();
+        },
+        behavior: HitTestBehavior.opaque,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: color, size: 24),
-            const SizedBox(height: 3),
+            Icon(isActive ? activeIcon : icon, color: color, size: 26),
+            const SizedBox(height: 4),
             Text(
-              label,
+              label.tr,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: color,
-                fontSize: 11,
-                fontWeight: isActive ? FontWeight.w800 : FontWeight.w500,
+                fontSize: 12.5,
+                fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
               ),
             ),
           ],

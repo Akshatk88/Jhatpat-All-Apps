@@ -22,8 +22,12 @@ class PopularBrandsList extends StatelessWidget {
 
     // Sized to the avatar + two text lines actually rendered — was 88,
     // leaving dead space below every chip before the section gap started.
+    // The two text lines grow with the system font scale; reserve that extra
+    // room so the chips don't overflow at large text.
+    final textGrowth = MediaQuery.textScalerOf(context).scale(24.sp) - 24.sp;
+
     return SizedBox(
-      height: 82.h,
+      height: 82.h + (textGrowth > 0 ? textGrowth : 0),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -82,7 +86,7 @@ class PopularBrandsList extends StatelessWidget {
                     name,
                     style: TextStyle(
                       fontSize: 10.5.sp,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
                     ),
                     maxLines: 1,

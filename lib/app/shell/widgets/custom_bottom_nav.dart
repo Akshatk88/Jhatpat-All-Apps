@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
-import 'package:superapp_user/design_system/tokens/app_colors.dart';
 import 'package:superapp_user/app/routing/route_names.dart';
 
 class CustomBottomNav extends StatelessWidget {
@@ -20,30 +20,33 @@ class CustomBottomNav extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
+    final navBg = isDark ? const Color(0xFF1E1E1E) : const Color(0xFFFFB800);
+    final activeColor = Colors.black;
+    final unselectedColor = isDark
+        ? const Color(0xFF9E9E9E)
+        : Colors.black.withValues(alpha: 0.72);
+
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-        border: Border(
-          top: BorderSide(
-            color: isDark ? AppColors.borderDark : const Color(0xFFEEEEEE),
-            width: 1.0,
+        color: navBg,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
           ),
-        ),
-        boxShadow: isDark
-            ? []
-            : [
-                BoxShadow(
-                  color: AppColors.shadow1,
-                  blurRadius: 10,
-                  offset: const Offset(0, -2),
-                ),
-              ],
+        ],
       ),
       child: SafeArea(
         top: false,
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 8.0.w, vertical: 6.0.h),
-          child: Row(
+          // Tablets / desktop: keep the tabs in a phone-sized band, centred.
+          child: Center(
+            heightFactor: 1,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 640),
+              child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               // 1. Home (Branch 0)
@@ -52,25 +55,28 @@ class CustomBottomNav extends StatelessWidget {
                 icon: Icons.home_rounded,
                 label: 'Home',
                 index: 0,
-                isDark: isDark,
+                activeColor: activeColor,
+                unselectedColor: unselectedColor,
               ),
 
-              // 2. 99 Store (Branch 2)
-              _buildNavItem(
-                context: context,
-                icon: Icons.shopping_bag_outlined,
-                label: '99 Store',
-                index: 2,
-                isDark: isDark,
-              ),
-
-              // 3. Orders (Route /orders)
+              // 2. Orders (Route /food/orders)
               _buildNavItem(
                 context: context,
                 icon: Icons.receipt_long_outlined,
                 label: 'Orders',
                 index: 99,
-                isDark: isDark,
+                activeColor: activeColor,
+                unselectedColor: unselectedColor,
+              ),
+
+              // 3. Ride (Route /taxi)
+              _buildNavItem(
+                context: context,
+                icon: Icons.local_taxi_rounded,
+                label: 'Ride',
+                index: 98,
+                activeColor: activeColor,
+                unselectedColor: unselectedColor,
               ),
 
               // 4. Profile (Branch 3)
@@ -79,9 +85,12 @@ class CustomBottomNav extends StatelessWidget {
                 icon: Icons.person_outline_rounded,
                 label: 'Profile',
                 index: 3,
-                isDark: isDark,
+                activeColor: activeColor,
+                unselectedColor: unselectedColor,
               ),
             ],
+          ),
+            ),
           ),
         ),
       ),
@@ -93,17 +102,21 @@ class CustomBottomNav extends StatelessWidget {
     required IconData icon,
     required String label,
     required int index,
-    required bool isDark,
+    required Color activeColor,
+    required Color unselectedColor,
   }) {
     final isSelected = currentIndex == index;
-    final activeColor = AppColors.primary;
-    final unselectedColor = isDark ? AppColors.textSecondaryDark : const Color(0xFF757575);
 
-    return GestureDetector(
+    // Flexible: lets the four tabs shrink on a 320dp phone at large text
+    // sizes instead of overflowing the row.
+    return Flexible(
+      child: GestureDetector(
       onTap: () {
         Haptics.light();
         if (index == 99) {
           context.push(RouteNames.orders);
+        } else if (index == 98) {
+          context.go('/taxi');
         } else {
           onTap(index);
         }
@@ -121,15 +134,18 @@ class CustomBottomNav extends StatelessWidget {
             ),
             SizedBox(height: 3.h),
             Text(
-              label,
+              label.tr,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: isSelected ? activeColor : unselectedColor,
                 fontSize: 11.sp,
-                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
+                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
               ),
             ),
           ],
         ),
+      ),
       ),
     );
   }

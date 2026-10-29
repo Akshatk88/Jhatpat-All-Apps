@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:superapp_user/core/connectivity/network_status_provider.dart';
@@ -21,17 +22,17 @@ class OfflineBanner extends ConsumerWidget {
               width: double.infinity,
               color: const Color(0xFFDC2626),
               padding: const EdgeInsets.symmetric(vertical: 8),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.wifi_off_rounded, color: Colors.white, size: 16),
-                  SizedBox(width: 8),
+                  const Icon(Icons.wifi_off_rounded, color: Colors.white, size: 16),
+                  const SizedBox(width: 8),
                   Text(
-                    'No internet connection',
-                    style: TextStyle(
+                    'No internet connection'.tr,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 12,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],

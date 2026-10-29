@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
 import 'package:superapp_user/modules/food/data/models/order_model.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
@@ -73,26 +74,26 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Filter Orders 🔍',
-                style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.bold),
+                'Filter Orders 🔍'.tr,
+                style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.w600),
               ),
               SizedBox(height: 12.h),
               ...filters.map((filter) {
                 final isSelected = _selectedFilter == filter;
                 return ListTile(
                   title: Text(
-                    filter,
+                    filter.tr,
                     style: TextStyle(
                       fontWeight: isSelected
-                          ? FontWeight.bold
+                          ? FontWeight.w600
                           : FontWeight.normal,
-                      color: isSelected ? const Color(0xFFFF5200) : null,
+                      color: isSelected ? const Color(0xFFE5A600) : null,
                     ),
                   ),
                   trailing: isSelected
                       ? const Icon(
                           Icons.check_circle_rounded,
-                          color: Color(0xFFFF5200),
+                          color: Color(0xFFFFB800),
                         )
                       : null,
                   onTap: () {
@@ -148,7 +149,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
             width: double.infinity,
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFFFF5200), Color(0xFFFF7A00)],
+                colors: [Color(0xFFFFB800), Color(0xFFFFC700)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -177,18 +178,18 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                           child: Column(
                             children: [
                               Text(
-                                'My Orders',
+                                'My Orders'.tr,
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: const Color(0xFF121212),
                                   fontSize: 18.sp,
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                               SizedBox(height: 2.h),
                               Text(
-                                'Track, view and reorder your food',
+                                'Track, view and reorder your food'.tr,
                                 style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.9),
+                                  color: Colors.black.withValues(alpha: 0.65),
                                   fontSize: 11.5.sp,
                                   fontWeight: FontWeight.normal,
                                 ),
@@ -213,14 +214,14 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                     ),
                     child: TabBar(
                       controller: _tabController,
-                      labelColor: const Color(0xFFFF5200),
+                      labelColor: isDark ? AppColors.primary : const Color(0xFF121212),
                       unselectedLabelColor: isDark ? AppColors.textSecondaryDark : const Color(0xFF6B7280),
-                      indicatorColor: const Color(0xFFFF5200),
+                      indicatorColor: const Color(0xFFFFB800),
                       indicatorWeight: 3.h,
                       indicatorSize: TabBarIndicatorSize.tab,
                       labelStyle: TextStyle(
                         fontSize: 13.sp,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                       ),
                       unselectedLabelStyle: TextStyle(
                         fontSize: 13.sp,
@@ -233,7 +234,13 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                             children: [
                               Icon(Icons.shopping_bag_outlined, size: 16.sp),
                               SizedBox(width: 6.w),
-                              Text('Active Orders (${activeList.length})'),
+                              Flexible(
+                                child: Text(
+                                  'Active Orders ({count})'.trArgs({'count': activeList.length}),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -243,7 +250,13 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                             children: [
                               Icon(Icons.shopping_bag_outlined, size: 16.sp),
                               SizedBox(width: 6.w),
-                              Text('Past Orders (${pastList.length})'),
+                              Flexible(
+                                child: Text(
+                                  'Past Orders ({count})'.trArgs({'count': pastList.length}),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -300,29 +313,29 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
             Container(
               padding: EdgeInsets.all(20.r),
               decoration: const BoxDecoration(
-                color: Color(0xFFFFECE0),
+                color: Color(0xFFFFF8E1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.receipt_long_rounded,
                 size: 40.sp,
-                color: const Color(0xFFFF5200),
+                color: const Color(0xFFFFB800),
               ),
             ),
             SizedBox(height: 16.h),
             Text(
-              isActiveTab ? 'No Active Orders' : 'No Past Orders',
+              isActiveTab ? 'No Active Orders'.tr : 'No Past Orders'.tr,
               style: TextStyle(
                 fontSize: 16.sp,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
                 color: textColor,
               ),
             ),
             SizedBox(height: 6.h),
             Text(
               isActiveTab
-                  ? 'Your active food orders will appear here.'
-                  : 'You have no past completed or cancelled orders.',
+                  ? 'Your active food orders will appear here.'.tr
+                  : 'You have no past completed or cancelled orders.'.tr,
               style: TextStyle(fontSize: 12.sp, color: secondaryColor),
             ),
           ],
@@ -433,10 +446,10 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                           Text(
                             order.restaurantName.isNotEmpty
                                 ? order.restaurantName
-                                : 'Suvio',
+                                : 'JhatPat',
                             style: TextStyle(
                               fontSize: 16.5.sp,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w600,
                               color: textColor,
                             ),
                             maxLines: 1,
@@ -444,7 +457,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                           ),
                           SizedBox(height: 2.h),
                           Text(
-                            'Order ID: #${order.orderNumber.isNotEmpty ? order.orderNumber : order.id}',
+                            'Order ID: #{id}'.trArgs({'id': order.orderNumber.isNotEmpty ? order.orderNumber : order.id}),
                             style: TextStyle(
                               fontSize: 11.5.sp,
                               color: secondaryColor,
@@ -462,7 +475,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                                 Icon(
                                   Icons.calendar_today_outlined,
                                   size: 12.sp,
-                                  color: const Color(0xFFFF5200),
+                                  color: const Color(0xFFFFB800),
                                 ),
                                 SizedBox(width: 4.w),
                                 Text(
@@ -486,7 +499,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                                 Icon(
                                   Icons.access_time_outlined,
                                   size: 12.sp,
-                                  color: const Color(0xFFFF5200),
+                                  color: const Color(0xFFFFB800),
                                 ),
                                 SizedBox(width: 4.w),
                                 Text(
@@ -504,7 +517,12 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                       ),
                     ),
                     SizedBox(width: 6.w),
-                    _buildStatusBadge(order),
+                    // Capped so a long backend status label ellipsizes
+                    // instead of squeezing the name column to nothing.
+                    ConstrainedBox(
+                      constraints: BoxConstraints(maxWidth: 130.w),
+                      child: _buildStatusBadge(order),
+                    ),
                   ],
                 ),
 
@@ -519,26 +537,26 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                         vertical: 2.h,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFF5200).withValues(alpha: 0.1),
+                        color: const Color(0xFFFFB800).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(5.r),
                       ),
                       child: Text(
                         '${totalItems}x',
                         style: TextStyle(
-                          color: const Color(0xFFFF5200),
+                          color: const Color(0xFFE5A600),
                           fontSize: 12.sp,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                     SizedBox(width: 10.w),
                     Expanded(
                       child: Text(
-                        totalItems == 1 ? '1 item' : '$totalItems items',
+                        totalItems == 1 ? '1 item'.tr : '{count} items'.trArgs({'count': totalItems}),
                         style: TextStyle(
                           fontSize: 13.sp,
                           color: textColor,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w500,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -550,7 +568,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                       style: TextStyle(
                         fontSize: 16.sp,
                         color: textColor,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
@@ -593,10 +611,10 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                     style: ElevatedButton.styleFrom(
                       backgroundColor: isCancelled
                           ? (isDark ? const Color(0xFF2C1E1E) : const Color(0xFFFFF0F0))
-                          : const Color(0xFFFF5200),
+                          : const Color(0xFFFFB800),
                       foregroundColor: isCancelled
                           ? const Color(0xFFDC2626)
-                          : Colors.white,
+                          : const Color(0xFF121212),
                       elevation: 0,
                       shadowColor: Colors.transparent,
                       shape: RoundedRectangleBorder(
@@ -612,7 +630,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                             height: 16.sp,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: isCancelled ? const Color(0xFFDC2626) : Colors.white,
+                              color: isCancelled ? const Color(0xFFDC2626) : const Color(0xFF121212),
                             ),
                           )
                         : Icon(
@@ -620,14 +638,14 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                                 ? Icons.navigation_rounded
                                 : Icons.refresh_rounded,
                             size: 18.sp,
-                            color: isCancelled ? const Color(0xFFDC2626) : Colors.white,
+                            color: isCancelled ? const Color(0xFFDC2626) : const Color(0xFF121212),
                           ),
                     label: Text(
-                      order.isActive ? 'TRACK ORDER' : 'REORDER',
+                      order.isActive ? 'TRACK ORDER'.tr : 'REORDER'.tr,
                       style: TextStyle(
                         fontSize: 13.5.sp,
-                        fontWeight: FontWeight.bold,
-                        color: isCancelled ? const Color(0xFFDC2626) : Colors.white,
+                        fontWeight: FontWeight.w600,
+                        color: isCancelled ? const Color(0xFFDC2626) : const Color(0xFF121212),
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -642,7 +660,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                   children: [
                     Flexible(
                       child: Text(
-                        'Ordered: $fullOrderedStr',
+                        'Ordered: {date}'.trArgs({'date': fullOrderedStr}),
                         style: TextStyle(
                           fontSize: 11.sp,
                           color: secondaryColor,
@@ -664,7 +682,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                         ),
                         RichText(
                           text: TextSpan(
-                            text: 'Bill Total: ',
+                            text: 'Bill Total: '.tr,
                             style: TextStyle(
                               fontSize: 11.sp,
                               color: secondaryColor,
@@ -674,10 +692,10 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                                 text: '₹${order.total.toStringAsFixed(2)}',
                                 style: TextStyle(
                                   fontSize: 11.sp,
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w600,
                                   color: isCancelled
                                       ? const Color(0xFFDC2626)
-                                      : const Color(0xFFFF5200),
+                                      : const Color(0xFFE5A600),
                                 ),
                               ),
                             ],
@@ -714,10 +732,10 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
             SizedBox(width: 4.w),
             Flexible(
               child: Text(
-                'Delivered',
+                'Delivered'.tr,
                 style: TextStyle(
                   fontSize: 11.sp,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   color: const Color(0xFF15803D),
                 ),
                 maxLines: 1,
@@ -729,8 +747,8 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
       );
     } else if (order.isCancelled || order.orderStatus.contains('cancelled')) {
       final label = order.cancelledBy.toLowerCase() == 'restaurant'
-          ? 'Cancelled by restaurant'
-          : 'Cancelled by you';
+          ? 'Cancelled by restaurant'.tr
+          : 'Cancelled by you'.tr;
       return Container(
         padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
         decoration: BoxDecoration(
@@ -751,7 +769,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                 label,
                 style: TextStyle(
                   fontSize: 11.sp,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   color: const Color(0xFFDC2626),
                 ),
                 maxLines: 1,
@@ -765,7 +783,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
       return Container(
         padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
         decoration: BoxDecoration(
-          color: const Color(0xFFFFECE0),
+          color: const Color(0xFFFFF8E1),
           borderRadius: BorderRadius.circular(20.r),
         ),
         child: Row(
@@ -773,17 +791,17 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
           children: [
             Icon(
               Icons.directions_bike_rounded,
-              color: const Color(0xFFFF5200),
+              color: const Color(0xFFFFB800),
               size: 14.sp,
             ),
             SizedBox(width: 4.w),
             Flexible(
               child: Text(
-                order.statusLabel.isNotEmpty ? order.statusLabel : 'On the Way',
+                order.statusLabel.isNotEmpty ? order.statusLabel.tr : 'On the Way'.tr,
                 style: TextStyle(
                   fontSize: 11.sp,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFFFF5200),
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFFE5A600),
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -819,10 +837,10 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
             SizedBox(width: 8.w),
             Expanded(
               child: Text(
-                'Rate your food & delivery experience',
+                'Rate your food & delivery experience'.tr,
                 style: TextStyle(
                   fontSize: 12.sp,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   color: const Color(0xFF15803D),
                 ),
                 maxLines: 1,
@@ -849,7 +867,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
       builder: (_) => RateOrderSheet(order: order),
     );
     if (result == true && context.mounted) {
-      AppSnackbar.success(context, 'Thanks for rating your order!');
+      AppSnackbar.success(context, 'Thanks for rating your order!'.tr);
     }
   }
 
@@ -864,10 +882,10 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
       margin: EdgeInsets.only(top: 6.h, bottom: 20.h),
       padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF231A14) : const Color(0xFFFFFBF5),
+        color: isDark ? const Color(0xFF231A14) : const Color(0xFFFFFBEB),
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: isDark ? const Color(0xFF3D2B1F) : const Color(0xFFFFE5D0),
+          color: isDark ? const Color(0xFF3D2B1F) : const Color(0xFFFFE8A3),
           width: 1,
         ),
       ),
@@ -876,12 +894,12 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
           Container(
             padding: EdgeInsets.all(7.r),
             decoration: const BoxDecoration(
-              color: Color(0xFFFFECE0),
+              color: Color(0xFFFFF8E1),
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.verified_user_rounded,
-              color: const Color(0xFFFF5200),
+              color: const Color(0xFFFFB800),
               size: 18.sp,
             ),
           ),
@@ -891,16 +909,16 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Need Help?',
+                  'Need Help?'.tr,
                   style: TextStyle(
                     fontSize: 13.5.sp,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: textColor,
                   ),
                 ),
                 SizedBox(height: 2.h),
                 Text(
-                  'For any issue with your order, contact our support team.',
+                  'For any issue with your order, contact our support team.'.tr,
                   style: TextStyle(fontSize: 10.5.sp, color: secondaryColor),
                 ),
               ],
@@ -918,23 +936,23 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20.r),
-                border: Border.all(color: const Color(0xFFFFE0C8), width: 1),
+                border: Border.all(color: const Color(0xFFFFE8A3), width: 1),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
                     Icons.headset_mic_rounded,
-                    color: const Color(0xFFFF5200),
+                    color: const Color(0xFFFFB800),
                     size: 14.sp,
                   ),
                   SizedBox(width: 4.w),
                   Text(
-                    'Contact Support',
+                    'Contact Support'.tr,
                     style: TextStyle(
                       fontSize: 11.5.sp,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFFFF5200),
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFFE5A600),
                     ),
                   ),
                 ],

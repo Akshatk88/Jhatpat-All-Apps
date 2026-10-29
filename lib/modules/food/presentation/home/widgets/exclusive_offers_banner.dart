@@ -174,7 +174,7 @@ class _ExclusiveOffersBannerState extends State<ExclusiveOffersBanner> with Tick
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFFFDF3E7),
+          color: const Color(0xFFFFF8E1),
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
@@ -200,7 +200,7 @@ class _ExclusiveOffersBannerState extends State<ExclusiveOffersBanner> with Tick
                         child: VideoPlayer(_videoController),
                       ),
                     )
-                  : Container(color: const Color(0xFFFDF3E7)),
+                  : Container(color: const Color(0xFFFFF8E1)),
 
               // Shine sweep.
               AnimatedBuilder(

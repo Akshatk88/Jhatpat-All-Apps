@@ -6,11 +6,23 @@ class LatLngPoint {
   const LatLngPoint({required this.lat, required this.lng});
 
   factory LatLngPoint.fromGeoJson(dynamic geo) {
-    if (geo is Map && geo['coordinates'] is List && geo['coordinates'].length == 2) {
-      final coords = geo['coordinates'] as List;
+    if (geo is Map) {
+      if (geo['coordinates'] is List && (geo['coordinates'] as List).length >= 2) {
+        final coords = geo['coordinates'] as List;
+        return LatLngPoint(
+          lat: double.tryParse('${coords[1]}') ?? 0,
+          lng: double.tryParse('${coords[0]}') ?? 0,
+        );
+      }
+      final lat = double.tryParse('${geo['lat'] ?? geo['latitude'] ?? 0}') ?? 0;
+      final lng = double.tryParse('${geo['lng'] ?? geo['longitude'] ?? 0}') ?? 0;
+      if (lat != 0 || lng != 0) {
+        return LatLngPoint(lat: lat, lng: lng);
+      }
+    } else if (geo is List && geo.length >= 2) {
       return LatLngPoint(
-        lat: double.tryParse('${coords[1]}') ?? 0,
-        lng: double.tryParse('${coords[0]}') ?? 0,
+        lat: double.tryParse('${geo[1]}') ?? 0,
+        lng: double.tryParse('${geo[0]}') ?? 0,
       );
     }
     return const LatLngPoint(lat: 0, lng: 0);
@@ -43,10 +55,10 @@ class RideDriverInfo {
       id: (json['_id'] ?? json['id'] ?? '').toString(),
       name: (json['name'] ?? '').toString(),
       phone: (json['phone'] ?? '').toString(),
-      profileImage: (json['profileImage'] ?? '').toString(),
-      vehicleNumber: (json['vehicleNumber'] ?? '').toString(),
-      vehicleModel: (json['vehicleModel'] ?? '').toString(),
-      vehicleMake: (json['vehicleMake'] ?? '').toString(),
+      profileImage: (json['profileImage'] ?? json['profile_image'] ?? '').toString(),
+      vehicleNumber: (json['vehicleNumber'] ?? json['vehicle_number'] ?? '').toString(),
+      vehicleModel: (json['vehicleModel'] ?? json['vehicle_model'] ?? '').toString(),
+      vehicleMake: (json['vehicleMake'] ?? json['vehicle_make'] ?? '').toString(),
       rating: double.tryParse('${json['rating'] ?? 0}') ?? 0,
     );
   }
@@ -99,6 +111,11 @@ class RideModel {
   final RideDriverInfo? driver;
   final LatLngPoint? lastDriverLocation;
   final double? lastDriverHeading;
+
+  /// Server time of [lastDriverLocation] (`lastDriverLocation.updatedAt`).
+  /// Lets live tracking tell a fresh REST/`ride:state` fix from one that is
+  /// older than what the socket already delivered.
+  final DateTime? lastDriverLocationAt;
   final List<RideMessageModel> messages;
   final String? serviceType;
   final String? vehicleType;
@@ -131,6 +148,7 @@ class RideModel {
     this.driver,
     this.lastDriverLocation,
     this.lastDriverHeading,
+    this.lastDriverLocationAt,
     this.messages = const [],
     this.serviceType,
     this.vehicleType,
@@ -140,17 +158,20 @@ class RideModel {
   factory RideModel.fromJson(Map<String, dynamic> json) {
     DateTime? parseDate(dynamic v) => v == null ? null : DateTime.tryParse(v.toString());
 
+    final pickupGeo = json['pickupLocation'] ?? json['pickup'] ?? json['pickup_location'];
+    final dropGeo = json['dropLocation'] ?? json['drop'] ?? json['drop_location'];
+
     return RideModel(
       rideId: (json['rideId'] ?? json['_id'] ?? json['id'] ?? '').toString(),
       status: (json['status'] ?? '').toString(),
-      liveStatus: (json['liveStatus'] ?? '').toString(),
-      fare: double.tryParse('${json['fare'] ?? 0}') ?? 0,
-      baseFare: double.tryParse('${json['baseFare'] ?? json['fare'] ?? 0}') ?? 0,
+      liveStatus: (json['liveStatus'] ?? json['status'] ?? '').toString(),
+      fare: double.tryParse('${json['fare'] ?? json['totalFare'] ?? json['total_fare'] ?? json['amount'] ?? json['cost'] ?? 0}') ?? 0,
+      baseFare: double.tryParse('${json['baseFare'] ?? json['base_fare'] ?? json['fare'] ?? 0}') ?? 0,
       estimatedDistanceMeters:
-          double.tryParse('${json['estimatedDistanceMeters'] ?? 0}') ?? 0,
+          double.tryParse('${json['estimatedDistanceMeters'] ?? json['estimated_distance_meters'] ?? json['distance'] ?? 0}') ?? 0,
       estimatedDurationMinutes:
-          double.tryParse('${json['estimatedDurationMinutes'] ?? 0}') ?? 0,
-      paymentMethod: json['paymentMethod']?.toString() ?? 'cash',
+          double.tryParse('${json['estimatedDurationMinutes'] ?? json['estimated_duration_minutes'] ?? json['duration'] ?? 0}') ?? 0,
+      paymentMethod: (json['paymentMethod'] ?? json['payment_method'] ?? 'cash').toString(),
       routePolyline: ((json['route'] is Map
               ? ((json['route'] as Map)['polyline'] ?? (json['route'] as Map)['encodedPolyline'])
               : null) ??
@@ -160,18 +181,19 @@ class RideModel {
           (json['route'] is String ? json['route'] : '') ??
           '').toString(),
       otp: (json['otp'] ?? '').toString(),
-      pickup: LatLngPoint.fromGeoJson(json['pickupLocation']),
-      pickupAddress: (json['pickupAddress'] ?? '').toString(),
-      drop: LatLngPoint.fromGeoJson(json['dropLocation']),
-      dropAddress: (json['dropAddress'] ?? '').toString(),
+      pickup: LatLngPoint.fromGeoJson(pickupGeo),
+      pickupAddress: (json['pickupAddress'] ?? json['pickup_address'] ?? json['pickupAddressName'] ?? '').toString(),
+      drop: LatLngPoint.fromGeoJson(dropGeo),
+      dropAddress: (json['dropAddress'] ?? json['drop_address'] ?? json['dropAddressName'] ?? '').toString(),
       stops: ((json['stops'] as List?) ?? [])
+          .whereType<Map>()
           .map((e) => RideStopPoint.fromJson(Map<String, dynamic>.from(e)))
           .toList(),
-      scheduledAt: parseDate(json['scheduledAt']),
-      acceptedAt: parseDate(json['acceptedAt']),
-      arrivedAt: parseDate(json['arrivedAt']),
-      startedAt: parseDate(json['startedAt']),
-      completedAt: parseDate(json['completedAt']),
+      scheduledAt: parseDate(json['scheduledAt'] ?? json['scheduled_at']),
+      acceptedAt: parseDate(json['acceptedAt'] ?? json['accepted_at']),
+      arrivedAt: parseDate(json['arrivedAt'] ?? json['arrived_at']),
+      startedAt: parseDate(json['startedAt'] ?? json['started_at']),
+      completedAt: parseDate(json['completedAt'] ?? json['completed_at'] ?? json['createdAt'] ?? json['created_at']),
       driver: json['driver'] is Map && (json['driver'] as Map).isNotEmpty
           ? RideDriverInfo.fromJson(Map<String, dynamic>.from(json['driver']))
           : null,
@@ -181,12 +203,16 @@ class RideModel {
       lastDriverHeading: json['lastDriverLocation'] is Map
           ? double.tryParse('${json['lastDriverLocation']['heading'] ?? ''}')
           : null,
+      lastDriverLocationAt: json['lastDriverLocation'] is Map
+          ? parseDate(json['lastDriverLocation']['updatedAt'])
+          : null,
       messages: ((json['messages'] as List?) ?? [])
+          .whereType<Map>()
           .map((e) => RideMessageModel.fromJson(Map<String, dynamic>.from(e)))
           .toList(),
-      serviceType: json['serviceType']?.toString(),
-      vehicleType: json['vehicleType']?.toString(),
-      vehicleIconType: json['vehicleIconType']?.toString(),
+      serviceType: (json['serviceType'] ?? json['service_type'])?.toString(),
+      vehicleType: (json['vehicleType'] ?? json['vehicle_type'] ?? json['vehicleTypeName'])?.toString(),
+      vehicleIconType: (json['vehicleIconType'] ?? json['vehicle_icon_type'])?.toString(),
     );
   }
 
@@ -226,6 +252,7 @@ class RideModel {
       driver: driver ?? this.driver,
       lastDriverLocation: lastDriverLocation ?? this.lastDriverLocation,
       lastDriverHeading: lastDriverHeading ?? this.lastDriverHeading,
+      lastDriverLocationAt: lastDriverLocationAt,
       messages: messages ?? this.messages,
       // Previously omitted, so every copyWith silently reset these to null —
       // which reset the map's vehicle marker back to the default on the first
@@ -246,4 +273,29 @@ class RideModel {
 
   bool get isCancelled =>
       status.toLowerCase() == 'cancelled' || liveStatus.toLowerCase() == 'cancelled';
+
+  /// Where the trip is, reading both status axes.
+  ///
+  /// k9 naming is not the obvious one: `arriving` means the driver is **at the
+  /// pickup**, `started` is the pickup (OTP verified), and `arrived` means the
+  /// trip **reached the drop**. `status` only says searching/accepted/ongoing/
+  /// completed, so `liveStatus` wins whenever it is more specific.
+  RideStage get stage {
+    if (isCancelled) return RideStage.cancelled;
+    if (isCompleted) return RideStage.completed;
+    final ls = liveStatus.toLowerCase();
+    final s = status.toLowerCase();
+    if (ls == 'arrived') return RideStage.atDrop;
+    if (ls == 'started' || s == 'ongoing' || s == 'started' || s == 'in_progress') {
+      return RideStage.onTrip;
+    }
+    if (ls == 'arriving' || s == 'arriving' || s == 'driver_arrived') {
+      return RideStage.atPickup;
+    }
+    if (ls == 'accepted' || s == 'accepted') return RideStage.toPickup;
+    return RideStage.searching;
+  }
 }
+
+/// Passenger-facing ride stage; see [RideModel.stage].
+enum RideStage { searching, toPickup, atPickup, onTrip, atDrop, completed, cancelled }

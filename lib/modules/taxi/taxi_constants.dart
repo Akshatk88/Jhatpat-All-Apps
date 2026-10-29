@@ -39,21 +39,21 @@ class TaxiConstants {
 
   static const TextStyle fontStyleHeadline = TextStyle(
     fontSize: 24,
-    fontWeight: FontWeight.w900,
+    fontWeight: FontWeight.w700,
     color: Color(0xFF0F172A),
     letterSpacing: -0.5,
   );
 
   static const TextStyle fontStyleTitle = TextStyle(
     fontSize: 18,
-    fontWeight: FontWeight.w800,
+    fontWeight: FontWeight.w600,
     color: Color(0xFF0F172A),
     letterSpacing: -0.3,
   );
 
   static const TextStyle fontStyleSubTitle = TextStyle(
     fontSize: 14,
-    fontWeight: FontWeight.w600,
+    fontWeight: FontWeight.w500,
     color: Color(0xFF0F172A),
   );
 

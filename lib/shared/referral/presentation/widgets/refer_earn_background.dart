@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class ReferEarnBackground extends StatelessWidget {
   final Widget child;
 
-  static const Color solid = Color(0xFF0B2418);
+  static const Color solid = Color(0xFF121212);
 
   const ReferEarnBackground({super.key, required this.child});
 
@@ -14,7 +14,7 @@ class ReferEarnBackground extends StatelessWidget {
       height: double.infinity,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFF0B2418), Color(0xFF04120C)],
+          colors: [Color(0xFF1C1C1C), Color(0xFF0A0A0A)],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),

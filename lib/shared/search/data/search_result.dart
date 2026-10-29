@@ -1,3 +1,5 @@
+import 'package:superapp_user/core/i18n/tr.dart';
+
 enum SearchResultType {
   restaurant,
   food,
@@ -41,15 +43,15 @@ class SearchResult {
   String get typeLabel {
     switch (type) {
       case SearchResultType.restaurant:
-        return 'Restaurant';
+        return 'Restaurant'.tr;
       case SearchResultType.food:
-        return 'Dish';
+        return 'Dish'.tr;
       case SearchResultType.category:
-        return 'Category';
+        return 'Category'.tr;
       case SearchResultType.brand:
-        return 'Brand';
+        return 'Brand'.tr;
       case SearchResultType.store99:
-        return '₹99 Meal';
+        return '₹99 Meal'.tr;
     }
   }
 }

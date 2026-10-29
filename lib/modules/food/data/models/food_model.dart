@@ -18,6 +18,9 @@ class FoodModel {
   final bool isSpicy;
   final bool isPopular;
 
+  /// Menu category name from the backend (e.g. "Beverages"); empty if unknown.
+  final String category;
+
   /// Size/portion choices. Empty when the item has a single price.
   final List<FoodVariant> variants;
 
@@ -37,6 +40,7 @@ class FoodModel {
     this.isVeg = false,
     this.isSpicy = false,
     this.isPopular = false,
+    this.category = '',
     this.variants = const [],
   });
 
@@ -83,7 +87,7 @@ class FoodModel {
   /// than at each call site, so the strikethrough and the badge can never
   /// disagree, and no future screen has to remember the rule.
   static double? _compareAtPrice(Object? raw, double price) {
-    final value = (raw as num?)?.toDouble();
+    final value = num.tryParse('$raw')?.toDouble();
     if (value == null || !value.isFinite) return null;
     return value > price ? value : null;
   }
@@ -91,7 +95,7 @@ class FoodModel {
   /// Maps a backend food/menu item. Used by the cross-restaurant feed
   /// (`/public/foods`) and by each menu section's `items[]` — same shape.
   factory FoodModel.fromApi(Map<String, dynamic> json, {String? restaurantId}) {
-    final price = (json['price'] as num?)?.toDouble() ?? 0.0;
+    final price = num.tryParse('${json['price']}')?.toDouble() ?? 0.0;
     return FoodModel(
       id: (json['_id'] ?? json['id'] ?? '').toString(),
       restaurantId: (json['restaurantId'] ?? restaurantId ?? '').toString(),
@@ -105,12 +109,13 @@ class FoodModel {
       // to the single image means the detail screen can always just read
       // imageGallery instead of special-casing the old shape.
       imageGallery: _galleryFrom(json),
-      rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
-      reviewCount: (json['totalRatings'] as num?)?.toInt() ?? 0,
-      calories: (json['calories'] as num?)?.toInt() ?? 0,
+      rating: num.tryParse('${json['rating']}')?.toDouble() ?? 0.0,
+      reviewCount: num.tryParse('${json['totalRatings']}')?.toInt() ?? 0,
+      calories: num.tryParse('${json['calories']}')?.toInt() ?? 0,
       deliveryTime: (json['preparationTime'] ?? json['prepTime'] ?? json['deliveryTime'] ?? '').toString(),
       isVeg: (json['foodType']?.toString().toLowerCase() ?? '') == 'veg',
       isPopular: json['isRecommended'] as bool? ?? false,
+      category: (json['categoryName'] ?? json['category'] ?? '').toString(),
       variants: FoodVariant.listFrom(json),
     );
   }
@@ -130,13 +135,14 @@ class FoodModel {
       ),
       imageUrl: json['imageUrl'] as String,
       imageGallery: (json['imageGallery'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
-      rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
+      rating: num.tryParse('${json['rating']}')?.toDouble() ?? 0.0,
       reviewCount: json['reviewCount'] as int? ?? 0,
       calories: json['calories'] as int? ?? 0,
       deliveryTime: json['deliveryTime'] as String? ?? '',
       isVeg: json['isVeg'] as bool? ?? false,
       isSpicy: json['isSpicy'] as bool? ?? false,
       isPopular: json['isPopular'] as bool? ?? false,
+      category: json['category'] as String? ?? '',
       variants: FoodVariant.listFrom(json),
     );
   }
@@ -158,6 +164,7 @@ class FoodModel {
       'isVeg': isVeg,
       'isSpicy': isSpicy,
       'isPopular': isPopular,
+      'category': category,
       'variants': variants.map((v) => v.toJson()).toList(),
     };
   }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -331,7 +332,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen>
                           isFavorite
                               ? Icons.favorite_rounded
                               : Icons.favorite_border_rounded,
-                          color: const Color(0xFFFF7A00),
+                          color: const Color(0xFFE5A600),
                           size: 24,
                         ),
                       ),
@@ -445,7 +446,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen>
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: isSelected
-                    ? const Color(0xFFFF7A00)
+                    ? const Color(0xFFFFB800)
                     : (isDark ? const Color(0xFF303030) : Colors.white),
                 width: isSelected ? 2.5 : 2,
               ),
@@ -475,7 +476,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen>
                           '+$remaining',
                           style: const TextStyle(
                             color: Colors.white,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             fontSize: 16,
                           ),
                         ),
@@ -509,7 +510,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen>
                   widget.food.name,
                   style: TextStyle(
                     fontSize: 26,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: textColor,
                     height: 1.2,
                   ),
@@ -523,8 +524,8 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen>
                     '₹${widget.food.price.toStringAsFixed(0)}',
                     style: const TextStyle(
                       fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFFFF7A00),
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFFE5A600),
                     ),
                   ),
                   if (widget.food.originalPrice != null)
@@ -534,7 +535,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen>
                           '₹${widget.food.originalPrice!.toStringAsFixed(0)}',
                           style: TextStyle(
                             fontSize: 13,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w500,
                             color: secondaryTextColor,
                             decoration: TextDecoration.lineThrough,
                           ),
@@ -553,7 +554,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen>
                             '-${widget.food.discountPercent}%',
                             style: const TextStyle(
                               fontSize: 11,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w600,
                               color: Color(0xFFFF4B72),
                             ),
                           ),
@@ -566,7 +567,11 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen>
           ),
           if (widget.food.rating > 0 || widget.food.calories > 0 || widget.food.deliveryTime.trim().isNotEmpty) ...[
             const SizedBox(height: 20),
-            Row(
+            // Wrap, not Row: three content-sized badges overflow a narrow
+            // phone (or large text), so let the last one drop to a new line.
+            Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              runSpacing: 10,
               children: [
                 if (widget.food.rating > 0) ...[
                   _buildInfoBadge(
@@ -657,7 +662,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen>
             text: TextSpan(
               text: primary,
               style: TextStyle(
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
                 fontSize: 12,
                 color: textColor,
               ),
@@ -685,10 +690,10 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Serving Size',
+            'Serving Size'.tr,
             style: TextStyle(
               fontSize: 16,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
               color: textColor,
             ),
           ),
@@ -710,7 +715,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen>
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: isSelected
-                            ? const Color(0xFFFF7A00)
+                            ? const Color(0xFFFFB800)
                             : (isDark
                                   ? const Color(0xFF303030)
                                   : const Color(0xFFEEEEEE)),
@@ -722,10 +727,10 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen>
                         variant.name,
                         style: TextStyle(
                           color: isSelected
-                              ? const Color(0xFFFF7A00)
+                              ? const Color(0xFFE5A600)
                               : textColor,
                           fontWeight: isSelected
-                              ? FontWeight.bold
+                              ? FontWeight.w600
                               : FontWeight.w500,
                         ),
                       ),
@@ -767,20 +772,25 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Add Extras',
+                'Add Extras'.tr,
                 style: TextStyle(
                   fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   color: textColor,
                 ),
               ),
-              Text(
-                'Customize your order',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: isDark
-                      ? const Color(0xFF9E9E9E)
-                      : const Color(0xFF9E9E9E),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  'Customize your order'.tr,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isDark
+                        ? const Color(0xFF9E9E9E)
+                        : const Color(0xFF9E9E9E),
+                  ),
                 ),
               ),
             ],
@@ -809,7 +819,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen>
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
                         color: isSelected
-                            ? const Color(0xFFFF7A00)
+                            ? const Color(0xFFFFB800)
                             : (isDark
                                   ? const Color(0xFF303030)
                                   : const Color(0xFFF0F0F0)),
@@ -843,7 +853,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen>
                               addon.name,
                               style: TextStyle(
                                 fontSize: 12,
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.w500,
                                 color: textColor,
                               ),
                             ),
@@ -862,7 +872,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen>
                               ? Icons.check_circle
                               : Icons.add_circle_outline,
                           color: isSelected
-                              ? const Color(0xFFFF7A00)
+                              ? const Color(0xFFFFB800)
                               : const Color(0xFFBDBDBD),
                           size: 20,
                         ),
@@ -945,7 +955,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen>
                         key: ValueKey<int>(_quantity),
                         style: TextStyle(
                           fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: isDark ? Colors.white : Colors.black,
                         ),
                       ),
@@ -1029,7 +1039,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen>
                   child: Ink(
                     height: 56,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFF7A00),
+                      color: const Color(0xFFFFB800),
                       borderRadius: BorderRadius.circular(28),
                     ),
                     child: Row(
@@ -1037,16 +1047,22 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen>
                       children: [
                         const Icon(
                           Icons.shopping_cart_outlined,
-                          color: Colors.white,
+                          color: Color(0xFF121212),
                           size: 20,
                         ),
                         const SizedBox(width: 8),
-                        Text(
-                          'Add to Cart • ₹${(unitPrice * _quantity).toStringAsFixed(0)}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                        Flexible(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              'Add to Cart • ₹{price}'.trArgs({'price': (unitPrice * _quantity).toStringAsFixed(0)}),
+                              maxLines: 1,
+                              style: const TextStyle(
+                                color: Color(0xFF121212),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
                         ),
                       ],

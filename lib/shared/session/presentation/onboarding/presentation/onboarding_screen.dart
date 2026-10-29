@@ -1,3 +1,4 @@
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/core/storage/storage_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -113,10 +114,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   TextButton(
                     onPressed: _finish,
                     child: Text(
-                      'Skip',
+                      'Skip'.tr,
                       style: TextStyle(
                         fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                         color: textSecondary,
                       ),
                     ),
@@ -151,28 +152,28 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                             ),
                             const SizedBox(height: 24),
                             Text(
-                              page.titlePrefix,
+                              page.titlePrefix.tr,
                               style: TextStyle(
                                 fontSize: 23,
-                                fontWeight: FontWeight.w900,
+                                fontWeight: FontWeight.w700,
                                 color: textPrimary,
                                 letterSpacing: -0.5,
                               ),
                               textAlign: TextAlign.center,
                             ),
                             Text(
-                              page.titleSuffix,
+                              page.titleSuffix.tr,
                               style: const TextStyle(
                                 fontSize: 23,
-                                fontWeight: FontWeight.w900,
-                                color: Color(0xFFFF5200),
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFFE5A600),
                                 letterSpacing: -0.5,
                               ),
                               textAlign: TextAlign.center,
                             ),
                             const SizedBox(height: 12),
                             Text(
-                              page.description,
+                              page.description.tr,
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w500,
@@ -201,17 +202,17 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     count: _pages.length,
                     effect: WormEffect(
                       dotColor: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
-                      activeDotColor: const Color(0xFFFF5200),
+                      activeDotColor: const Color(0xFFFFB800),
                       dotHeight: 8,
                       dotWidth: 8,
                       spacing: 8,
                     ),
                   ),
                   Material(
-                    color: const Color(0xFFFF5200),
+                    color: const Color(0xFFFFB800),
                     shape: const CircleBorder(),
                     elevation: 3,
-                    shadowColor: const Color(0x40FF5200),
+                    shadowColor: const Color(0x40FFB800),
                     child: InkWell(
                       customBorder: const CircleBorder(),
                       onTap: _next,
@@ -219,7 +220,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         padding: EdgeInsets.all(16),
                         child: Icon(
                           Icons.arrow_forward_rounded,
-                          color: Colors.white,
+                          color: Colors.black,
                           size: 22,
                         ),
                       ),

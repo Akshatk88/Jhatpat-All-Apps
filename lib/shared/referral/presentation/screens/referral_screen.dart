@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:superapp_user/app/routing/back_navigation.dart';
 
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
 import 'package:superapp_user/core/audio/referral_audio_player.dart';
 import 'package:superapp_user/shared/wallet/data/wallet_model.dart';
@@ -101,14 +102,14 @@ class _ReferralScreenState extends ConsumerState<ReferralScreen>
     if (statusLower == 'credited') {
       color = Colors.green;
       text = partner.earnedAmount > 0
-          ? 'Earned ₹${partner.earnedAmount.toStringAsFixed(0)}'
-          : 'Credited';
+          ? 'Earned ₹{amount}'.trArgs({'amount': partner.earnedAmount.toStringAsFixed(0)})
+          : 'Credited'.tr;
     } else if (statusLower == 'rejected') {
       color = Colors.grey;
-      text = partner.reason?.isNotEmpty == true ? partner.reason! : 'Rejected';
+      text = partner.reason?.isNotEmpty == true ? partner.reason! : 'Rejected'.tr;
     } else {
       color = Colors.amber;
-      text = 'Waiting for order';
+      text = 'Waiting for order'.tr;
     }
 
     return Container(
@@ -120,7 +121,9 @@ class _ReferralScreenState extends ConsumerState<ReferralScreen>
       ),
       child: Text(
         text,
-        style: TextStyle(color: color, fontSize: 10.sp, fontWeight: FontWeight.bold),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(color: color, fontSize: 10.sp, fontWeight: FontWeight.w600),
       ),
     );
   }
@@ -139,7 +142,7 @@ class _ReferralScreenState extends ConsumerState<ReferralScreen>
           onPressed: () => context.backOr(),
         ),
         title: Text(
-          'Refer & earn',
+          'Refer & earn'.tr,
           style: TextStyle(color: Colors.white, fontSize: 16.sp),
         ),
         centerTitle: true,
@@ -168,18 +171,18 @@ class _ReferralScreenState extends ConsumerState<ReferralScreen>
                   ),
                   SizedBox(height: 8.h),
                   Text(
-                    'Invite a friend, earn ₹$rewardAmountStr',
+                    'Invite a friend, earn ₹{amount}'.trArgs({'amount': rewardAmountStr}),
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 22.sp,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   SizedBox(height: 8.h),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20.w),
                     child: Text(
-                      'Earn ₹$rewardAmountStr when your friend completes their first order!',
+                      'Earn ₹{amount} when your friend completes their first order!'.trArgs({'amount': rewardAmountStr}),
                       textAlign: TextAlign.center,
                       style: TextStyle(color: Colors.grey[400], fontSize: 14.sp),
                     ),
@@ -189,16 +192,16 @@ class _ReferralScreenState extends ConsumerState<ReferralScreen>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Earned: ₹$totalEarnedStr',
+                        'Earned: ₹{amount}'.trArgs({'amount': totalEarnedStr}),
                         style: TextStyle(
                           color: Colors.greenAccent,
                           fontSize: 14.sp,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       SizedBox(width: 16.w),
                       Text(
-                        '$totalInvited referrals',
+                        '{count} referrals'.trArgs({'count': totalInvited}),
                         style: TextStyle(color: Colors.white70, fontSize: 14.sp),
                       ),
                     ],
@@ -246,11 +249,11 @@ class _ReferralScreenState extends ConsumerState<ReferralScreen>
                                               ),
                                             ),
                                             Text(
-                                              'suvio\nrewards',
+                                              'JhatPat\nrewards'.tr,
                                               textAlign: TextAlign.right,
                                               style: TextStyle(
                                                 color: Colors.grey,
-                                                fontWeight: FontWeight.bold,
+                                                fontWeight: FontWeight.w600,
                                                 height: 1.1,
                                                 fontSize: 12.sp,
                                               ),
@@ -341,16 +344,16 @@ class _ReferralScreenState extends ConsumerState<ReferralScreen>
                                               ),
                                               child: Icon(
                                                 Icons.touch_app,
-                                                color: Colors.white,
+                                                color: Colors.black,
                                                 size: 50.sp,
                                               ),
                                             ),
                                             SizedBox(height: 20.h),
                                             Text(
-                                              'TAP TO CREATE',
+                                              'TAP TO CREATE'.tr,
                                               style: TextStyle(
-                                                color: AppColors.primary,
-                                                fontWeight: FontWeight.bold,
+                                                color: const Color(0xFFE5A600),
+                                                fontWeight: FontWeight.w700,
                                                 letterSpacing: 1.2,
                                                 fontSize: 13.sp,
                                               ),
@@ -376,11 +379,11 @@ class _ReferralScreenState extends ConsumerState<ReferralScreen>
                       child: Row(
                         children: [
                           Text(
-                            'Invited Friends',
+                            'Invited Friends'.tr,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 18.sp,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
@@ -403,21 +406,28 @@ class _ReferralScreenState extends ConsumerState<ReferralScreen>
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    partner.name.isNotEmpty ? partner.name : partner.phone,
-                                    style: TextStyle(color: Colors.white, fontSize: 16.sp, fontWeight: FontWeight.bold),
-                                  ),
-                                  SizedBox(height: 4.h),
-                                  Text(
-                                    partner.phone.isNotEmpty ? partner.phone : 'Friend',
-                                    style: TextStyle(color: Colors.grey, fontSize: 12.sp),
-                                  ),
-                                ],
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      partner.name.isNotEmpty ? partner.name : partner.phone,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(color: Colors.white, fontSize: 16.sp, fontWeight: FontWeight.w600),
+                                    ),
+                                    SizedBox(height: 4.h),
+                                    Text(
+                                      partner.phone.isNotEmpty ? partner.phone : 'Friend'.tr,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(color: Colors.grey, fontSize: 12.sp),
+                                    ),
+                                  ],
+                                ),
                               ),
-                              _buildStatusChip(partner),
+                              SizedBox(width: 8.w),
+                              Flexible(child: _buildStatusChip(partner)),
                             ],
                           ),
                         );
@@ -434,7 +444,7 @@ class _ReferralScreenState extends ConsumerState<ReferralScreen>
             padding: EdgeInsets.all(20),
             child: SkeletonBanner(height: 380),
           ),
-          error: (e, _) => Center(child: Text('Error: $e', style: const TextStyle(color: Colors.red))),
+          error: (e, _) => Center(child: Text('Error: {error}'.trArgs({'error': e}), style: const TextStyle(color: Colors.red))),
         ),
       ),
     );

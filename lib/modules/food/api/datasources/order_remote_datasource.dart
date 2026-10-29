@@ -92,6 +92,9 @@ class OrderRemoteDataSource {
       'zoneId': ?zoneId,
       'couponCode': ?couponCode,
       'deliveryMode': deliveryMode,
+      // The backend schema knows this choice only as `deliveryFleet` (zod
+      // strips `deliveryMode`); 'standard' is its name for basic.
+      'deliveryFleet': deliveryMode == 'quick' ? 'quick' : 'standard',
       'scheduledAt': ?scheduledAt?.toUtc().toIso8601String(),
     };
 
@@ -136,6 +139,9 @@ class OrderRemoteDataSource {
       'pricing': pricing,
       'paymentMethod': paymentMethod,
       'deliveryMode': deliveryMode,
+      // The backend schema knows this choice only as `deliveryFleet` (zod
+      // strips `deliveryMode`); 'standard' is its name for basic.
+      'deliveryFleet': deliveryMode == 'quick' ? 'quick' : 'standard',
       'note': ?note,
       'deliveryInstructions': ?deliveryInstructions,
       'sendCutlery': sendCutlery,
@@ -275,12 +281,15 @@ class OrderRemoteDataSource {
         pastCount: null,
       );
     }
-    final map = (data as Map).cast<String, dynamic>();
-    final list = ((map['data'] as List?) ?? const [])
+    final Map<String, dynamic> map = data is Map ? data.cast<String, dynamic>() : const <String, dynamic>{};
+    final rawList = [map['data'], map['orders'], map['results'], map['items'], map['docs']]
+        .firstWhere((v) => v is List, orElse: () => const []) as List;
+    final list = rawList
         .whereType<Map>()
         .map((e) => e.cast<String, dynamic>())
         .toList();
-    final meta = (map['meta'] as Map?)?.cast<String, dynamic>() ?? const {};
+    final metaRaw = map['meta'] ?? map['pagination'];
+    final meta = metaRaw is Map ? metaRaw.cast<String, dynamic>() : const <String, dynamic>{};
     final totalOrders = (meta['total'] as num?)?.toInt() ??
         (meta['totalOrders'] as num?)?.toInt() ??
         (meta['count'] as num?)?.toInt() ??

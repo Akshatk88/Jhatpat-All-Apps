@@ -6,19 +6,15 @@ class LocaleLanguageList {
   final String lang;
   final String? flag;
 
-  const LocaleLanguageList({
-    required this.name,
-    required this.lang,
-    this.flag,
-  });
+  const LocaleLanguageList({required this.name, required this.lang, this.flag});
 }
 
-/// Central App Constants for Suvio User Application.
+/// Central App Constants for JhatPat User Application.
 class AppConstants {
   const AppConstants._();
 
-  static const String title = 'Suvio';
-  static const String appName = 'Suvio';
+  static const String title = 'JhatPat';
+  static const String appName = 'JhatPat';
 
   /// Merchant name shown on the Razorpay checkout sheet.
   ///
@@ -33,9 +29,14 @@ class AppConstants {
   static const String appVersion = '1.0.0';
 
   /// Backend REST API host domain.
+  ///
+  /// The merged master deployment (`/opt/master`, pm2 `master-api`, port 5007)
+  /// behind nginx. One host serves every module — `/api/v1/food/*`,
+  /// `/api/v1/taxi/*` and `/api/v1/sp/*` — plus the Socket.IO endpoint, so
+  /// there is exactly one origin to change when the environment moves.
   static const String hostUrl = String.fromEnvironment(
     'API_HOST',
-    defaultValue: 'https://k9.appzeto.com',
+    defaultValue: 'https://jhatpattaxi.com',
   );
 
   /// Backend REST API base URL (all endpoints mounted under `/api/v1`).
@@ -50,10 +51,9 @@ class AppConstants {
     defaultValue: hostUrl,
   );
 
-  /// Firebase project configuration for the super app (com.k9bharat.user).
+  /// Firebase project configuration for the super app (com.user.jhatpat).
   ///
-  /// Project `k9rides-529a8` — the same project the k9 backend authenticates
-  /// as (`firebase-adminsdk-fbsvc@k9rides-529a8.iam.gserviceaccount.com`).
+  /// Project `jhatpat-d0e4f`.
   /// These values must stay in sync with `android/app/google-services.json`;
   /// they are only used as a fallback when the default `Firebase.initializeApp()`
   /// fails to read the platform config (see `ensureFirebaseInitialized`).
@@ -61,33 +61,40 @@ class AppConstants {
   /// iOS is not configured yet — there is no GoogleService-Info.plist for this
   /// project, so iOS builds will fall through to the failure branch.
   static String firebaseApiKey = (kIsWeb || Platform.isAndroid)
-      ? "AIzaSyDt1UEqn5kYbrbQoRJnQ5klKZbLNVrGvuQ"
+      ? "AIzaSyAAeZjaXyhCUBCtp7_ne-eGxWw7fFzj7Ck"
       : "ios firebase api key";
 
   static String get firbaseApiKey => firebaseApiKey;
 
   static String firebaseAppId = (kIsWeb || Platform.isAndroid)
-      ? "1:857854567102:android:0472547c3baf400bfc34ef"
+      ? "1:1068476980955:android:8b05a954e6d3e3d8dfb6fe"
       : "ios firebase app id";
 
-  static String firebaseMessagingSenderId =
-      (kIsWeb || Platform.isAndroid) ? "857854567102" : "ios firebase sender id";
+  static String firebaseMessagingSenderId = (kIsWeb || Platform.isAndroid)
+      ? "1068476980955"
+      : "ios firebase sender id";
 
   static String get firebasemessagingSenderId => firebaseMessagingSenderId;
 
-  static String firebaseProjectId =
-      (kIsWeb || Platform.isAndroid) ? "k9rides-529a8" : "ios firebase project id";
+  static String firebaseProjectId = (kIsWeb || Platform.isAndroid)
+      ? "jhatpat-d0e4f"
+      : "ios firebase project id";
 
+  /// Deliberately still the k9 backend's database (project k9rides-529a8),
+  /// not jhatpat-d0e4f: live order tracking reads what the backend writes
+  /// there. Move it only together with the backend.
+  ///
   /// Regional RTDB instance — note this is NOT the default `.firebaseio.com`
   /// domain, so it must always be passed explicitly to
   /// `FirebaseDatabase.instanceFor(app:, databaseURL:)`.
   static String firebaseDatabaseUrl =
       "https://k9rides-529a8-default-rtdb.asia-southeast1.firebasedatabase.app";
 
-  static const String firebaseStorageBucket = "k9rides-529a8.firebasestorage.app";
+  static const String firebaseStorageBucket =
+      "jhatpat-d0e4f.firebasestorage.app";
 
   /// Google Maps API key (Maps SDK + Geocoding API).
-  static String mapKey = 'AIzaSyArBbII2fgAuVaycfkEAm1GcuyvKPTSWyc';
+  static String mapKey = 'AIzaSyBbOTOv3KgTY__MAvPC1A7GZSO_5Wp1N88';
 
   /// Payment Gateway keys.
   static const String stripePublishKey = '';
@@ -99,6 +106,6 @@ class AppConstants {
     LocaleLanguageList(name: 'English', lang: 'en'),
   ];
 
-  static String packageName = 'com.k9bharat.user';
+  static String packageName = 'com.user.jhatpat';
   static String signKey = '';
 }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -147,7 +148,7 @@ class _RestaurantCardState extends ConsumerState<RestaurantCard> {
                 restaurantId: restaurant.id,
                 imageSlides: imageSlides,
                 isOpen: restaurant.isOpen,
-                featuredPriceBadge: startingPrice > 0 ? '₹${startingPrice.toStringAsFixed(0)} for one' : null,
+                featuredPriceBadge: startingPrice > 0 ? '₹{price} for one'.trArgs({'price': startingPrice.toStringAsFixed(0)}) : null,
                 featuredDishName: restaurant.featuredDishName ?? featuredDish?.name,
                 topMenuItemNames: slideDishLabels.isNotEmpty ? slideDishLabels : displayTopItems,
                 onPageChanged: (page) {
@@ -271,21 +272,31 @@ class _RestaurantInfo extends ConsumerWidget {
     required IconData icon,
     required String label,
     required Color color,
+    double? maxLabelWidth,
   }) {
+    final text = Text(
+      label,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: TextStyle(
+        color: color,
+        fontSize: 11.5.sp,
+        fontWeight: FontWeight.w600,
+      ),
+    );
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Icon(icon, size: 12.sp, color: color),
         SizedBox(width: 3.w),
-        Text(
-          label,
-          style: TextStyle(
-            color: color,
-            fontSize: 11.5.sp,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        if (maxLabelWidth != null)
+          ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: maxLabelWidth),
+            child: text,
+          )
+        else
+          text,
       ],
     );
   }
@@ -307,14 +318,14 @@ class _RestaurantInfo extends ConsumerWidget {
         child: Icon(
           Icons.access_time_rounded,
           size: 13.sp,
-          color: const Color(0xFFE65100),
+          color: const Color(0xFFE5A600),
         ),
       ));
       infoSpans.add(TextSpan(
         text: ' ${restaurant.deliveryTime}',
         style: TextStyle(
           color: secondaryColor,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w500,
           fontSize: 12.sp,
         ),
       ));
@@ -331,7 +342,7 @@ class _RestaurantInfo extends ConsumerWidget {
         text: '${restaurant.distanceKm.toStringAsFixed(1)} km',
         style: TextStyle(
           color: secondaryColor,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w500,
           fontSize: 12.sp,
         ),
       ));
@@ -352,10 +363,10 @@ class _RestaurantInfo extends ConsumerWidget {
                       : startingPrice);
               if (activePrice <= 0) return const SizedBox.shrink();
               return Text(
-                '₹${activePrice.toStringAsFixed(0)} for one',
+                '₹{price} for one'.trArgs({'price': activePrice.toStringAsFixed(0)}),
                 style: TextStyle(
                   color: secondaryColor,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w500,
                   fontSize: 12.sp,
                 ),
               );
@@ -380,8 +391,8 @@ class _RestaurantInfo extends ConsumerWidget {
     final cuisinesText = restaurant.tags.isNotEmpty
         ? restaurant.tags.join('  •  ')
         : (restaurant.restaurantTags.isNotEmpty
-            ? restaurant.restaurantTags.join('  •  ')
-            : 'Desserts  •  North Indian  •  Snacks');
+            ? restaurant.restaurantTags.map((t) => t.tr).join('  •  ')
+            : 'Desserts  •  North Indian  •  Snacks'.tr);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -396,7 +407,7 @@ class _RestaurantInfo extends ConsumerWidget {
                 restaurant.name,
                 style: TextStyle(
                   fontSize: 19.sp,
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.w600,
                   color: titleColor,
                   letterSpacing: -0.2,
                 ),
@@ -424,7 +435,7 @@ class _RestaurantInfo extends ConsumerWidget {
                       restaurant.rating.toStringAsFixed(1),
                       style: TextStyle(
                         color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                         fontSize: 12.sp,
                       ),
                     ),
@@ -452,7 +463,10 @@ class _RestaurantInfo extends ConsumerWidget {
               _buildInlineItem(
                 icon: Icons.location_on_rounded,
                 label: locationLabel,
-                color: const Color(0xFFE65100),
+                color: const Color(0xFFE5A600),
+                // Area names come from the backend and can be long; cap the
+                // label so it can't push the info line off the card.
+                maxLabelWidth: 120.w,
               )
             else if (!restaurant.isOpen)
               Container(
@@ -479,11 +493,11 @@ class _RestaurantInfo extends ConsumerWidget {
                     ),
                     SizedBox(width: 4.w),
                     Text(
-                      'Closed Now',
+                      'Closed Now'.tr,
                       style: TextStyle(
                         color: const Color(0xFFE11D48),
                         fontSize: 11.sp,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
@@ -515,7 +529,7 @@ class _RestaurantInfo extends ConsumerWidget {
               SizedBox(width: 8.w),
               _buildInlineItem(
                 icon: Icons.eco_rounded,
-                label: 'Pure Veg',
+                label: 'Pure Veg'.tr,
                 color: const Color(0xFF2E7D32),
               ),
             ],
@@ -554,10 +568,10 @@ class _RestaurantInfo extends ConsumerWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'This restaurant is currently closed.',
+                        'This restaurant is currently closed.'.tr,
                         style: TextStyle(
                           fontSize: 11.5.sp,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: isDark
                               ? const Color(0xFFFDBA74)
                               : const Color(0xFF7C2D12),
@@ -565,7 +579,7 @@ class _RestaurantInfo extends ConsumerWidget {
                       ),
                       SizedBox(height: 1.h),
                       Text(
-                        'It will accept orders once it reopens.',
+                        'It will accept orders once it reopens.'.tr,
                         style: TextStyle(
                           fontSize: 10.5.sp,
                           fontWeight: FontWeight.w500,
@@ -590,12 +604,12 @@ class _RestaurantInfo extends ConsumerWidget {
             decoration: BoxDecoration(
               color: isDark
                   ? const Color(0xFF261D1A)
-                  : const Color(0xFFFFF7ED),
+                  : const Color(0xFFFFFBEB),
               borderRadius: BorderRadius.circular(12.r),
               border: Border.all(
                 color: isDark
                     ? const Color(0xFF452B20)
-                    : const Color(0xFFFED7AA),
+                    : const Color(0xFFFFE8A3),
                 width: 0.8,
               ),
             ),
@@ -605,7 +619,7 @@ class _RestaurantInfo extends ConsumerWidget {
                 Icon(
                   Icons.auto_awesome,
                   size: 14.sp,
-                  color: const Color(0xFFEA580C),
+                  color: const Color(0xFFE5A600),
                 ),
                 SizedBox(width: 6.w),
                 Expanded(
@@ -617,16 +631,16 @@ class _RestaurantInfo extends ConsumerWidget {
                               '${restaurant.featuredDishName}${startingPrice > 0 ? ' • ₹${startingPrice.toStringAsFixed(0)}' : ''}'
                           ],
                     prefix: Text(
-                      'Must Try • ',
+                      'Must Try • '.tr,
                       style: TextStyle(
                         fontSize: 11.sp,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFFC2410C),
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? const Color(0xFFFFB800) : const Color(0xFF121212),
                       ),
                     ),
                     style: TextStyle(
                       fontSize: 11.5.sp,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w500,
                       color: titleColor,
                     ),
                   ),
@@ -643,10 +657,10 @@ class _RestaurantInfo extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(8.r),
                     ),
                     child: Text(
-                      'Unavailable',
+                      'Unavailable'.tr,
                       style: TextStyle(
                         fontSize: 10.5.sp,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                         color: isDark
                             ? const Color(0xFF94A3B8)
                             : const Color(0xFF64748B),
@@ -668,7 +682,7 @@ class _RestaurantInfo extends ConsumerWidget {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(8.r),
                         border: Border.all(
-                          color: const Color(0xFFFED7AA),
+                          color: const Color(0xFFFFE8A3),
                           width: 0.8,
                         ),
                         boxShadow: [
@@ -685,15 +699,15 @@ class _RestaurantInfo extends ConsumerWidget {
                           Icon(
                             Icons.add_rounded,
                             size: 14.sp,
-                            color: const Color(0xFFE65100),
+                            color: const Color(0xFFE5A600),
                           ),
                           SizedBox(width: 2.w),
                           Text(
-                            'Add',
+                            'Add'.tr,
                             style: TextStyle(
                               fontSize: 10.5.sp,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFFE65100),
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF121212),
                             ),
                           ),
                         ],
@@ -948,17 +962,17 @@ class _MediaCarouselState extends ConsumerState<_MediaCarousel> with SingleTicke
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'TEMPORARILY CLOSED',
+                              'TEMPORARILY CLOSED'.tr,
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 12.5.sp,
-                                fontWeight: FontWeight.w800,
+                                fontWeight: FontWeight.w600,
                                 letterSpacing: 0.6,
                               ),
                             ),
                             SizedBox(height: 1.h),
                             Text(
-                              'Will reopen soon',
+                              'Will reopen soon'.tr,
                               style: TextStyle(
                                 color: const Color(0xFFD4D4D8),
                                 fontSize: 10.5.sp,
@@ -1006,7 +1020,7 @@ class _MediaCarouselState extends ConsumerState<_MediaCarousel> with SingleTicke
                       Icon(
                         Icons.local_fire_department_rounded,
                         size: 13.sp,
-                        color: const Color(0xFFFF7A00),
+                        color: const Color(0xFFFFB800),
                       ),
                       SizedBox(width: 4.w),
                       Flexible(
@@ -1015,7 +1029,7 @@ class _MediaCarouselState extends ConsumerState<_MediaCarousel> with SingleTicke
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 10.5.sp,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w500,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,

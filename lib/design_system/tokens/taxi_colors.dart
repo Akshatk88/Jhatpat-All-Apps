@@ -5,23 +5,22 @@ class TaxiColors {
   TaxiColors._();
 
   // Brand Colors (Vibrant Orange & Emerald Green)
-  static const Color primaryOrange = Color(0xFFFF5C2B);
-  static const Color orangeDark = Color(0xFFE04313);
-  static const Color orangeLight = Color(0xFFFFF4EF);
+  static const Color primaryOrange = Color(0xFFFFB800);
+  static const Color orangeDark = Color(0xFFE5A600);
+  static const Color orangeLight = Color(0xFFFFF8E1);
 
-  static const Color primary = Color(0xFFFF5C2B);
-  static const Color primaryDark = Color(0xFFE04313);
-  static const Color primaryLight = Color(0xFFFFF4EF);
+  static const Color primary = Color(0xFFFFB800);
+  static const Color primaryDark = Color(0xFFE5A600);
+  static const Color primaryLight = Color(0xFFFFF8E1);
 
   static const Color accent = Color(0xFF0F172A);
   static const Color accentDark = Color(0xFF020617);
 
   // Category Colors
-  static const Color rideCategory = Color(0xFFFF5C2B);
-  static const Color bikeCategory = Color(0xFFFF8A00);
+  static const Color rideCategory = Color(0xFFFFB800);
+  static const Color bikeCategory = Color(0xFFFFB800);
   static const Color autoCategory = Color(0xFF10B981);
   static const Color parcelCategory = Color(0xFFF59E0B);
-  static const Color rentalsCategory = Color(0xFF3B82F6);
   static const Color outstationCategory = Color(0xFF8B5CF6);
 
   // Semantic Colors
@@ -48,13 +47,13 @@ class TaxiColors {
 
   // Gradients
   static const List<Color> primaryGradient = [
-    Color(0xFFFF5C2B),
-    Color(0xFFE04313),
+    Color(0xFFFFB800),
+    Color(0xFFE5A600),
   ];
 
   static const List<Color> orangeBannerGradient = [
-    Color(0xFFFFF0EA),
-    Color(0xFFFFDFD3),
+    Color(0xFFFFF8E1),
+    Color(0xFFFFECB3),
   ];
 
   static const List<Color> accentGradient = [
@@ -63,7 +62,7 @@ class TaxiColors {
   ];
 
   static const List<Color> mapPulseGradient = [
-    Color(0x33FF5C2B),
-    Color(0x00FF5C2B),
+    Color(0x33FFB800),
+    Color(0x00FFB800),
   ];
 }

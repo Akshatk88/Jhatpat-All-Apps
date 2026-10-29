@@ -180,7 +180,7 @@ class RestaurantModel {
         json['isVegOnly'] == true ||
         (json['category']?.toString().toLowerCase().contains('veg') == true) ||
         (json['foodType']?.toString().toLowerCase() == 'veg');
-    final isFreeDeliv = json['isFreeDelivery'] == true || json['freeDelivery'] == true || (json['deliveryFee'] != null && (json['deliveryFee'] as num).toDouble() == 0.0);
+    final isFreeDeliv = json['isFreeDelivery'] == true || json['freeDelivery'] == true || (num.tryParse(json['deliveryFee']?.toString() ?? '') == 0);
     final areaName = _extractLocationFromApi(json);
 
     final restId = (json['_id'] ?? json['id'] ?? json['restaurantId'] ?? '').toString();
@@ -194,10 +194,10 @@ class RestaurantModel {
     final closes = (json['closingTime'] ?? json['closesIn'] ?? json['operatingHours'] ?? json['openingTime'] ?? '').toString();
     final featuredDishName = (json['featuredDish'] as String?)?.isNotEmpty == true ? json['featuredDish'] as String : null;
 
-    final priceForOne = (json['featuredPrice'] as num?)?.toDouble() ??
-        (json['priceForOne'] as num?)?.toDouble() ??
-        (json['startingPrice'] as num?)?.toDouble() ??
-        (json['minOrder'] as num?)?.toDouble() ??
+    final priceForOne = num.tryParse('${json['featuredPrice']}')?.toDouble() ??
+        num.tryParse('${json['priceForOne']}')?.toDouble() ??
+        num.tryParse('${json['startingPrice']}')?.toDouble() ??
+        num.tryParse('${json['minOrder']}')?.toDouble() ??
         0.0;
 
     final deliveryTimeStr = (json['estimatedDeliveryTime'] ??
@@ -211,15 +211,15 @@ class RestaurantModel {
       imageUrl: primaryImageUrl,
       coverImages: resolvedCovers.isNotEmpty ? resolvedCovers : (primaryImageUrl.isNotEmpty ? [primaryImageUrl] : const []),
       menuImages: resolvedMenuImages,
-      rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
-      reviewCount: (json['totalRatings'] as num?)?.toInt() ?? (json['reviewCount'] as num?)?.toInt() ?? 0,
+      rating: num.tryParse('${json['rating']}')?.toDouble() ?? 0.0,
+      reviewCount: num.tryParse('${json['totalRatings']}')?.toInt() ?? num.tryParse('${json['reviewCount']}')?.toInt() ?? 0,
       deliveryTime: deliveryTimeStr,
-      deliveryFee: (json['deliveryFee'] as num?)?.toDouble() ?? 0.0,
+      deliveryFee: num.tryParse('${json['deliveryFee']}')?.toDouble() ?? 0.0,
       tags: (json['cuisines'] as List?)?.whereType<String>().toList() ??
             (json['tags'] as List?)?.whereType<String>().toList() ?? const [],
       isFeatured: json['isFeatured'] as bool? ?? false,
-      distanceKm: (json['distanceInKm'] as num?)?.toDouble() ??
-          ((json['distanceMeters'] as num?)?.toDouble() ?? 0) / 1000,
+      distanceKm: num.tryParse('${json['distanceInKm']}')?.toDouble() ??
+          (num.tryParse('${json['distanceMeters']}')?.toDouble() ?? 0) / 1000,
       priceForOne: priceForOne,
       featuredDishName: featuredDishName,
       isNearAndFast: json['isNearAndFast'] as bool? ?? false,
@@ -245,14 +245,14 @@ class RestaurantModel {
       imageUrl: json['imageUrl'] as String,
       coverImages: (json['coverImages'] as List<dynamic>?)?.map((e) => e as String).toList() ?? const [],
       menuImages: (json['menuImages'] as List<dynamic>?)?.map((e) => e as String).toList() ?? const [],
-      rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
+      rating: num.tryParse('${json['rating']}')?.toDouble() ?? 0.0,
       reviewCount: json['reviewCount'] as int? ?? 0,
       deliveryTime: json['deliveryTime'] as String? ?? '',
-      deliveryFee: (json['deliveryFee'] as num?)?.toDouble() ?? 0.0,
+      deliveryFee: num.tryParse('${json['deliveryFee']}')?.toDouble() ?? 0.0,
       tags: (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList() ?? const [],
       isFeatured: json['isFeatured'] as bool? ?? false,
-      distanceKm: (json['distanceKm'] as num?)?.toDouble() ?? 0.0,
-      priceForOne: (json['priceForOne'] as num?)?.toDouble() ?? 0.0,
+      distanceKm: num.tryParse('${json['distanceKm']}')?.toDouble() ?? 0.0,
+      priceForOne: num.tryParse('${json['priceForOne']}')?.toDouble() ?? 0.0,
       featuredDishName: json['featuredDishName'] as String?,
       isNearAndFast: json['isNearAndFast'] as bool? ?? false,
       offerBadges: (json['offerBadges'] as List<dynamic>?)?.map((e) => e as String).toList() ?? const [],

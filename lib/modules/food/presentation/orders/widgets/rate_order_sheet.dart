@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
 import 'package:superapp_user/modules/food/data/models/order_model.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
@@ -51,8 +52,8 @@ class _RateOrderSheetState extends ConsumerState<RateOrderSheet> {
     if (!_canSubmit) {
       setState(
         () => _error = _hasDeliveryPartner
-            ? 'Please rate both the food and the delivery partner.'
-            : 'Please rate your food.',
+            ? 'Please rate both the food and the delivery partner.'.tr
+            : 'Please rate your food.'.tr,
       );
       return;
     }
@@ -183,10 +184,10 @@ class _RateOrderSheetState extends ConsumerState<RateOrderSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Rate Your Order',
+                        'Rate Your Order'.tr,
                         style: TextStyle(
                           fontSize: 17.sp,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: textColor,
                         ),
                       ),
@@ -194,7 +195,7 @@ class _RateOrderSheetState extends ConsumerState<RateOrderSheet> {
                       Text(
                         order.restaurantName.isNotEmpty
                             ? order.restaurantName
-                            : 'Your order',
+                            : 'Your order'.tr,
                         style: TextStyle(
                           fontSize: 12.5.sp,
                           color: secondaryColor,
@@ -203,10 +204,10 @@ class _RateOrderSheetState extends ConsumerState<RateOrderSheet> {
                       SizedBox(height: 20.h),
 
                       Text(
-                        'Food Rating',
+                        'Food Rating'.tr,
                         style: TextStyle(
                           fontSize: 13.sp,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w500,
                           color: textColor,
                         ),
                       ),
@@ -218,16 +219,16 @@ class _RateOrderSheetState extends ConsumerState<RateOrderSheet> {
                       SizedBox(height: 10.h),
                       _commentField(
                         _restaurantComment,
-                        'Add a comment about the food (optional)',
+                        'Add a comment about the food (optional)'.tr,
                       ),
 
                       if (_hasDeliveryPartner) ...[
                         SizedBox(height: 20.h),
                         Text(
-                          'Delivery Partner Rating',
+                          'Delivery Partner Rating'.tr,
                           style: TextStyle(
                             fontSize: 13.sp,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w500,
                             color: textColor,
                           ),
                         ),
@@ -239,17 +240,17 @@ class _RateOrderSheetState extends ConsumerState<RateOrderSheet> {
                         SizedBox(height: 10.h),
                         _commentField(
                           _deliveryComment,
-                          'Add a comment about the delivery (optional)',
+                          'Add a comment about the delivery (optional)'.tr,
                         ),
                       ],
 
                       if (order.items.isNotEmpty) ...[
                         SizedBox(height: 20.h),
                         Text(
-                          'Rate Items',
+                          'Rate Items'.tr,
                           style: TextStyle(
                             fontSize: 13.sp,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w500,
                             color: textColor,
                           ),
                         ),
@@ -279,7 +280,7 @@ class _RateOrderSheetState extends ConsumerState<RateOrderSheet> {
                                 SizedBox(height: 8.h),
                                 _commentField(
                                   _commentControllerFor(item.itemId),
-                                  'Comment on this item (optional)',
+                                  'Comment on this item (optional)'.tr,
                                 ),
                               ],
                             ),
@@ -306,7 +307,7 @@ class _RateOrderSheetState extends ConsumerState<RateOrderSheet> {
                           onPressed: _isSubmitting ? null : _submit,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
-                            foregroundColor: Colors.white,
+                            foregroundColor: const Color(0xFF121212),
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12.r),
@@ -318,14 +319,14 @@ class _RateOrderSheetState extends ConsumerState<RateOrderSheet> {
                                   height: 20.w,
                                   child: const CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    color: Colors.white,
+                                    color: Color(0xFF121212),
                                   ),
                                 )
                               : Text(
-                                  'Submit Rating',
+                                  'Submit Rating'.tr,
                                   style: TextStyle(
                                     fontSize: 14.sp,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
                         ),

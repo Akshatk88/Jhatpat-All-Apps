@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 class Formatters {
   Formatters._();
@@ -31,9 +32,11 @@ class Formatters {
 
   static String durationMinutes(double seconds) {
     final minutes = (seconds / 60).round();
-    if (minutes < 60) return '$minutes min';
+    if (minutes < 60) return '{minutes} min'.trArgs({'minutes': minutes});
     final hours = minutes ~/ 60;
     final remaining = minutes % 60;
-    return remaining == 0 ? '$hours h' : '$hours h $remaining min';
+    return remaining == 0
+        ? '{hours} h'.trArgs({'hours': hours})
+        : '{hours} h {minutes} min'.trArgs({'hours': hours, 'minutes': remaining});
   }
 }

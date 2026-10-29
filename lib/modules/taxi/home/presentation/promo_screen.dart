@@ -9,6 +9,7 @@ import 'package:superapp_user/design_system/components/ride/empty_state.dart';
 import 'package:superapp_user/design_system/components/ride/primary_button.dart';
 import 'package:superapp_user/modules/taxi/promo/application/promo_providers.dart';
 import 'package:superapp_user/modules/taxi/home/application/booking_controller.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 class PromoScreen extends ConsumerStatefulWidget {
   const PromoScreen({super.key});
@@ -28,7 +29,7 @@ class _PromoScreenState extends ConsumerState<PromoScreen> {
 
   void _apply(String code) {
     ref.read(bookingControllerProvider.notifier).applyPromoCode(code);
-    SnackbarUtils.success(context, 'Promo "$code" applied');
+    SnackbarUtils.success(context, 'Promo "{code}" applied'.trArgs({'code': code}));
     context.pop();
   }
 
@@ -38,7 +39,7 @@ class _PromoScreenState extends ConsumerState<PromoScreen> {
     final applied = ref.watch(bookingControllerProvider).promoCode;
 
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Apply promo code'),
+      appBar: CustomAppBar(title: 'Apply promo code'.tr),
       body: Column(
         children: [
           Padding(
@@ -48,13 +49,13 @@ class _PromoScreenState extends ConsumerState<PromoScreen> {
                 Expanded(
                   child: AppTextField(
                     controller: _codeController,
-                    hint: 'Enter promo code',
+                    hint: 'Enter promo code'.tr,
                     prefixIcon: Icons.local_offer_outlined,
                   ),
                 ),
                 const SizedBox(width: 12),
                 TaxiPrimaryButton(
-                  label: 'Apply',
+                  label: 'Apply'.tr,
                   onPressed: () {
                     if (_codeController.text.trim().isNotEmpty) {
                       _apply(_codeController.text.trim());
@@ -68,17 +69,17 @@ class _PromoScreenState extends ConsumerState<PromoScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Chip(
-                label: Text('Applied: $applied'),
+                label: Text('Applied: {code}'.trArgs({'code': applied})),
                 onDeleted: () => ref.read(bookingControllerProvider.notifier).applyPromoCode(null),
               ),
             ),
           Expanded(
             child: promosAsync.when(
               data: (promos) => promos.isEmpty
-                  ? const EmptyState(
+                  ? EmptyState(
                       icon: Icons.local_offer_outlined,
-                      title: 'No promos available',
-                      message: 'Check back later for new offers and discounts.',
+                      title: 'No promos available'.tr,
+                      message: 'Check back later for new offers and discounts.'.tr,
                     )
                   : ListView.builder(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -100,10 +101,10 @@ class _PromoScreenState extends ConsumerState<PromoScreen> {
                       },
                     ),
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (_, _) => const EmptyState(
+              error: (_, _) => EmptyState(
                 icon: Icons.error_outline_rounded,
-                title: 'Could not load promos',
-                message: 'Please check your connection and try again.',
+                title: 'Could not load promos'.tr,
+                message: 'Please check your connection and try again.'.tr,
               ),
             ),
           ),

@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
+import 'package:geocoding/geocoding.dart' as geo;
 import 'package:geolocator/geolocator.dart';
 import 'package:superapp_user/core/config/app_constants.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 /// Result wrapper for GPS location detection and reverse geocoding.
 /// One search hit in the address picker.
@@ -66,9 +68,9 @@ class LocationService {
     // 1. Check if location services (GPS) are enabled
     final serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      return const UserLocationResult(
+      return UserLocationResult(
         isServiceDisabled: true,
-        error: 'Location services (GPS) are turned off. Please turn on location services and try again.',
+        error: 'Location services (GPS) are turned off. Please turn on location services and try again.'.tr,
       );
     }
 
@@ -77,17 +79,17 @@ class LocationService {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        return const UserLocationResult(
+        return UserLocationResult(
           isPermissionDenied: true,
-          error: 'Location permission was denied.',
+          error: 'Location permission was denied.'.tr,
         );
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      return const UserLocationResult(
+      return UserLocationResult(
         isPermanentlyDenied: true,
-        error: 'Location permission is permanently denied. Please enable it in app settings.',
+        error: 'Location permission is permanently denied. Please enable it in app settings.'.tr,
       );
     }
 
@@ -106,8 +108,8 @@ class LocationService {
       if (lastKnown != null) {
         position = lastKnown;
       } else {
-        return const UserLocationResult(
-          error: 'Could not obtain current location. Please make sure GPS is active.',
+        return UserLocationResult(
+          error: 'Could not obtain current location. Please make sure GPS is active.'.tr,
         );
       }
     }
@@ -123,10 +125,87 @@ class LocationService {
   /// Places is a separately-enabled product and would fail silently if it is not
   /// switched on. Geocoding accepts free text and returns several ranked matches,
   /// which is enough to find and jump to a place.
-  Future<List<PlaceSuggestion>> searchPlaces(String query) async {
+  Future<List<PlaceSuggestion>> searchPlaces(
+    String query, {
+    double? nearLat,
+    double? nearLng,
+  }) async {
     final text = query.trim();
+    if (text.length < 3) return const [];
+
+    final google = await _searchPlacesGoogle(text);
+    if (google.isNotEmpty) return google;
+    // Google refuses while the Cloud project has no billing (REQUEST_DENIED),
+    // which left this search with no suggestions at all.
+    return _searchPlacesOsm(text, nearLat: nearLat, nearLng: nearLng);
+  }
+
+  /// Place search over OpenStreetMap (Photon), limited to India and biased
+  /// towards [nearLat]/[nearLng] when given.
+  Future<List<PlaceSuggestion>> _searchPlacesOsm(
+    String text, {
+    double? nearLat,
+    double? nearLng,
+  }) async {
+    try {
+      final response = await _dio.get<Map<String, dynamic>>(
+        'https://photon.komoot.io/api/',
+        queryParameters: {
+          'q': text,
+          'limit': 25,
+          // India's bounding box, so results are Indian places rather than the
+          // worldwide matches Photon ranks first (countrycode is still checked).
+          'bbox': '68.1,6.5,97.5,35.7',
+          if (nearLat != null && nearLng != null) ...{
+            'lat': nearLat,
+            'lon': nearLng,
+          },
+        },
+        options: Options(headers: {'User-Agent': 'SuperAppUser/1.0'}),
+      );
+      final features = (response.data?['features'] as List?) ?? const [];
+      final seen = <String>{};
+      final results = <PlaceSuggestion>[];
+      for (final raw in features) {
+        final feature = raw as Map;
+        final props = (feature['properties'] as Map?) ?? const {};
+        if ((props['countrycode'] ?? '').toString().toUpperCase() != 'IN') {
+          continue;
+        }
+        final coords = (feature['geometry'] as Map?)?['coordinates'] as List?;
+        if (coords == null || coords.length < 2) continue;
+        final description = [
+          props['name'],
+          props['street'],
+          props['district'],
+          props['city'],
+          props['state'],
+          props['postcode'],
+        ]
+            .whereType<Object>()
+            .map((p) => p.toString().trim())
+            .where((p) => p.isNotEmpty)
+            .toSet()
+            .join(', ');
+        if (description.isEmpty || !seen.add(description.toLowerCase())) {
+          continue;
+        }
+        results.add(PlaceSuggestion(
+          description: description,
+          latitude: (coords[1] as num).toDouble(),
+          longitude: (coords[0] as num).toDouble(),
+        ));
+        if (results.length >= 8) break;
+      }
+      return results;
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  Future<List<PlaceSuggestion>> _searchPlacesGoogle(String text) async {
     final key = AppConstants.mapKey;
-    if (text.length < 3 || key.isEmpty) return const [];
+    if (key.isEmpty) return const [];
 
     try {
       final response = await _dio.get<Map<String, dynamic>>(
@@ -186,93 +265,177 @@ class LocationService {
     }
   }
 
-  /// Reverse geocodes [lat], [lng] into structured address components using Google Geocoding API.
+  /// Reverse geocodes [lat], [lng] into structured address components (Area, City, State)
+  /// using Google Geocoding API, native device Geocoder, or OpenStreetMap Nominatim.
   Future<UserLocationResult> reverseGeocode(double lat, double lng) async {
+    // 1. Try Google Maps Geocoding API if key is available
     final key = AppConstants.mapKey;
-    if (key.isEmpty) {
-      return UserLocationResult(
-        latitude: lat,
-        longitude: lng,
-        fullAddress: 'Lat: ${lat.toStringAsFixed(4)}, Lng: ${lng.toStringAsFixed(4)}',
-      );
+    if (key.isNotEmpty) {
+      try {
+        final response = await _dio.get<Map<String, dynamic>>(
+          'https://maps.googleapis.com/maps/api/geocode/json',
+          queryParameters: {
+            'latlng': '$lat,$lng',
+            'key': key,
+          },
+        );
+
+        final data = response.data;
+        if (data != null && data['status'] == 'OK' && !(data['results'] as List?).isNullOrEmpty) {
+          final results = data['results'] as List;
+          final firstResult = results.first as Map<String, dynamic>;
+          final formattedAddress = (firstResult['formatted_address'] ?? '').toString();
+          final components = (firstResult['address_components'] as List?) ?? [];
+
+          String buildingNumber = '';
+          String route = '';
+          String sublocality = '';
+          String locality = '';
+          String stateName = '';
+          String postalCode = '';
+          String landmarkName = '';
+
+          for (final item in components) {
+            if (item is Map) {
+              final types = (item['types'] as List?)?.cast<String>() ?? [];
+              final longName = (item['long_name'] ?? '').toString();
+
+              if (types.contains('street_number') || types.contains('premise') || types.contains('subpremise')) {
+                buildingNumber = longName;
+              } else if (types.contains('route')) {
+                route = longName;
+              } else if (types.contains('sublocality') || types.contains('sublocality_level_1') || types.contains('neighborhood')) {
+                if (sublocality.isEmpty) sublocality = longName;
+              } else if (types.contains('locality') || types.contains('administrative_area_level_2')) {
+                if (locality.isEmpty) locality = longName;
+              } else if (types.contains('administrative_area_level_1')) {
+                stateName = longName;
+              } else if (types.contains('postal_code')) {
+                postalCode = longName;
+              } else if (types.contains('point_of_interest') || types.contains('establishment')) {
+                landmarkName = longName;
+              }
+            }
+          }
+
+          final streetCombined = [buildingNumber, route].where((s) => s.isNotEmpty).join(' ');
+          final areaName = sublocality.isNotEmpty
+              ? sublocality
+              : (locality.isNotEmpty ? locality : stateName);
+
+          final fullParts = [
+            if (sublocality.isNotEmpty) sublocality,
+            if (locality.isNotEmpty && locality != sublocality) locality,
+            if (stateName.isNotEmpty) stateName,
+          ];
+          final fullAddr = formattedAddress.isNotEmpty ? formattedAddress : fullParts.join(', ');
+
+          return UserLocationResult(
+            latitude: lat,
+            longitude: lng,
+            building: buildingNumber.isNotEmpty ? buildingNumber : (route.isNotEmpty ? route : 'Building'),
+            street: route.isNotEmpty ? route : streetCombined,
+            area: areaName,
+            landmark: landmarkName,
+            city: locality,
+            state: stateName,
+            pincode: postalCode,
+            fullAddress: fullAddr,
+          );
+        }
+      } catch (_) {}
     }
 
+    // 2. Fallback to Flutter native geocoding (CLGeocoder / Android Geocoder)
+    try {
+      final placemarks = await geo.placemarkFromCoordinates(lat, lng);
+      if (placemarks.isNotEmpty) {
+        final place = placemarks.first;
+        final sublocality = (place.subLocality ?? place.name ?? place.subAdministrativeArea ?? '').trim();
+        final locality = (place.locality ?? place.subAdministrativeArea ?? '').trim();
+        final stateName = (place.administrativeArea ?? '').trim();
+        final postalCode = (place.postalCode ?? '').trim();
+        final street = (place.thoroughfare ?? place.street ?? '').trim();
+
+        final areaName = sublocality.isNotEmpty
+            ? sublocality
+            : (locality.isNotEmpty ? locality : stateName);
+
+        final fullParts = [
+          if (sublocality.isNotEmpty) sublocality,
+          if (locality.isNotEmpty && locality != sublocality) locality,
+          if (stateName.isNotEmpty) stateName,
+        ];
+        final fullAddr = fullParts.join(', ');
+
+        if (areaName.isNotEmpty || locality.isNotEmpty) {
+          return UserLocationResult(
+            latitude: lat,
+            longitude: lng,
+            building: place.name ?? street,
+            street: street,
+            area: areaName,
+            city: locality,
+            state: stateName,
+            pincode: postalCode,
+            fullAddress: fullAddr.isNotEmpty ? fullAddr : '$areaName, $locality',
+          );
+        }
+      }
+    } catch (_) {}
+
+    // 3. Fallback to OpenStreetMap Nominatim reverse geocoding API
     try {
       final response = await _dio.get<Map<String, dynamic>>(
-        'https://maps.googleapis.com/maps/api/geocode/json',
+        'https://nominatim.openstreetmap.org/reverse',
         queryParameters: {
-          'latlng': '$lat,$lng',
-          'key': key,
+          'format': 'json',
+          'lat': lat,
+          'lon': lng,
+          'zoom': 18,
+          'addressdetails': 1,
         },
+        options: Options(headers: {'User-Agent': 'SuperAppUser/1.0'}),
       );
 
       final data = response.data;
-      if (data == null || data['status'] != 'OK' || (data['results'] as List?).isNullOrEmpty) {
+      if (data != null && data['address'] != null) {
+        final address = data['address'] as Map<String, dynamic>;
+        final sublocality = (address['suburb'] ?? address['neighbourhood'] ?? address['residential'] ?? address['road'] ?? '').toString();
+        final locality = (address['city'] ?? address['town'] ?? address['village'] ?? address['county'] ?? '').toString();
+        final stateName = (address['state'] ?? '').toString();
+        final postalCode = (address['postcode'] ?? '').toString();
+
+        final areaName = sublocality.isNotEmpty
+            ? sublocality
+            : (locality.isNotEmpty ? locality : stateName);
+
+        final fullParts = [
+          if (sublocality.isNotEmpty) sublocality,
+          if (locality.isNotEmpty && locality != sublocality) locality,
+          if (stateName.isNotEmpty) stateName,
+        ];
+        final fullAddr = (data['display_name'] ?? fullParts.join(', ')).toString();
+
         return UserLocationResult(
           latitude: lat,
           longitude: lng,
-          fullAddress: 'Lat: ${lat.toStringAsFixed(4)}, Lng: ${lng.toStringAsFixed(4)}',
+          building: sublocality,
+          street: (address['road'] ?? '').toString(),
+          area: areaName,
+          city: locality,
+          state: stateName,
+          pincode: postalCode,
+          fullAddress: fullAddr,
         );
       }
+    } catch (_) {}
 
-      final results = data['results'] as List;
-      final firstResult = results.first as Map<String, dynamic>;
-      final formattedAddress = (firstResult['formatted_address'] ?? '').toString();
-      final components = (firstResult['address_components'] as List?) ?? [];
-
-      String buildingNumber = '';
-      String route = '';
-      String sublocality = '';
-      String locality = '';
-      String stateName = '';
-      String postalCode = '';
-      String landmarkName = '';
-
-      for (final item in components) {
-        if (item is Map) {
-          final types = (item['types'] as List?)?.cast<String>() ?? [];
-          final longName = (item['long_name'] ?? '').toString();
-
-          if (types.contains('street_number') || types.contains('premise') || types.contains('subpremise')) {
-            buildingNumber = longName;
-          } else if (types.contains('route')) {
-            route = longName;
-          } else if (types.contains('sublocality') || types.contains('sublocality_level_1') || types.contains('neighborhood')) {
-            if (sublocality.isEmpty) sublocality = longName;
-          } else if (types.contains('locality') || types.contains('administrative_area_level_2')) {
-            if (locality.isEmpty) locality = longName;
-          } else if (types.contains('administrative_area_level_1')) {
-            stateName = longName;
-          } else if (types.contains('postal_code')) {
-            postalCode = longName;
-          } else if (types.contains('point_of_interest') || types.contains('establishment')) {
-            landmarkName = longName;
-          }
-        }
-      }
-
-      final streetCombined = [buildingNumber, route].where((s) => s.isNotEmpty).join(' ');
-      final areaCombined = [sublocality, locality, stateName].where((s) => s.isNotEmpty).join(', ');
-
-      return UserLocationResult(
-        latitude: lat,
-        longitude: lng,
-        building: buildingNumber.isNotEmpty ? buildingNumber : (route.isNotEmpty ? route : 'Building'),
-        street: route.isNotEmpty ? route : streetCombined,
-        area: areaCombined.isNotEmpty ? areaCombined : formattedAddress,
-        landmark: landmarkName,
-        city: locality,
-        state: stateName,
-        pincode: postalCode,
-        fullAddress: formattedAddress,
-      );
-    } catch (_) {
-      return UserLocationResult(
-        latitude: lat,
-        longitude: lng,
-        fullAddress: 'Lat: ${lat.toStringAsFixed(4)}, Lng: ${lng.toStringAsFixed(4)}',
-      );
-    }
+    return UserLocationResult(
+      latitude: lat,
+      longitude: lng,
+      fullAddress: 'Lat: ${lat.toStringAsFixed(4)}, Lng: ${lng.toStringAsFixed(4)}',
+    );
   }
 }
 

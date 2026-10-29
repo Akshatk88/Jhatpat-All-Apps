@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
 import 'package:superapp_user/shared/wallet/data/wallet_model.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
@@ -54,17 +55,17 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
           },
         ),
         title: Text(
-          'Suvio Wallet',
+          'JhatPat Wallet'.tr,
           style: TextStyle(
             color: textColor,
             fontSize: 18,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
           ),
         ),
         actions: [
           IconButton(
             icon: Icon(Icons.refresh_rounded, color: AppColors.primary, size: 22),
-            tooltip: 'Refresh Wallet',
+            tooltip: 'Refresh Wallet'.tr,
             onPressed: () {
               Haptics.light();
               viewModel.loadWallet();
@@ -103,7 +104,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     }
 
     if (state.status == WalletStatus.error) {
-      return _buildErrorState(state.errorMessage ?? 'Something went wrong', viewModel, textColor, secondaryColor);
+      return _buildErrorState(state.errorMessage ?? 'Something went wrong'.tr, viewModel, textColor, secondaryColor);
     }
 
     return ListView(
@@ -129,15 +130,15 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Transaction History',
+              'Transaction History'.tr,
               style: TextStyle(
                 fontSize: 17,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
                 color: textColor,
               ),
             ),
             Text(
-              '${state.filteredTransactions.length} Items',
+              '{count} Items'.trArgs({'count': state.filteredTransactions.length}),
               style: TextStyle(fontSize: 12.5, color: secondaryColor, fontWeight: FontWeight.w500),
             ),
           ],
@@ -147,10 +148,10 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
 
         if (state.selectedTab == WalletFilterTab.creditsAndCashback && state.totalCashbackEarned > 0) ...[
           const SizedBox(height: 10),
-          _buildTotalStat('Total cashback earned', state.totalCashbackEarned, isDark, secondaryColor),
+          _buildTotalStat('Total cashback earned'.tr, state.totalCashbackEarned, isDark, secondaryColor),
         ] else if (state.selectedTab == WalletFilterTab.refunds && state.totalRefunded > 0) ...[
           const SizedBox(height: 10),
-          _buildTotalStat('Total refunded', state.totalRefunded, isDark, secondaryColor),
+          _buildTotalStat('Total refunded'.tr, state.totalRefunded, isDark, secondaryColor),
         ],
 
         const SizedBox(height: 16),
@@ -179,14 +180,14 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFFFF7A00), Color(0xFFFF9D3B)],
+          colors: [Color(0xFFFFB800), Color(0xFFFFC72C)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFF7A00).withValues(alpha: 0.35),
+            color: const Color(0xFFFFB800).withValues(alpha: 0.35),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -198,44 +199,51 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
+              Flexible(
+                child: Row(
                 children: [
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
+                      color: Colors.black.withValues(alpha: 0.08),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
                       Icons.account_balance_wallet_rounded,
-                      color: Colors.white,
+                      color: Colors.black,
                       size: 20,
                     ),
                   ),
                   const SizedBox(width: 10),
-                  const Text(
-                    'Available Balance',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w500,
+                  Flexible(
+                    child: Text(
+                      'Available Balance'.tr,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ],
+                ),
               ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: Colors.black.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(Icons.verified_user_rounded, color: Colors.white, size: 13),
-                    SizedBox(width: 4),
+                    const Icon(Icons.verified_user_rounded, color: Colors.black, size: 13),
+                    const SizedBox(width: 4),
                     Text(
-                      'Suvio Pay',
-                      style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                      'JhatPat Pay'.tr,
+                      style: const TextStyle(color: Colors.black, fontSize: 11, fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
@@ -246,23 +254,25 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
           Text(
             '₹${balance.toStringAsFixed(2)}',
             style: const TextStyle(
-              color: Colors.white,
+              color: Colors.black,
               fontSize: 34,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w600,
               letterSpacing: -0.5,
             ),
           ),
           const SizedBox(height: 6),
           Row(
             children: [
-              Icon(Icons.stars_rounded, color: Colors.white.withValues(alpha: 0.9), size: 15),
+              Icon(Icons.stars_rounded, color: Colors.black.withValues(alpha: 0.75), size: 15),
               const SizedBox(width: 6),
-              Text(
-                'Includes ₹${cashback.toStringAsFixed(2)} Cashback Rewards',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.9),
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w500,
+              Flexible(
+                child: Text(
+                  'Includes ₹{amount} Cashback Rewards'.trArgs({'amount': cashback.toStringAsFixed(2)}),
+                  style: TextStyle(
+                    color: Colors.black.withValues(alpha: 0.75),
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             ],
@@ -273,8 +283,8 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
             height: 46,
             child: ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: const Color(0xFFFF7A00),
+                backgroundColor: const Color(0xFF121212),
+                foregroundColor: const Color(0xFFFFC72C),
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
@@ -285,11 +295,11 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                 _showAddMoneySheet(context, viewModel, isDark);
               },
               icon: const Icon(Icons.add_circle_outline_rounded, size: 20),
-              label: const Text(
-                'ADD MONEY TO WALLET',
-                style: TextStyle(
+              label: Text(
+                'ADD MONEY TO WALLET'.tr,
+                style: const TextStyle(
                   fontSize: 13.5,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   letterSpacing: 0.5,
                 ),
               ),
@@ -319,7 +329,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
           Expanded(
             child: Text(
               settings.bannerText,
-              style: const TextStyle(color: AppColors.success, fontSize: 12.5, fontWeight: FontWeight.w600),
+              style: const TextStyle(color: AppColors.success, fontSize: 12.5, fontWeight: FontWeight.w500),
             ),
           ),
         ],
@@ -336,7 +346,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
         const SizedBox(width: 6),
         Text(
           '$label: ₹${amount.toStringAsFixed(2)}',
-          style: TextStyle(fontSize: 12.5, color: secondaryColor, fontWeight: FontWeight.w600),
+          style: TextStyle(fontSize: 12.5, color: secondaryColor, fontWeight: FontWeight.w500),
         ),
       ],
     );
@@ -379,10 +389,10 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
               Icon(Icons.info_outline_rounded, color: AppColors.primary, size: 18),
               const SizedBox(width: 8),
               Text(
-                'Why use Suvio Wallet?',
+                'Why use JhatPat Wallet?'.tr,
                 style: TextStyle(
                   fontSize: 14,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   color: textColor,
                 ),
               ),
@@ -393,8 +403,8 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: benefits.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
+            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: 200,
               mainAxisExtent: 64,
               crossAxisSpacing: 10,
               mainAxisSpacing: 10,
@@ -424,15 +434,17 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            b['title'] as String,
+                            (b['title'] as String).tr,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 12,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w600,
                               color: textColor,
                             ),
                           ),
                           Text(
-                            b['desc'] as String,
+                            (b['desc'] as String).tr,
                             style: TextStyle(fontSize: 10.5, color: secondaryColor),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -475,7 +487,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
   ) {
     final isSelected = tab == currentTab;
     return ChoiceChip(
-      label: Text(label),
+      label: Text(label.tr),
       selected: isSelected,
       onSelected: (selected) {
         if (selected) {
@@ -486,9 +498,9 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
       selectedColor: AppColors.primary,
       backgroundColor: isDark ? AppColors.cardDark : AppColors.secondarySurfaceLight,
       labelStyle: TextStyle(
-        color: isSelected ? Colors.white : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight),
+        color: isSelected ? Colors.black : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight),
         fontSize: 12.5,
-        fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
       ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
@@ -532,7 +544,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
 
     final dateFormatted = txn.date != null
         ? '${txn.date!.day} ${_monthName(txn.date!.month)}, ${_timeFormatted(txn.date!)}'
-        : 'Recent';
+        : 'Recent'.tr;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -570,7 +582,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                   txn.description,
                   style: TextStyle(
                     fontSize: 14,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w500,
                     color: textColor,
                   ),
                 ),
@@ -589,7 +601,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                 '${isCredit ? "+" : "-"}₹${txn.amount.toStringAsFixed(2)}',
                 style: TextStyle(
                   fontSize: 15,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   color: amountColor,
                 ),
               ),
@@ -604,7 +616,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                   txn.status.toUpperCase(),
                   style: const TextStyle(
                     fontSize: 9.5,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.success,
                   ),
                 ),
@@ -654,17 +666,17 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
           ),
           const SizedBox(height: 14),
           Text(
-            message,
+            message.tr,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14.5,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
               color: textColor,
             ),
           ),
           const SizedBox(height: 6),
           Text(
-            'Your future transactions, cashback rewards & order refunds will appear here.',
+            'Your future transactions, cashback rewards & order refunds will appear here.'.tr,
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 12, color: secondaryColor),
           ),
@@ -717,8 +729,8 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
             const Icon(Icons.error_outline_rounded, color: AppColors.error, size: 54),
             const SizedBox(height: 16),
             Text(
-              'Unable to Load Wallet',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: textColor),
+              'Unable to Load Wallet'.tr,
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: textColor),
             ),
             const SizedBox(height: 8),
             Text(
@@ -736,8 +748,8 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                 Haptics.medium();
                 viewModel.loadWallet();
               },
-              icon: const Icon(Icons.refresh_rounded, color: Colors.white),
-              label: const Text('RETRY', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              icon: const Icon(Icons.refresh_rounded, color: Colors.black),
+              label: Text('RETRY'.tr, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w600)),
             ),
           ],
         ),
@@ -774,7 +786,8 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                 top: 20,
                 bottom: MediaQuery.of(modalCtx).viewInsets.bottom + 24,
               ),
-              child: Column(
+              child: SingleChildScrollView(
+                child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -790,16 +803,16 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Add Money to Suvio Wallet',
+                    'Add Money to JhatPat Wallet'.tr,
                     style: TextStyle(
                       fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       color: modalTextColor,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Top up instantly using UPI, Cards, or NetBanking',
+                    'Top up instantly using Cards or NetBanking'.tr,
                     style: TextStyle(fontSize: 12.5, color: modalSecondaryColor),
                   ),
                   const SizedBox(height: 20),
@@ -810,12 +823,12 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                     keyboardType: TextInputType.number,
                     style: TextStyle(
                       fontSize: 24,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       color: modalTextColor,
                     ),
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.currency_rupee_rounded, color: AppColors.primary, size: 24),
-                      labelText: 'Enter Amount',
+                      labelText: 'Enter Amount'.tr,
                       hintText: '100',
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                       focusedBorder: OutlineInputBorder(
@@ -832,12 +845,16 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
 
                   // Quick Amount Chips
                   Text(
-                    'Recommended Amounts',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: modalSecondaryColor),
+                    'Recommended Amounts'.tr,
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: modalSecondaryColor),
                   ),
                   const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  SizedBox(
+                    width: double.infinity,
+                    child: Wrap(
+                    alignment: WrapAlignment.spaceBetween,
+                    spacing: 8,
+                    runSpacing: 8,
                     children: [100.0, 200.0, 500.0, 1000.0].map((amt) {
                       final isChipSelected = selectedAmount == amt;
                       return ActionChip(
@@ -846,8 +863,8 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                             ? AppColors.primary
                             : (isDark ? AppColors.cardDark : AppColors.secondarySurfaceLight),
                         labelStyle: TextStyle(
-                          color: isChipSelected ? Colors.white : modalTextColor,
-                          fontWeight: isChipSelected ? FontWeight.bold : FontWeight.w500,
+                          color: isChipSelected ? Colors.black : modalTextColor,
+                          fontWeight: isChipSelected ? FontWeight.w600 : FontWeight.w500,
                           fontSize: 13,
                         ),
                         shape: RoundedRectangleBorder(
@@ -863,6 +880,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                         },
                       );
                     }).toList(),
+                  ),
                   ),
                   const SizedBox(height: 24),
 
@@ -891,17 +909,18 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                               }
                             },
                       child: Text(
-                        'PROCEED TO PAY ₹${selectedAmount.toStringAsFixed(2)}',
+                        'PROCEED TO PAY ₹{amount}'.trArgs({'amount': selectedAmount.toStringAsFixed(2)}),
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: Colors.black,
                           fontSize: 14,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           letterSpacing: 0.5,
                         ),
                       ),
                     ),
                   ),
                 ],
+              ),
               ),
             );
           },

@@ -1,129 +1,240 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
+import 'package:superapp_user/shared/settings/presentation/language_sheet.dart';
 import 'package:superapp_user/app/routing/app_route_names.dart';
 import 'package:superapp_user/design_system/components/media/smart_image.dart';
-import 'package:superapp_user/design_system/tokens/app_colors.dart';
 import 'package:superapp_user/shared/auth/presentation/viewmodels/auth_viewmodel.dart';
+import 'package:superapp_user/shared/address/presentation/viewmodels/address_viewmodel.dart';
 import 'package:superapp_user/shared/location/application/current_location_provider.dart';
 import 'package:superapp_user/shared/notifications/presentation/viewmodels/notification_inbox_viewmodel.dart';
+import 'package:superapp_user/core/utils/haptics.dart';
+
+import 'package:superapp_user/design_system/tokens/module_theme_config.dart';
+import 'package:superapp_user/modules/module_id.dart';
 
 /// Location, notifications and profile — shared across every module home.
-///
-/// It lives in the shell rather than inside each module so the address is
-/// resolved once and rendered identically whichever service is open. The
-/// location itself comes from [currentLocationProvider], which fetches a single
-/// time for the app's lifetime; switching Food → Rides re-reads a cached value
-/// instead of re-acquiring GPS.
 class SuperAppHeader extends ConsumerWidget {
-  const SuperAppHeader({super.key});
+  const SuperAppHeader({
+    super.key,
+    this.themeConfig,
+    this.moduleId,
+    this.showLocation = true,
+  });
+
+  final ModuleThemeConfig? themeConfig;
+  final ModuleId? moduleId;
+
+  /// False on screens that show the pickup/delivery location themselves (the
+  /// rides map), so the header is just brand + actions.
+  final bool showLocation;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final config = themeConfig ?? ModuleThemeConfig.of(ModuleId.food);
     final label = ref.watch(currentLocationLabelProvider);
     final addressLine = ref.watch(currentAddressLineProvider);
     final user = ref.watch(authViewModelProvider).value;
     final unread = ref.watch(unreadNotificationCountProvider);
 
-    final primaryText =
-        isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final secondaryText =
-        isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
+    // The header shows the app-wide location (currentLocationProvider): the
+    // saved address the user last picked, or their latest "use my current
+    // location" fix. It used to prefer the *default* saved address instead,
+    // so picking or fetching a location never reached the home screen.
+    // The default saved address is only a fallback when there is no usable
+    // location at all (GPS off / permission denied, nothing picked yet).
+    final location = ref.watch(currentLocationProvider).value;
+    final hasLocation =
+        location?.latitude != null && location?.longitude != null;
+    ref.watch(addressViewModelProvider);
+    final saved = hasLocation
+        ? null
+        : ref.read(addressViewModelProvider.notifier).defaultAddress;
+
+    final displayLabel = saved != null
+        ? (saved.title.trim().isNotEmpty ? saved.title.trim() : saved.type)
+        : (label.isNotEmpty && label != 'Locating…')
+        ? label
+        : 'Current Location'.tr;
+    final displayAddress =
+        (saved != null && saved.fullAddress.trim().isNotEmpty)
+        ? saved.fullAddress.trim()
+        : addressLine.isNotEmpty
+        ? addressLine
+        : 'Fetching address…'.tr;
+
+    // One header for every module: the Jhatpat yellow + black design. Only
+    // the "Deliver to" prefix is food-specific.
+    final locationTitle = moduleId == ModuleId.food
+        ? 'Deliver to • {label}'.trArgs({'label': displayLabel})
+        : displayLabel;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(14, 8, 14, 2),
-      child: Row(
+      padding: const EdgeInsets.fromLTRB(16, 6, 16, 6),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(
-              color: isDark ? AppColors.cardDark : AppColors.textPrimaryLight,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.location_on_rounded,
-              color: Colors.white,
-              size: 19,
-            ),
+          // Row 1: Brand & Actions
+          Row(
+            children: [
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Center(
+                  child: Icon(
+                    Icons.bolt_rounded,
+                    color: Color(0xFFFFC700),
+                    size: 24,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Flexible(
+                child: Text(
+                  'JHATPAT',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.black,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+              ),
+              const Spacer(),
+              _HeaderIconButton(
+                icon: Icons.translate_rounded,
+                themeConfig: config,
+                iconColor: Colors.black,
+                bgColor: Colors.transparent,
+                borderColor: Colors.transparent,
+                onTap: () {
+                  Haptics.light();
+                  showLanguageSheet(context);
+                },
+              ),
+              const SizedBox(width: 2),
+              _HeaderIconButton(
+                icon: Icons.notifications_none_rounded,
+                badgeCount: unread,
+                themeConfig: config,
+                iconColor: Colors.black,
+                bgColor: Colors.transparent,
+                borderColor: Colors.transparent,
+                onTap: () {
+                  Haptics.light();
+                  ref
+                      .read(notificationInboxProvider.notifier)
+                      .clearUnreadCount();
+                  context.push(AppRoutePaths.notifications);
+                },
+              ),
+              const SizedBox(width: 6),
+              GestureDetector(
+                onTap: () {
+                  Haptics.light();
+                  context.push(AppRoutePaths.profile);
+                },
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.black, width: 1.5),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: (user?.avatarUrl?.isNotEmpty ?? false)
+                      ? SmartImage(
+                          url: user!.avatarUrl!,
+                          category: ImageCategory.brand,
+                          width: 36,
+                          height: 36,
+                        )
+                      : const Icon(
+                          Icons.person_rounded,
+                          size: 22,
+                          color: Colors.black,
+                        ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: InkWell(
-              // Tapping the address opens the address book rather than silently
-              // re-locating — a stale pin is usually a wrong saved address, not
-              // a stale GPS fix.
-              onTap: () => context.push(AppRoutePaths.addresses),
-              borderRadius: BorderRadius.circular(8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
+          if (showLocation) const SizedBox(height: 8),
+          // Row 2: Deliver to Card
+          if (showLocation)
+          InkWell(
+            onTap: () {
+              Haptics.light();
+              context.push(AppRoutePaths.addresses);
+            },
+            borderRadius: BorderRadius.circular(14),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFB800),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: Colors.black.withValues(alpha: 0.1)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Row(
                 children: [
-                  Row(
-                    children: [
-                      Flexible(
-                        child: Text(
-                          label,
+                  const Icon(Icons.location_on, color: Colors.black, size: 22),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          locationTitle,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 15,
+                          style: const TextStyle(
+                            fontSize: 13,
                             fontWeight: FontWeight.w800,
-                            letterSpacing: -0.3,
-                            color: primaryText,
+                            color: Colors.black,
                           ),
                         ),
-                      ),
-                      Icon(Icons.keyboard_arrow_down_rounded,
-                          size: 19, color: primaryText),
-                    ],
-                  ),
-                  Text(
-                    addressLine,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 11.5,
-                      height: 1.2,
-                      color: secondaryText,
+                        Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                displayAddress,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 11.5,
+                                  height: 1.2,
+                                  color: Colors.black.withValues(alpha: 0.75),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                            const Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              size: 18,
+                              color: Colors.black,
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          _HeaderIconButton(
-            icon: Icons.notifications_none_rounded,
-            badgeCount: unread,
-            isDark: isDark,
-            onTap: () => context.push(AppRoutePaths.notifications),
-          ),
-          const SizedBox(width: 8),
-          InkWell(
-            onTap: () => context.push(AppRoutePaths.profile),
-            borderRadius: BorderRadius.circular(20),
-            child: Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isDark ? AppColors.borderDark : AppColors.borderLight,
-                  width: 1.5,
-                ),
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: (user?.avatarUrl?.isNotEmpty ?? false)
-                  ? SmartImage(
-                      url: user!.avatarUrl!,
-                      category: ImageCategory.brand,
-                      width: 38,
-                      height: 38,
-                    )
-                  : Icon(Icons.person_rounded, size: 21, color: secondaryText),
             ),
           ),
         ],
@@ -135,55 +246,56 @@ class SuperAppHeader extends ConsumerWidget {
 class _HeaderIconButton extends StatelessWidget {
   const _HeaderIconButton({
     required this.icon,
-    required this.isDark,
+    required this.themeConfig,
     required this.onTap,
     this.badgeCount = 0,
+    this.iconColor,
+    this.bgColor,
+    this.borderColor,
   });
 
   final IconData icon;
-  final bool isDark;
+  final ModuleThemeConfig themeConfig;
   final VoidCallback onTap;
   final int badgeCount;
+  final Color? iconColor;
+  final Color? bgColor;
+  final Color? borderColor;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(14),
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          Container(
-            width: 38,
-            height: 38,
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: isDark ? AppColors.cardDark : AppColors.surfaceLight,
+              color: bgColor ?? themeConfig.containerBoxBg,
+              borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: isDark ? AppColors.borderDark : AppColors.borderLight,
+                color: borderColor ?? themeConfig.containerBoxBorder,
+                width: 1,
               ),
             ),
-            child: Icon(
-              icon,
-              size: 20,
-              color:
-                  isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
-            ),
+            child: Icon(icon, size: 22, color: iconColor ?? Colors.white),
           ),
           if (badgeCount > 0)
             Positioned(
-              right: -2,
-              top: -2,
+              right: -3,
+              top: -3,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                constraints: const BoxConstraints(minWidth: 17),
+                constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
                 decoration: BoxDecoration(
-                  color: AppColors.error,
-                  borderRadius: BorderRadius.circular(9),
+                  color: const Color(0xFFEF4444),
+                  shape: BoxShape.circle,
                   border: Border.all(
-                    color: isDark
-                        ? AppColors.backgroundDark
-                        : AppColors.backgroundLight,
+                    color: const Color(0xFF032418),
                     width: 1.5,
                   ),
                 ),
@@ -191,9 +303,9 @@ class _HeaderIconButton extends StatelessWidget {
                   badgeCount > 9 ? '9+' : '$badgeCount',
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    fontSize: 9.5,
+                    fontSize: 10,
                     height: 1.3,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w600,
                     color: Colors.white,
                   ),
                 ),

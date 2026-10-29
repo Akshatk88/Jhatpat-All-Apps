@@ -43,7 +43,10 @@ class RazorpayService {
       'amount': (request.amount * 100).round(),
       'name': request.name,
       'description': request.description,
-      if (request.contact != null) 'prefill': {'contact': request.contact, 'email': request.email ?? ''},
+      'prefill': {
+        if (request.contact != null && request.contact!.isNotEmpty) 'contact': request.contact,
+        if (request.email != null && request.email!.isNotEmpty) 'email': request.email,
+      },
     });
   }
 

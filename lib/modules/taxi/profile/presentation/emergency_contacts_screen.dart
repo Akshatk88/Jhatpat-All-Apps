@@ -7,6 +7,7 @@ import 'package:superapp_user/design_system/components/ride/custom_bottom_sheet.
 import 'package:superapp_user/design_system/components/ride/empty_state.dart';
 import 'package:superapp_user/design_system/components/ride/primary_button.dart';
 import 'package:superapp_user/modules/taxi/profile/application/emergency_contacts_provider.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 class EmergencyContactsScreen extends ConsumerWidget {
   const EmergencyContactsScreen({super.key});
@@ -17,7 +18,7 @@ class EmergencyContactsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: CustomAppBar(
-        title: 'Emergency contacts',
+        title: 'Emergency contacts'.tr,
         actions: [
           IconButton(
             icon: const Icon(Icons.add_rounded),
@@ -28,9 +29,9 @@ class EmergencyContactsScreen extends ConsumerWidget {
       body: contacts.isEmpty
           ? EmptyState(
               icon: Icons.shield_outlined,
-              title: 'No emergency contacts',
-              message: 'Add trusted contacts who can be notified during an SOS.',
-              actionLabel: 'Add contact',
+              title: 'No emergency contacts'.tr,
+              message: 'Add trusted contacts who can be notified during an SOS.'.tr,
+              actionLabel: 'Add contact'.tr,
               onAction: () => _showAddSheet(context),
             )
           : ListView.builder(
@@ -43,11 +44,11 @@ class EmergencyContactsScreen extends ConsumerWidget {
                     backgroundColor: TaxiColors.primary.withValues(alpha: 0.08),
                     child: Text(
                       contact.name.isNotEmpty ? contact.name[0].toUpperCase() : '?',
-                      style: const TextStyle(color: TaxiColors.primary, fontWeight: FontWeight.w700),
+                      style: const TextStyle(color: TaxiColors.primaryDark, fontWeight: FontWeight.w600),
                     ),
                   ),
                   title: Text(contact.name),
-                  subtitle: Text('${contact.relation} · ${contact.phone}'),
+                  subtitle: Text('${contact.relation.tr} · ${contact.phone}'),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete_outline_rounded),
                     onPressed: () => ref.read(emergencyContactsProvider.notifier).remove(contact.id),
@@ -61,7 +62,7 @@ class EmergencyContactsScreen extends ConsumerWidget {
   void _showAddSheet(BuildContext context) {
     CustomBottomSheet.show(
       context,
-      title: 'Add emergency contact',
+      title: 'Add emergency contact'.tr,
       child: const _AddContactForm(),
     );
   }
@@ -90,23 +91,23 @@ class _AddContactFormState extends ConsumerState<_AddContactForm> {
           children: [
             for (final r in ['Family', 'Friend', 'Other'])
               ChoiceChip(
-                label: Text(r),
+                label: Text(r.tr),
                 selected: _relation == r,
                 onSelected: (_) => setState(() => _relation = r),
               ),
           ],
         ),
         const SizedBox(height: 16),
-        AppTextField(controller: _nameController, label: 'Name', hint: 'Contact name'),
+        AppTextField(controller: _nameController, label: 'Name'.tr, hint: 'Contact name'.tr),
         const SizedBox(height: 12),
         AppTextField(
           controller: _phoneController,
-          label: 'Phone number',
-          hint: '10-digit mobile number',
+          label: 'Phone number'.tr,
+          hint: '10-digit mobile number'.tr,
           keyboardType: TextInputType.phone,
         ),
         const SizedBox(height: 20),
-        TaxiPrimaryButton(label: 'Save contact', onPressed: _save),
+        TaxiPrimaryButton(label: 'Save contact'.tr, onPressed: _save),
       ],
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
 import 'package:superapp_user/modules/food/data/models/category_model.dart';
@@ -53,7 +54,7 @@ class _CategoryListState extends State<CategoryList> {
     ];
 
     return SizedBox(
-      height: 84.h,
+      height: 92.h,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -77,8 +78,8 @@ class _CategoryListState extends State<CategoryList> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    width: 54.w,
-                    height: 54.h,
+                    width: 52.w,
+                    height: 52.h,
                     padding: EdgeInsets.all(2.r),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
@@ -105,7 +106,7 @@ class _CategoryListState extends State<CategoryList> {
                                 child: Icon(
                                   isMore ? Icons.grid_view_rounded : Icons.apps_rounded,
                                   color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
-                                  size: 24.sp,
+                                  size: 22.sp,
                                 ),
                               )
                             : SmartImage(
@@ -116,23 +117,24 @@ class _CategoryListState extends State<CategoryList> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 6.h),
-                  // Fixed to the circle's own width — otherwise a longer name
-                  // (e.g. "Chhatppta Veg") widens just this item's column,
-                  // throwing off the gap to its neighbors on both sides.
-                  SizedBox(
-                    width: 58.w,
-                    child: Text(
-                      name,
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: isSelected
-                            ? AppColors.primary
-                            : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight),
-                        fontSize: 11.5.sp,
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                  SizedBox(height: 4.h),
+                  // Flexible: the row is a fixed 92.h, so on short phones with
+                  // large text a two-line label must not push past it.
+                  Flexible(
+                    child: SizedBox(
+                      width: 62.w,
+                      child: Text(
+                        isMore || isAll ? name.tr : name,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          // Black on the yellow header; white only in dark mode.
+                          color: isDark ? Colors.white : Colors.black,
+                          fontSize: 11.sp,
+                          height: 1.15,
+                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),

@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/core/error/failures.dart';
 import 'package:superapp_user/modules/food/data/models/active_order_rtdb_model.dart';
 import 'package:superapp_user/modules/food/data/models/order_model.dart';
@@ -36,6 +37,13 @@ class OrderTrackingState {
   final String? polyline;
   final List<PointLatLng> routePoints;
 
+  /// From GET /orders/:id/route: the router's duration/distance for the whole
+  /// current leg, and which leg it is ('restaurant' before pickup, 'customer' after).
+  final double? routeDurationMins;
+  final double? routeDistanceKm;
+  final DateTime? routeFetchedAt;
+  final String? routeTarget;
+
   /// True once riderLat/riderLng came from an actual rider fix rather than a
   /// caller-side fallback. The map must not trim the route to a placeholder.
   final bool hasRiderFix;
@@ -63,6 +71,10 @@ class OrderTrackingState {
     this.customerLng,
     this.polyline,
     this.routePoints = const [],
+    this.routeDurationMins,
+    this.routeDistanceKm,
+    this.routeFetchedAt,
+    this.routeTarget,
     this.hasRiderFix = false,
     this.lastUpdated,
     this.isLocatingRider = false,
@@ -86,6 +98,10 @@ class OrderTrackingState {
     double? customerLng,
     String? polyline,
     List<PointLatLng>? routePoints,
+    double? routeDurationMins,
+    double? routeDistanceKm,
+    DateTime? routeFetchedAt,
+    String? routeTarget,
     bool? hasRiderFix,
     int? lastUpdated,
     bool? isLocatingRider,
@@ -109,6 +125,10 @@ class OrderTrackingState {
       customerLng: customerLng ?? this.customerLng,
       polyline: polyline ?? this.polyline,
       routePoints: routePoints ?? this.routePoints,
+      routeDurationMins: routeDurationMins ?? this.routeDurationMins,
+      routeDistanceKm: routeDistanceKm ?? this.routeDistanceKm,
+      routeFetchedAt: routeFetchedAt ?? this.routeFetchedAt,
+      routeTarget: routeTarget ?? this.routeTarget,
       hasRiderFix: hasRiderFix ?? this.hasRiderFix,
       lastUpdated: lastUpdated ?? this.lastUpdated,
       isLocatingRider: isLocatingRider ?? this.isLocatingRider,
@@ -243,6 +263,19 @@ class OrderTrackingViewModel extends Notifier<OrderTrackingState> {
         state = state.copyWith(riderLat: oLat, riderLng: oLng, hasRiderFix: true);
       }
 
+      // Pace for the live ETA. Stored ahead of the unchanged-geometry return so a
+      // stationary route still gets its duration refreshed.
+      final mins = (data['durationMins'] as num?)?.toDouble();
+      final km = (data['distanceKm'] as num?)?.toDouble();
+      if (mins != null || km != null) {
+        state = state.copyWith(
+          routeDurationMins: mins,
+          routeDistanceKm: km,
+          routeFetchedAt: DateTime.now(),
+          routeTarget: data['target']?.toString(),
+        );
+      }
+
       final encoded = data['polyline']?.toString() ?? '';
       if (encoded.isEmpty) {
         _trackingLog('Route endpoint returned no polyline yet');
@@ -334,8 +367,13 @@ class OrderTrackingViewModel extends Notifier<OrderTrackingState> {
       // was what made the polyline appear seconds late.
       if (order.hasRider && state.routePoints.isEmpty) unawaited(_fetchRoute());
 
-      // Pull handover OTP if relevant
-      if (order.showDropOtp && state.dropOtp == null) {
+      // Pull the handover OTP whenever one is still outstanding — not just the
+      // first time. This used to latch on `state.dropOtp == null`, so once a
+      // code had been shown the screen kept displaying it no matter what the
+      // server held. If the stored code ever moved, the customer read out a
+      // dead number and the rider could not complete the drop. The endpoint is
+      // authoritative, so re-reading it is what makes the screen self-correct.
+      if (order.showDropOtp) {
         unawaited(_fetchDropOtp());
       }
 
@@ -346,7 +384,7 @@ class OrderTrackingViewModel extends Notifier<OrderTrackingState> {
     } on Failure catch (f) {
       state = state.copyWith(isLoading: false, error: f.message);
     } catch (_) {
-      state = state.copyWith(isLoading: false, error: 'Could not load tracking details.');
+      state = state.copyWith(isLoading: false, error: 'Could not load tracking details.'.tr);
     }
   }
 
@@ -453,7 +491,7 @@ class OrderTrackingViewModel extends Notifier<OrderTrackingState> {
     } on Failure catch (f) {
       return f.message;
     } catch (_) {
-      return 'Could not cancel this order.';
+      return 'Could not cancel this order.'.tr;
     }
   }
 

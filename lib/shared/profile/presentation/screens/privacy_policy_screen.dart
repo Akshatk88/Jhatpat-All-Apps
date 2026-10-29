@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
@@ -16,7 +17,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
         await launchUrl(launchUri);
       } else {
         if (context.mounted) {
-          AppSnackbar.info(context, 'Calling $phoneNumber...');
+          AppSnackbar.info(context, 'Calling {phone}...'.trArgs({'phone': phoneNumber}));
         }
       }
     } catch (_) {}
@@ -27,14 +28,14 @@ class PrivacyPolicyScreen extends StatelessWidget {
     final Uri launchUri = Uri(
       scheme: 'mailto',
       path: emailAddress,
-      queryParameters: {'subject': 'Privacy Policy Inquiry - Suvio App'},
+      queryParameters: {'subject': 'Privacy Policy Inquiry - JhatPat App'},
     );
     try {
       if (await canLaunchUrl(launchUri)) {
         await launchUrl(launchUri);
       } else {
         if (context.mounted) {
-          AppSnackbar.info(context, 'Opening mail to $emailAddress...');
+          AppSnackbar.info(context, 'Opening mail to {email}...'.trArgs({'email': emailAddress}));
         }
       }
     } catch (_) {}
@@ -76,7 +77,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                 title,
                 style: TextStyle(
                   fontSize: 17.sp,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   color: textColor,
                 ),
               ),
@@ -85,8 +86,8 @@ class PrivacyPolicyScreen extends StatelessWidget {
                 description,
                 style: TextStyle(
                   fontSize: 13.sp,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primary,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFFE5A600),
                   height: 1.3,
                 ),
               ),
@@ -107,12 +108,12 @@ class PrivacyPolicyScreen extends StatelessWidget {
                   onPressed: () => Navigator.pop(ctx),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
+                    foregroundColor: Colors.black,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12.r),
                     ),
                   ),
-                  child: const Text('Understand & Close', style: TextStyle(fontWeight: FontWeight.bold)),
+                  child: Text('Understand & Close'.tr, style: const TextStyle(fontWeight: FontWeight.w600)),
                 ),
               ),
             ],
@@ -145,11 +146,11 @@ class PrivacyPolicyScreen extends StatelessWidget {
           },
         ),
         title: Text(
-          'Privacy Policy',
+          'Privacy Policy'.tr,
           style: TextStyle(
             color: textColor,
             fontSize: 18.sp,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),
@@ -179,7 +180,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
               Column(
                 children: [
                   Text(
-                    '© 2026 Suvio. All rights reserved.',
+                    '© 2026 JhatPat. All rights reserved.'.tr,
                     style: TextStyle(
                       fontSize: 11.5.sp,
                       color: secondaryTextColor,
@@ -188,7 +189,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 2.h),
                   Text(
-                    'Your privacy is our priority.',
+                    'Your privacy is our priority.'.tr,
                     style: TextStyle(
                       fontSize: 11.sp,
                       color: secondaryTextColor,
@@ -205,17 +206,17 @@ class PrivacyPolicyScreen extends StatelessWidget {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
+                        foregroundColor: Colors.black,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24.r),
                         ),
                       ),
                       child: Text(
-                        'Close',
+                        'Close'.tr,
                         style: TextStyle(
                           fontSize: 15.sp,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
@@ -240,17 +241,17 @@ class PrivacyPolicyScreen extends StatelessWidget {
           end: Alignment.bottomRight,
           colors: isDark
               ? [
-                  const Color(0xFF231A14),
-                  const Color(0xFF1E1A16),
+                  const Color(0xFF1E1E1E),
+                  const Color(0xFF181818),
                 ]
               : [
-                  const Color(0xFFFFFBF5),
-                  const Color(0xFFFFF4EA),
+                  const Color(0xFFFFFDF5),
+                  const Color(0xFFFFF8E1),
                 ],
         ),
         borderRadius: BorderRadius.circular(20.r),
         border: Border.all(
-          color: isDark ? const Color(0xFF3D2B1F) : const Color(0xFFFFE5D0),
+          color: isDark ? const Color(0xFF333333) : const Color(0xFFFFE8A3),
           width: 1,
         ),
         boxShadow: [
@@ -272,16 +273,16 @@ class PrivacyPolicyScreen extends StatelessWidget {
                   text: TextSpan(
                     style: TextStyle(
                       fontSize: 22.sp,
-                      fontWeight: FontWeight.w900,
+                      fontWeight: FontWeight.w700,
                       height: 1.2,
                     ),
                     children: [
                       TextSpan(
-                        text: 'Your Privacy\n',
-                        style: TextStyle(color: AppColors.primary),
+                        text: 'Your Privacy\n'.tr,
+                        style: TextStyle(color: const Color(0xFFE5A600)),
                       ),
                       TextSpan(
-                        text: 'Matters',
+                        text: 'Matters'.tr,
                         style: TextStyle(color: textColor),
                       ),
                     ],
@@ -289,7 +290,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 10.h),
                 Text(
-                  'At Suvio, we are committed to protecting your personal information and ensuring a safe and secure experience.',
+                  'At JhatPat, we are committed to protecting your personal information and ensuring a safe and secure experience.'.tr,
                   style: TextStyle(
                     fontSize: 11.5.sp,
                     color: secondaryTextColor,
@@ -344,7 +345,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
         'icon': Icons.lock_outline_rounded,
         'title': '4. Data Security',
         'subtitle': 'We use industry-standard security measures to protect your information from unauthorized access, loss, or misuse.',
-        'fullText': 'All communications with Suvio servers are encrypted via SSL/TLS. Account authentication uses secure OTP tokens, preventing password leakage.',
+        'fullText': 'All communications with JhatPat servers are encrypted via SSL/TLS. Account authentication uses secure OTP tokens, preventing password leakage.',
       },
       {
         'icon': Icons.cookie_outlined,
@@ -362,13 +363,13 @@ class PrivacyPolicyScreen extends StatelessWidget {
         'icon': Icons.info_outline_rounded,
         'title': '7. Changes to This Policy',
         'subtitle': 'We may update this Privacy Policy from time to time. Changes will be posted on this page with the updated date.',
-        'fullText': 'Any policy modifications will be published directly within the app. Continued use of Suvio indicates acceptance of the updated terms.',
+        'fullText': 'Any policy modifications will be published directly within the app. Continued use of JhatPat indicates acceptance of the updated terms.',
       },
       {
         'icon': Icons.mail_outline_rounded,
         'title': '8. Contact Us',
         'subtitle': 'If you have any questions or concerns, please contact us.',
-        'fullText': 'Our dedicated data protection team is available 24/7 to resolve any privacy queries at support@suvio.com or via phone support.',
+        'fullText': 'Our dedicated data protection team is available 24/7 to resolve any privacy queries at support@jhatpat.com or via phone support.',
       },
     ];
 
@@ -396,9 +397,9 @@ class PrivacyPolicyScreen extends StatelessWidget {
           return InkWell(
             onTap: () => _showPolicyDetailModal(
               context,
-              item['title'] as String,
-              item['subtitle'] as String,
-              item['fullText'] as String,
+              (item['title'] as String).tr,
+              (item['subtitle'] as String).tr,
+              (item['fullText'] as String).tr,
             ),
             borderRadius: BorderRadius.vertical(
               top: index == 0 ? Radius.circular(16.r) : Radius.zero,
@@ -414,12 +415,12 @@ class PrivacyPolicyScreen extends StatelessWidget {
                       Container(
                         padding: EdgeInsets.all(8.r),
                         decoration: const BoxDecoration(
-                          color: Color(0xFFFFF3E0),
+                          color: Color(0xFFFFF8E1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           item['icon'] as IconData,
-                          color: const Color(0xFFFF6D00),
+                          color: const Color(0xFFFFB800),
                           size: 18.sp,
                         ),
                       ),
@@ -429,16 +430,16 @@ class PrivacyPolicyScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              item['title'] as String,
+                              (item['title'] as String).tr,
                               style: TextStyle(
                                 fontSize: 13.5.sp,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w600,
                                 color: textColor,
                               ),
                             ),
                             SizedBox(height: 3.h),
                             Text(
-                              item['subtitle'] as String,
+                              (item['subtitle'] as String).tr,
                               style: TextStyle(
                                 fontSize: 11.sp,
                                 color: secondaryTextColor,
@@ -481,10 +482,10 @@ class PrivacyPolicyScreen extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 8.w),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF231A14) : const Color(0xFFFFFBF5),
+        color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFFFFDF5),
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: isDark ? const Color(0xFF3D2B1F) : const Color(0xFFFFE5D0),
+          color: isDark ? const Color(0xFF333333) : const Color(0xFFFFE8A3),
           width: 1,
         ),
       ),
@@ -502,7 +503,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                     Container(
                       padding: EdgeInsets.all(7.r),
                       decoration: const BoxDecoration(
-                        color: Color(0xFFFFECE0),
+                        color: Color(0xFFFFF0C2),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -517,10 +518,10 @@ class PrivacyPolicyScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Phone',
+                            'Phone'.tr,
                             style: TextStyle(
                               fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w600,
                               color: textColor,
                             ),
                           ),
@@ -546,7 +547,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
           Container(
             height: 36.h,
             width: 1,
-            color: isDark ? const Color(0xFF3D2B1F) : const Color(0xFFFFE5D0),
+            color: isDark ? const Color(0xFF333333) : const Color(0xFFFFE8A3),
           ),
 
           // Right Column: Email
@@ -561,7 +562,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                     Container(
                       padding: EdgeInsets.all(7.r),
                       decoration: const BoxDecoration(
-                        color: Color(0xFFFFECE0),
+                        color: Color(0xFFFFF0C2),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -576,10 +577,10 @@ class PrivacyPolicyScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Email',
+                            'Email'.tr,
                             style: TextStyle(
                               fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w600,
                               color: textColor,
                             ),
                           ),

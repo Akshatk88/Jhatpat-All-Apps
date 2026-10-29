@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:go_router/go_router.dart';
 import 'package:superapp_user/design_system/tokens/taxi_colors.dart';
 import 'package:superapp_user/core/utils/taxi_formatters.dart';
@@ -7,6 +8,11 @@ import 'package:superapp_user/design_system/components/ride/custom_app_bar.dart'
 import 'package:superapp_user/design_system/components/ride/custom_bottom_sheet.dart';
 import 'package:superapp_user/design_system/components/ride/price_card.dart';
 import 'package:superapp_user/design_system/components/ride/primary_button.dart';
+import 'package:superapp_user/app/routing/route_names.dart';
+import 'package:superapp_user/design_system/components/feedback/taxi_snackbar_utils.dart';
+import 'package:superapp_user/modules/taxi/auth/application/auth_providers.dart';
+import 'package:superapp_user/shared/auth/presentation/viewmodels/auth_viewmodel.dart';
+import 'package:superapp_user/modules/taxi/taxi_route_names.dart';
 import 'package:superapp_user/modules/taxi/home/application/booking_controller.dart';
 import 'package:superapp_user/modules/taxi/home/application/booking_state.dart';
 import 'package:superapp_user/modules/taxi/home/presentation/schedule_ride_sheet.dart';
@@ -21,7 +27,7 @@ class ConfirmBookingScreen extends ConsumerWidget {
     final fare = booking.fareBreakdown;
 
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Confirm your ride'),
+      appBar: CustomAppBar(title: 'Confirm your ride'.tr),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
@@ -29,34 +35,34 @@ class ConfirmBookingScreen extends ConsumerWidget {
           const SizedBox(height: 20),
           if (fare != null)
             PriceCard(
-              label: 'Estimated fare',
+              label: 'Estimated fare'.tr,
               amount: fare.total,
               breakdown: [
-                MapEntry('Base fare', fare.baseFare),
-                MapEntry('Distance', fare.distanceFare),
-                MapEntry('Time', fare.timeFare),
-                MapEntry('Taxes & fees', fare.serviceTax),
+                MapEntry('Base fare'.tr, fare.baseFare),
+                MapEntry('Distance'.tr, fare.distanceFare),
+                MapEntry('Time'.tr, fare.timeFare),
+                MapEntry('Taxes & fees'.tr, fare.serviceTax),
               ],
             ),
           const SizedBox(height: 16),
           _OptionRow(
             icon: Icons.payments_outlined,
-            label: 'Payment method',
-            value: booking.paymentMethod == 'cash' ? 'Cash' : booking.paymentMethod.toUpperCase(),
+            label: 'Payment method'.tr,
+            value: booking.paymentMethod == 'cash' ? 'Cash'.tr : booking.paymentMethod.toUpperCase(),
             onTap: () => _showPaymentSheet(context, controller, booking.paymentMethod),
           ),
           _OptionRow(
             icon: Icons.local_offer_outlined,
-            label: 'Promo code',
-            value: booking.promoCode ?? 'Add promo code',
+            label: 'Promo code'.tr,
+            value: booking.promoCode ?? 'Add promo code'.tr,
             onTap: () => context.push('/taxi/promo'),
           ),
           _OptionRow(
             icon: Icons.schedule_rounded,
-            label: 'Ride time',
+            label: 'Ride time'.tr,
             value: booking.scheduledAt != null
                 ? '${booking.scheduledAt!.day}/${booking.scheduledAt!.month} ${TimeOfDay.fromDateTime(booking.scheduledAt!).format(context)}'
-                : 'Ride now',
+                : 'Ride now'.tr,
             onTap: () async {
               final selected = await CustomBottomSheet.show<DateTime?>(
                 context,
@@ -67,7 +73,7 @@ class ConfirmBookingScreen extends ConsumerWidget {
           ),
           if (booking.error != null) ...[
             const SizedBox(height: 12),
-            Text(booking.error!, style: const TextStyle(color: TaxiColors.error)),
+            Text(booking.error!.tr, style: const TextStyle(color: TaxiColors.error)),
           ],
         ],
       ),
@@ -75,11 +81,19 @@ class ConfirmBookingScreen extends ConsumerWidget {
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: TaxiPrimaryButton(
-            label: 'Confirm booking',
+            label: 'Confirm booking'.tr,
             isLoading: booking.isSubmitting,
             onPressed: fare == null
                 ? null
                 : () async {
+                    final user = ref.read(authViewModelProvider).value ?? ref.read(authControllerProvider).user;
+                    if (user == null) {
+                      SnackbarUtils.info(context, 'Please login to continue'.tr);
+                      context.push(
+                        '${RouteNames.login}?from=${Uri.encodeComponent(TaxiRoutePaths.confirm)}',
+                      );
+                      return;
+                    }
                     final success = await controller.confirmBooking();
                     if (!context.mounted) return;
                     if (success) {
@@ -97,14 +111,14 @@ class ConfirmBookingScreen extends ConsumerWidget {
   void _showPaymentSheet(BuildContext context, BookingController controller, String current) {
     CustomBottomSheet.show(
       context,
-      title: 'Payment method',
+      title: 'Payment method'.tr,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           RadioListTile<String>(
             value: 'cash',
             groupValue: current,
-            title: const Text('Cash'),
+            title: Text('Cash'.tr),
             secondary: const Icon(Icons.money_rounded),
             onChanged: (v) {
               controller.setPaymentMethod(v!);
@@ -114,23 +128,23 @@ class ConfirmBookingScreen extends ConsumerWidget {
           RadioListTile<String>(
             value: 'wallet',
             groupValue: current,
-            title: const Text('Wallet'),
+            title: Text('Wallet'.tr),
             secondary: const Icon(Icons.account_balance_wallet_outlined),
             onChanged: (v) {
               controller.setPaymentMethod(v!);
               Navigator.of(context).pop();
             },
           ),
-          RadioListTile<String>(
-            value: 'razorpay',
-            groupValue: current,
-            title: const Text('Card / UPI'),
-            secondary: const Icon(Icons.credit_card_rounded),
-            onChanged: (v) {
-              controller.setPaymentMethod(v!);
-              Navigator.of(context).pop();
-            },
-          ),
+          // RadioListTile<String>(
+          //   value: 'razorpay',
+          //   groupValue: current,
+          //   title: const Text('Card'),
+          //   secondary: const Icon(Icons.credit_card_rounded),
+          //   onChanged: (v) {
+          //     controller.setPaymentMethod(v!);
+          //     Navigator.of(context).pop();
+          //   },
+          // ),
         ],
       ),
     );

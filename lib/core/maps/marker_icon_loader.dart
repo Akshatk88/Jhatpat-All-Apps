@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:superapp_user/core/config/api_config.dart';
 
 /// Turns backend-supplied vehicle art into map markers.
 ///
@@ -17,6 +18,9 @@ class MarkerIconLoader {
   /// Fixed width so a marker looks identical on every device instead of
   /// scaling with whatever resolution the admin happened to upload.
   static const _markerWidthPx = 75;
+
+  /// On-map size of a vehicle marker, in logical pixels.
+  static const double markerLogicalWidth = 34;
 
   /// Keyed by hash rather than the source string itself — the keys would
   /// otherwise be megabytes of base64 held alongside the decoded bitmaps.
@@ -39,7 +43,12 @@ class MarkerIconLoader {
       final data = await frame.image.toByteData(format: ui.ImageByteFormat.png);
       if (data == null) return null;
 
-      final descriptor = BitmapDescriptor.bytes(data.buffer.asUint8List());
+      // width: the size on the map in logical pixels. Without it the 75px
+      // bitmap was drawn at device scale, ~3x too big on most phones.
+      final descriptor = BitmapDescriptor.bytes(
+        data.buffer.asUint8List(),
+        width: markerLogicalWidth,
+      );
       _cache[key] = descriptor;
       return descriptor;
     } catch (_) {
@@ -56,10 +65,13 @@ class MarkerIconLoader {
       return base64Decode(source.substring(comma + 1));
     }
 
-    if (source.startsWith('http://') || source.startsWith('https://')) {
+    // Uploaded files come back as relative paths ('/uploads/...') as often as
+    // absolute URLs; resolve those against the API host.
+    final url = ApiConfig.resolveMedia(source);
+    if (url.startsWith('http://') || url.startsWith('https://')) {
       final client = HttpClient()..connectionTimeout = const Duration(seconds: 10);
       try {
-        final request = await client.getUrl(Uri.parse(source));
+        final request = await client.getUrl(Uri.parse(url));
         final response = await request.close();
         if (response.statusCode != 200) return null;
         final chunks = await response.toList();

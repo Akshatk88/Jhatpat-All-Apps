@@ -8,6 +8,7 @@ import 'package:superapp_user/design_system/components/ride/app_text_field.dart'
 import 'package:superapp_user/design_system/components/ride/primary_button.dart';
 import 'package:superapp_user/modules/taxi/auth/application/auth_providers.dart';
 import 'package:superapp_user/modules/taxi/wallet/application/wallet_providers.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 const _quickAmounts = [100.0, 200.0, 500.0, 1000.0];
 
@@ -31,7 +32,7 @@ class _TopupSheetState extends ConsumerState<TopupSheet> {
   Future<void> _startTopup() async {
     final amount = double.tryParse(_amountController.text.trim());
     if (amount == null || amount < 10) {
-      SnackbarUtils.error(context, 'Enter a valid amount (min ₹10)');
+      SnackbarUtils.error(context, 'Enter a valid amount (min ₹10)'.tr);
       return;
     }
 
@@ -45,8 +46,8 @@ class _TopupSheetState extends ConsumerState<TopupSheet> {
               keyId: order.keyId,
               orderId: order.orderId,
               amount: amount,
-              name: 'Wallet top-up',
-              description: 'Add money to wallet',
+              name: 'Wallet top-up'.tr,
+              description: 'Add money to wallet'.tr,
               contact: user?.phone,
               email: user?.email,
             ),
@@ -61,18 +62,18 @@ class _TopupSheetState extends ConsumerState<TopupSheet> {
                 ref.invalidate(walletTransactionsProvider);
                 if (mounted) {
                   Navigator.of(context).pop();
-                  SnackbarUtils.success(context, 'Wallet topped up successfully');
+                  SnackbarUtils.success(context, 'Wallet topped up successfully'.tr);
                 }
               } catch (e) {
-                if (mounted) SnackbarUtils.error(context, 'Payment verification failed');
+                if (mounted) SnackbarUtils.error(context, 'Payment verification failed'.tr);
               }
             },
             onError: (PaymentFailureResponse response) {
-              if (mounted) SnackbarUtils.error(context, response.message ?? 'Payment failed');
+              if (mounted) SnackbarUtils.error(context, response.message ?? 'Payment failed'.tr);
             },
           );
     } catch (e) {
-      if (mounted) SnackbarUtils.error(context, 'Could not start payment');
+      if (mounted) SnackbarUtils.error(context, 'Could not start payment'.tr);
     } finally {
       if (mounted) setState(() => _processing = false);
     }
@@ -84,12 +85,12 @@ class _TopupSheetState extends ConsumerState<TopupSheet> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Add money', style: Theme.of(context).textTheme.titleLarge),
+        Text('Add money'.tr, style: Theme.of(context).textTheme.titleLarge),
         const SizedBox(height: 16),
         AppTextField(
           controller: _amountController,
-          label: 'Amount',
-          hint: 'Enter amount',
+          label: 'Amount'.tr,
+          hint: 'Enter amount'.tr,
           prefixIcon: Icons.currency_rupee_rounded,
           keyboardType: TextInputType.number,
         ),
@@ -106,7 +107,7 @@ class _TopupSheetState extends ConsumerState<TopupSheet> {
               .toList(),
         ),
         const SizedBox(height: 24),
-        TaxiPrimaryButton(label: 'Proceed to pay', isLoading: _processing, onPressed: _startTopup),
+        TaxiPrimaryButton(label: 'Proceed to pay'.tr, isLoading: _processing, onPressed: _startTopup),
       ],
     );
   }

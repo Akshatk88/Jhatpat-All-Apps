@@ -6,6 +6,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/core/maps/map_styles.dart';
 
 /// Compass bearing from [a] to [b], in degrees clockwise from north.
@@ -607,7 +608,7 @@ class _LiveTrackingMapState extends State<LiveTrackingMap>
     return {
       Polyline(
         polylineId: const PolylineId('route'),
-        color: const Color(0xFFFF7A00),
+        color: const Color(0xFF1B6FF3), // route blue, same as the driver app
         width: 5,
         points: points,
         // Rounded caps and joints are what stop a dense road route from looking
@@ -635,7 +636,7 @@ class _LiveTrackingMapState extends State<LiveTrackingMap>
           anchor: const Offset(0.5, 1.0),
           icon: _restaurantIcon ??
               BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-          infoWindow: const InfoWindow(title: 'Restaurant'),
+          infoWindow: InfoWindow(title: 'Restaurant'.tr),
         ),
       if (widget.customerLat != null && widget.customerLng != null)
         Marker(
@@ -644,7 +645,7 @@ class _LiveTrackingMapState extends State<LiveTrackingMap>
           anchor: const Offset(0.5, 1.0),
           icon: _customerIcon ??
               BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-          infoWindow: const InfoWindow(title: 'Your address'),
+          infoWindow: InfoWindow(title: 'Your address'.tr),
         ),
     };
   }
@@ -665,7 +666,7 @@ class _LiveTrackingMapState extends State<LiveTrackingMap>
           anchor: const Offset(0.5, 0.5),
           flat: true,
           icon: _bikeIcon ?? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
-          infoWindow: const InfoWindow(title: 'Delivery partner'),
+          infoWindow: InfoWindow(title: 'Delivery partner'.tr),
         ),
       ...statics,
     };
@@ -700,7 +701,7 @@ class _LiveTrackingMapState extends State<LiveTrackingMap>
     return {
       Polyline(
         polylineId: const PolylineId('route_connector'),
-        color: const Color(0xFFFF7A00),
+        color: const Color(0xFF1B6FF3),
         width: 4,
         points: [_current, head],
         patterns: [PatternItem.dot, PatternItem.gap(10)],
@@ -809,21 +810,21 @@ class _LiveTrackingMapState extends State<LiveTrackingMap>
             children: [
               _MapControlButton(
                 icon: Icons.add_rounded,
-                tooltip: 'Zoom in',
+                tooltip: 'Zoom in'.tr,
                 isDark: isDark,
                 onTap: _zoomIn,
               ),
               const SizedBox(height: 8),
               _MapControlButton(
                 icon: Icons.remove_rounded,
-                tooltip: 'Zoom out',
+                tooltip: 'Zoom out'.tr,
                 isDark: isDark,
                 onTap: _zoomOut,
               ),
               const SizedBox(height: 8),
               _MapControlButton(
                 icon: Icons.center_focus_strong_rounded,
-                tooltip: 'Recenter on route',
+                tooltip: 'Recenter on route'.tr,
                 isDark: isDark,
                 isActive: _isAutoFollowEnabled,
                 onTap: _recenterRider,
@@ -863,7 +864,7 @@ class _MapControlButton extends StatelessWidget {
           height: 38,
           decoration: BoxDecoration(
             color: isActive
-                ? const Color(0xFFFF7A00)
+                ? const Color(0xFFFFB800)
                 : (isDark ? const Color(0xFF2C2C2C) : Colors.white),
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
@@ -875,7 +876,7 @@ class _MapControlButton extends StatelessWidget {
             ],
             border: Border.all(
               color: isActive
-                  ? const Color(0xFFFF7A00)
+                  ? const Color(0xFFFFB800)
                   : (isDark ? const Color(0xFF383838) : const Color(0xFFE2E4E8)),
               width: 1,
             ),
@@ -883,7 +884,7 @@ class _MapControlButton extends StatelessWidget {
           child: Icon(
             icon,
             color: isActive
-                ? Colors.white
+                ? const Color(0xFF121212)
                 : (isDark ? Colors.white : const Color(0xFF1E1E1E)),
             size: 20,
           ),

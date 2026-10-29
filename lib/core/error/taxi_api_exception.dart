@@ -1,4 +1,5 @@
 import 'package:superapp_user/core/error/failures.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:dio/dio.dart';
 
 class TaxiApiException implements Exception {
@@ -36,13 +37,13 @@ class TaxiApiException implements Exception {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
-        return 'The connection timed out. Please try again.';
+        return 'The connection timed out. Please try again.'.tr;
       case DioExceptionType.connectionError:
-        return 'Unable to reach the server. Check your internet connection.';
+        return 'Unable to reach the server. Check your internet connection.'.tr;
       case DioExceptionType.cancel:
-        return 'Request was cancelled.';
+        return 'Request was cancelled.'.tr;
       default:
-        return error.message ?? 'Something went wrong. Please try again.';
+        return error.message ?? 'Something went wrong. Please try again.'.tr;
     }
   }
 

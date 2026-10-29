@@ -9,22 +9,22 @@ class TaxiTextStyles {
     final base = GoogleFonts.poppinsTextTheme();
     return base.copyWith(
       displayLarge: base.displayLarge?.copyWith(
-        fontWeight: FontWeight.w700,
+        fontWeight: FontWeight.w600,
         color: primaryColor,
         letterSpacing: -0.5,
       ),
       headlineLarge: base.headlineLarge?.copyWith(
-        fontWeight: FontWeight.w700,
+        fontWeight: FontWeight.w600,
         color: primaryColor,
         fontSize: 28,
       ),
       headlineMedium: base.headlineMedium?.copyWith(
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.w500,
         color: primaryColor,
         fontSize: 22,
       ),
       titleLarge: base.titleLarge?.copyWith(
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.w500,
         color: primaryColor,
         fontSize: 18,
       ),
@@ -49,14 +49,14 @@ class TaxiTextStyles {
         fontWeight: FontWeight.w400,
       ),
       labelLarge: base.labelLarge?.copyWith(
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.w500,
         fontSize: 14,
       ),
     );
   }
 
   static const TextStyle price = TextStyle(
-    fontWeight: FontWeight.w700,
+    fontWeight: FontWeight.w600,
     fontSize: 20,
     color: TaxiColors.primary,
   );

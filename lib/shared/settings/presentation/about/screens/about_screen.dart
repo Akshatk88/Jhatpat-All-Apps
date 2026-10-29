@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
@@ -37,11 +38,11 @@ class AboutScreen extends StatelessWidget {
           },
         ),
         title: Text(
-          'About Us',
+          'About Us'.tr,
           style: TextStyle(
             color: textColor,
             fontSize: 18.sp,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),
@@ -75,7 +76,7 @@ class AboutScreen extends StatelessWidget {
               SizedBox(height: 20.h),
 
               // 4. WHY CHOOSE SUVIO? SECTION
-              _buildSectionTitle('Why Choose Suvio?', isDark),
+              _buildSectionTitle('Why Choose JhatPat?'.tr, isDark),
               SizedBox(height: 12.h),
               _buildWhyChooseUsCard(isDark, textColor, secondaryTextColor),
 
@@ -95,7 +96,7 @@ class AboutScreen extends StatelessWidget {
               Column(
                 children: [
                   Text(
-                    'Version 1.2.0',
+                    'Version 1.2.0'.tr,
                     style: TextStyle(
                       fontSize: 11.5.sp,
                       color: secondaryTextColor,
@@ -104,7 +105,7 @@ class AboutScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 2.h),
                   Text(
-                    '© 2026 Suvio. All Rights Reserved.',
+                    '© 2026 JhatPat. All Rights Reserved.'.tr,
                     style: TextStyle(
                       fontSize: 11.sp,
                       color: secondaryTextColor,
@@ -114,12 +115,15 @@ class AboutScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        'Fresh Food. Fast Delivery. Anytime.',
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.primary,
+                      Flexible(
+                        child: Text(
+                          'Fresh Food. Fast Delivery. Anytime.'.tr,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFFE5A600),
+                          ),
                         ),
                       ),
                       SizedBox(width: 4.w),
@@ -137,17 +141,17 @@ class AboutScreen extends StatelessWidget {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
+                        foregroundColor: Colors.black,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24.r),
                         ),
                       ),
                       child: Text(
-                        'Close',
+                        'Close'.tr,
                         style: TextStyle(
                           fontSize: 15.sp,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
@@ -162,7 +166,7 @@ class AboutScreen extends StatelessWidget {
     );
   }
 
-  /// 1. Hero Card: Suvio Logo + Subtitle + Headline + Description + 3D Illustration
+  /// 1. Hero Card: Jhatpat Logo + Subtitle + Headline + Description + 3D Illustration
   Widget _buildHeroCard(bool isDark, Color textColor, Color secondaryTextColor) {
     return Container(
       padding: EdgeInsets.all(16.r),
@@ -172,17 +176,17 @@ class AboutScreen extends StatelessWidget {
           end: Alignment.bottomRight,
           colors: isDark
               ? [
-                  const Color(0xFF231A14),
-                  const Color(0xFF1E1A16),
+                  const Color(0xFF1E1E1E),
+                  const Color(0xFF181818),
                 ]
               : [
-                  const Color(0xFFFFFBF5),
-                  const Color(0xFFFFF4EA),
+                  const Color(0xFFFFFDF5),
+                  const Color(0xFFFFF8E1),
                 ],
         ),
         borderRadius: BorderRadius.circular(20.r),
         border: Border.all(
-          color: isDark ? const Color(0xFF3D2B1F) : const Color(0xFFFFE5D0),
+          color: isDark ? const Color(0xFF333333) : const Color(0xFFFFE8A3),
           width: 1,
         ),
         boxShadow: [
@@ -205,13 +209,18 @@ class AboutScreen extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      'suvio',
-                      style: TextStyle(
-                        fontSize: 28.sp,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.primary,
-                        letterSpacing: -0.5,
+                    Flexible(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          'JhatPat',
+                          style: TextStyle(
+                            fontSize: 28.sp,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFFE5A600),
+                            letterSpacing: -0.5,
+                          ),
+                        ),
                       ),
                     ),
                     SizedBox(width: 3.w),
@@ -223,17 +232,17 @@ class AboutScreen extends StatelessWidget {
                       ),
                       child: Icon(
                         Icons.restaurant_menu_rounded,
-                        color: Colors.white,
+                        color: Colors.black,
                         size: 10.sp,
                       ),
                     ),
                   ],
                 ),
                 Text(
-                  'Food & Drink',
+                  'Food & Drink'.tr,
                   style: TextStyle(
                     fontSize: 12.sp,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: textColor,
                   ),
                 ),
@@ -254,17 +263,17 @@ class AboutScreen extends StatelessWidget {
                   text: TextSpan(
                     style: TextStyle(
                       fontSize: 13.5.sp,
-                      fontWeight: FontWeight.w900,
+                      fontWeight: FontWeight.w700,
                       height: 1.25,
                     ),
                     children: [
                       TextSpan(
-                        text: 'Good Food. Great Moments.\n',
+                        text: 'Good Food. Great Moments.\n'.tr,
                         style: TextStyle(color: textColor),
                       ),
                       TextSpan(
-                        text: 'Delivered to You.',
-                        style: TextStyle(color: AppColors.primary),
+                        text: 'Delivered to You.'.tr,
+                        style: TextStyle(color: const Color(0xFFE5A600)),
                       ),
                     ],
                   ),
@@ -274,7 +283,7 @@ class AboutScreen extends StatelessWidget {
 
                 // Description
                 Text(
-                  'Suvio is your trusted food delivery platform, connecting you with the best restaurants, cafés and food partners. Fresh meals, quick delivery and delightful experiences – all at your fingertips.',
+                  'JhatPat is your trusted food delivery platform, connecting you with the best restaurants, cafés and food partners. Fresh meals, quick delivery and delightful experiences – all at your fingertips.'.tr,
                   style: TextStyle(
                     fontSize: 11.sp,
                     height: 1.35,
@@ -370,16 +379,16 @@ class AboutScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 5.h),
                   Text(
-                    m['stat'] as String,
+                    (m['stat'] as String).tr,
                     style: TextStyle(
                       fontSize: 12.5.sp,
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.primary,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFFE5A600),
                     ),
                   ),
                   SizedBox(height: 2.h),
                   Text(
-                    m['label'] as String,
+                    (m['label'] as String).tr,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 10.sp,
@@ -402,10 +411,10 @@ class AboutScreen extends StatelessWidget {
       padding: EdgeInsets.all(14.r),
       constraints: BoxConstraints(minHeight: 165.h),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF261D18) : const Color(0xFFFFF8F2),
+        color: isDark ? const Color(0xFF222222) : const Color(0xFFFFFDF5),
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: isDark ? const Color(0xFF4A3428) : const Color(0xFFFFE8D6),
+          color: isDark ? const Color(0xFF3A3A3A) : const Color(0xFFFFE8A3),
           width: 1,
         ),
       ),
@@ -417,7 +426,7 @@ class AboutScreen extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(8.r),
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF3D271B) : const Color(0xFFFFECE0),
+                  color: isDark ? const Color(0xFF333333) : const Color(0xFFFFF0C2),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -432,10 +441,10 @@ class AboutScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Our Mission',
+                      'Our Mission'.tr,
                       style: TextStyle(
                         fontSize: 13.5.sp,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                         color: textColor,
                       ),
                     ),
@@ -452,7 +461,7 @@ class AboutScreen extends StatelessWidget {
           ),
           SizedBox(height: 10.h),
           Text(
-            'To make food ordering effortless by delivering quality meals quickly, safely and affordably through smart technology and excellent service.',
+            'To make food ordering effortless by delivering quality meals quickly, safely and affordably through smart technology and excellent service.'.tr,
             style: TextStyle(
               fontSize: 11.sp,
               height: 1.35,
@@ -500,10 +509,10 @@ class AboutScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Our Vision',
+                      'Our Vision'.tr,
                       style: TextStyle(
                         fontSize: 13.5.sp,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                         color: textColor,
                       ),
                     ),
@@ -520,7 +529,7 @@ class AboutScreen extends StatelessWidget {
           ),
           SizedBox(height: 10.h),
           Text(
-            'To become the most trusted Food & Drink platform, connecting millions of customers with the best local restaurants and creating memorable food experiences.',
+            'To become the most trusted Food & Drink platform, connecting millions of customers with the best local restaurants and creating memorable food experiences.'.tr,
             style: TextStyle(
               fontSize: 11.sp,
               height: 1.35,
@@ -550,7 +559,7 @@ class AboutScreen extends StatelessWidget {
           title,
           style: TextStyle(
             fontSize: 15.sp,
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.w600,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
           ),
         ),
@@ -567,7 +576,7 @@ class AboutScreen extends StatelessWidget {
     );
   }
 
-  /// 4. Why Choose Suvio Card (6 Features Grid)
+  /// 4. Why Choose Jhatpat Card (6 Features Grid)
   Widget _buildWhyChooseUsCard(bool isDark, Color textColor, Color secondaryTextColor) {
     final features = [
       {
@@ -659,17 +668,17 @@ class AboutScreen extends StatelessWidget {
                       ),
                       SizedBox(height: 6.h),
                       Text(
-                        f['title'] as String,
+                        (f['title'] as String).tr,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 10.5.sp,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: textColor,
                         ),
                       ),
                       SizedBox(height: 3.h),
                       Text(
-                        f['desc'] as String,
+                        (f['desc'] as String).tr,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 9.sp,
@@ -692,21 +701,21 @@ class AboutScreen extends StatelessWidget {
   Widget _buildCompanyInfoCard(
       BuildContext context, bool isDark, Color textColor, Color secondaryTextColor) {
     final items = [
-      {'icon': Icons.label_outlined, 'title': 'Company Name', 'value': 'Suvio', 'isLink': false},
+      {'icon': Icons.label_outlined, 'title': 'Company Name', 'value': 'JhatPat', 'isLink': false},
       {'icon': Icons.grid_view_rounded, 'title': 'Category', 'value': 'Food & Drink', 'isLink': false},
       {
         'icon': Icons.language_rounded,
         'title': 'Website',
-        'value': 'www.suvio.com',
+        'value': 'www.jhatpat.com',
         'isLink': true,
-        'url': 'https://www.suvio.com'
+        'url': 'https://www.jhatpat.com'
       },
       {
         'icon': Icons.email_outlined,
         'title': 'Email',
-        'value': 'support@suvio.com',
+        'value': 'support@jhatpat.com',
         'isLink': false,
-        'url': 'mailto:support@suvio.com'
+        'url': 'mailto:support@jhatpat.com'
       },
       {
         'icon': Icons.phone_outlined,
@@ -757,20 +766,25 @@ class AboutScreen extends StatelessWidget {
                       ),
                       SizedBox(width: 12.w),
                       Text(
-                        item['title'] as String,
+                        (item['title'] as String).tr,
                         style: TextStyle(
                           fontSize: 12.5.sp,
                           fontWeight: FontWeight.w500,
                           color: textColor,
                         ),
                       ),
-                      const Spacer(),
-                      Text(
-                        item['value'] as String,
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w600,
-                          color: item['isLink'] == true ? AppColors.primary : secondaryTextColor,
+                      SizedBox(width: 8.w),
+                      Expanded(
+                        child: Text(
+                          (item['value'] as String).tr,
+                          textAlign: TextAlign.right,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w500,
+                            color: item['isLink'] == true ? const Color(0xFFE5A600) : secondaryTextColor,
+                          ),
                         ),
                       ),
                       SizedBox(width: 4.w),
@@ -807,17 +821,17 @@ class AboutScreen extends StatelessWidget {
           end: Alignment.centerRight,
           colors: isDark
               ? [
-                  const Color(0xFF231A14),
-                  const Color(0xFF1F1A16),
+                  const Color(0xFF1E1E1E),
+                  const Color(0xFF1A1A1A),
                 ]
               : [
-                  const Color(0xFFFFFBF0),
-                  const Color(0xFFFFF4E5),
+                  const Color(0xFFFFFDF5),
+                  const Color(0xFFFFF8E1),
                 ],
         ),
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: isDark ? const Color(0xFF3D2B1F) : const Color(0xFFFFE6CC),
+          color: isDark ? const Color(0xFF333333) : const Color(0xFFFFE8A3),
           width: 1,
         ),
       ),
@@ -841,16 +855,16 @@ class AboutScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Thank you for being a part of Suvio!',
+                  'Thank you for being a part of JhatPat!'.tr,
                   style: TextStyle(
                     fontSize: 12.5.sp,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: textColor,
                   ),
                 ),
                 SizedBox(height: 2.h),
                 Text(
-                  'We are grateful for your trust and support.',
+                  'We are grateful for your trust and support.'.tr,
                   style: TextStyle(
                     fontSize: 11.sp,
                     color: secondaryTextColor,

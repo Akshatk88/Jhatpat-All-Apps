@@ -43,7 +43,12 @@ class AppSearchBar extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: readOnly
-                    ? Text(hint, style: Theme.of(context).textTheme.bodyMedium)
+                    ? Text(
+                        hint,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      )
                     : TextField(
                         controller: controller,
                         onChanged: onChanged,

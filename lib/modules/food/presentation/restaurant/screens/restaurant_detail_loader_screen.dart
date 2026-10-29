@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -24,7 +25,7 @@ class RestaurantDetailLoaderScreen extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     if (restaurantId.isEmpty) {
-      return _buildErrorState(context, isDark, 'Invalid restaurant link.');
+      return _buildErrorState(context, isDark, 'Invalid restaurant link.'.tr);
     }
 
     final restaurantAsync = ref.watch(restaurantByIdProvider(restaurantId));
@@ -43,14 +44,14 @@ class RestaurantDetailLoaderScreen extends ConsumerWidget {
       error: (err, stack) => _buildErrorState(
         context,
         isDark,
-        'Unable to load restaurant. Link may be expired.',
+        'Unable to load restaurant. Link may be expired.'.tr,
       ),
       data: (restaurant) {
         if (restaurant == null) {
           return _buildErrorState(
             context,
             isDark,
-            'This restaurant is currently unavailable.',
+            'This restaurant is currently unavailable.'.tr,
           );
         }
         return RestaurantScreen(restaurant: restaurant);
@@ -101,10 +102,10 @@ class RestaurantDetailLoaderScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 20),
               Text(
-                'Restaurant Not Found',
+                'Restaurant Not Found'.tr,
                 style: TextStyle(
                   fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   color: textColor,
                 ),
               ),
@@ -118,7 +119,7 @@ class RestaurantDetailLoaderScreen extends ConsumerWidget {
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
+                  foregroundColor: const Color(0xFF121212),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24,
                     vertical: 12,
@@ -129,9 +130,9 @@ class RestaurantDetailLoaderScreen extends ConsumerWidget {
                 ),
                 onPressed: () => context.go(RouteNames.home),
                 icon: const Icon(Icons.home_rounded, size: 18),
-                label: const Text(
-                  'GO TO HOME',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                label: Text(
+                  'GO TO HOME'.tr,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
               ),
             ],

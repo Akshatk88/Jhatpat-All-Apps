@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 import 'package:superapp_user/modules/taxi/home/application/booking_state.dart';
 import 'package:superapp_user/modules/taxi/home/application/home_providers.dart';
@@ -48,7 +49,7 @@ class _DeliveryVehicleScreenState extends ConsumerState<DeliveryVehicleScreen> {
   Widget build(BuildContext context) {
     final pickup = ref.watch(deliveryBookingProvider).pickup;
     final addressAsync = ref.watch(currentAddressProvider);
-    final currentAddr = addressAsync.value ?? 'Fetching location...';
+    final currentAddr = addressAsync.value ?? 'Fetching location...'.tr;
     final addressToDisplay = (pickup?.address != null && pickup!.address.isNotEmpty)
         ? pickup.address
         : currentAddr;
@@ -77,26 +78,26 @@ class _DeliveryVehicleScreenState extends ConsumerState<DeliveryVehicleScreen> {
                   children: [
                     // Subheader Section: "Choose a Service"
                     Row(
-                      children: const [
-                        Expanded(
+                      children: [
+                        const Expanded(
                           child: Divider(
                             color: Color(0xFFE2E8F0),
                             thickness: 1,
                           ),
                         ),
                         Padding(
-                          padding: EdgeInsets.fromLTRB(16.0, 18.0, 16.0, 0.0),
-                          child: Text( 
-                            'Choose a Service',
-                            style: TextStyle(
+                          padding: const EdgeInsets.fromLTRB(16.0, 18.0, 16.0, 0.0),
+                          child: Text(
+                            'Choose a Service'.tr,
+                            style: const TextStyle(
                               fontSize: 14.5,
-                              fontWeight: FontWeight.w800,
+                              fontWeight: FontWeight.w600,
                               color: Color(0xFF0F172A),
                               letterSpacing: -0.2,
                             ),
                           ),
                         ),
-                        Expanded(
+                        const Expanded(
                           child: Divider(
                             color: Color(0xFFE2E8F0),
                             thickness: 1,
@@ -105,9 +106,9 @@ class _DeliveryVehicleScreenState extends ConsumerState<DeliveryVehicleScreen> {
                       ],
                     ),
                     const SizedBox(height: 3),
-                    const Text(
-                      'Select a vehicle for delivery service',
-                      style: TextStyle(
+                    Text(
+                      'Select a vehicle for delivery service'.tr,
+                      style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w500,
                         color: Color(0xFF64748B),
@@ -120,9 +121,10 @@ class _DeliveryVehicleScreenState extends ConsumerState<DeliveryVehicleScreen> {
                       padding: EdgeInsets.zero,
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
+                      // 2x2 on phones; more per row on tablets / desktop.
                       gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
+                          const SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 220,
                             mainAxisSpacing: 12,
                             crossAxisSpacing: 12,
                             childAspectRatio: 0.94,
@@ -154,30 +156,30 @@ class _DeliveryVehicleScreenState extends ConsumerState<DeliveryVehicleScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: const [
-                        _TrustBadge(
+                        Expanded(child: _TrustBadge(
                           icon: Icons.verified_user_rounded,
                           iconColor: Color(0xFF10B981),
                           title: 'Safety Assured',
                           subtitle: 'Verified Drivers',
-                        ),
-                        _TrustBadge(
+                        )),
+                        Expanded(child: _TrustBadge(
                           icon: Icons.timer_rounded,
-                          iconColor: Color(0xFFFF5C2B),
+                          iconColor: Color(0xFFE5A600),
                           title: 'On-Time',
                           subtitle: 'Fast & Reliable',
-                        ),
-                        _TrustBadge(
+                        )),
+                        Expanded(child: _TrustBadge(
                           icon: Icons.headset_mic_rounded,
                           iconColor: Color(0xFF3B82F6),
                           title: '24/7 Support',
                           subtitle: 'Always Active',
-                        ),
-                        _TrustBadge(
+                        )),
+                        Expanded(child: _TrustBadge(
                           icon: Icons.account_balance_wallet_rounded,
                           iconColor: Color(0xFF8B5CF6),
                           title: 'Affordable',
                           subtitle: 'Best Rates',
-                        ),
+                        )),
                       ],
                     ),
 
@@ -227,11 +229,11 @@ class _HeaderSection extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
-        // Warm lighter orange gradient
+        // Jhatpat yellow gradient
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0xFFFF8550), Color(0xFFFF6933)],
+          colors: [Color(0xFFFFC700), Color(0xFFFFB800)],
         ),
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(26),
@@ -272,7 +274,7 @@ class _HeaderSection extends StatelessWidget {
                     onPressed: onBack,
                     icon: const Icon(
                       Icons.arrow_back_rounded,
-                      color: Colors.white,
+                      color: Color(0xFF121212),
                       size: 22,
                     ),
                     constraints: const BoxConstraints(
@@ -332,12 +334,12 @@ class _HeaderSection extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Text(
-                                'PICK UP FROM',
-                                style: TextStyle(
+                              Text(
+                                'PICK UP FROM'.tr,
+                                style: const TextStyle(
                                   fontSize: 9.5,
                                   letterSpacing: 0.5,
-                                  fontWeight: FontWeight.w800,
+                                  fontWeight: FontWeight.w600,
                                   color: Color(0xFF94A3B8),
                                 ),
                               ),
@@ -348,7 +350,7 @@ class _HeaderSection extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
                                   fontSize: 13,
-                                  fontWeight: FontWeight.w800,
+                                  fontWeight: FontWeight.w600,
                                   color: Color(0xFF0F172A),
                                 ),
                               ),
@@ -392,24 +394,24 @@ class _CategoryCardTile extends StatelessWidget {
   Widget build(BuildContext context) {
     // Unique accent styling per category card
     final tagBgColors = [
-      const Color(0xFFFFF7ED), // Trucks
-      const Color(0xFFEFF6FF), // 2 Wheeler
-      const Color(0xFFF0FDF4), // Auto
-      const Color(0xFFFAF5FF), // Movers
+      const Color(0xFFFFF8E1), // Trucks
+      const Color(0xFFFFF8E1), // 2 Wheeler
+      const Color(0xFFFFF8E1), // Auto
+      const Color(0xFFFFF8E1), // Movers
     ];
 
     final tagTextColors = [
-      const Color(0xFFFF5C2B),
-      const Color(0xFF3B82F6),
-      const Color(0xFF10B981),
-      const Color(0xFF8B5CF6),
+      const Color(0xFF121212),
+      const Color(0xFF121212),
+      const Color(0xFF121212),
+      const Color(0xFF121212),
     ];
 
     final plusBtnColors = [
-      const Color(0xFFFF5C2B),
-      const Color(0xFF3B82F6),
-      const Color(0xFF10B981),
-      const Color(0xFF8B5CF6),
+      const Color(0xFFFFB800),
+      const Color(0xFFFFB800),
+      const Color(0xFFFFB800),
+      const Color(0xFFFFB800),
     ];
 
     final tagBg = tagBgColors[index % tagBgColors.length];
@@ -461,10 +463,10 @@ class _CategoryCardTile extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    category.title,
+                    category.title.tr,
                     style: TextStyle(
                       fontSize: 9.5,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w600,
                       color: tagText,
                     ),
                   ),
@@ -497,11 +499,11 @@ class _CategoryCardTile extends StatelessWidget {
 
                   // Title Text
                   Text(
-                    category.title,
+                    category.title.tr,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontWeight: FontWeight.w900,
+                      fontWeight: FontWeight.w700,
                       fontSize: 13.5,
                       color: Color(0xFF0F172A),
                     ),
@@ -513,7 +515,7 @@ class _CategoryCardTile extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          _getShortDesc(category.id),
+                          _getShortDesc(category.id).tr,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
@@ -534,7 +536,7 @@ class _CategoryCardTile extends StatelessWidget {
                         child: const Center(
                           child: Icon(
                             Icons.add_rounded,
-                            color: Colors.white,
+                            color: Color(0xFF121212),
                             size: 15,
                           ),
                         ),
@@ -579,11 +581,11 @@ class _ExploreRewardsBanner extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
-          colors: [Color(0xFFFF7A45), Color(0xFFFF5C2B)],
+          colors: [Color(0xFFFFC700), Color(0xFFFFB800)],
         ),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x2BFF5C2B),
+            color: Color(0x2BFFB800),
             blurRadius: 12,
             offset: Offset(0, 4),
           ),
@@ -615,7 +617,7 @@ class _ExploreRewardsBanner extends StatelessWidget {
                 '\$',
                 style: TextStyle(
                   color: Colors.white,
-                  fontWeight: FontWeight.w900,
+                  fontWeight: FontWeight.w700,
                   fontSize: 20,
                   shadows: [
                     Shadow(
@@ -631,27 +633,27 @@ class _ExploreRewardsBanner extends StatelessWidget {
           const SizedBox(width: 10),
 
           // Title & Description
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Explore Rewards',
-                  style: TextStyle(
+                  'Explore Rewards'.tr,
+                  style: const TextStyle(
                     fontSize: 14,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF121212),
                     letterSpacing: -0.2,
                   ),
                 ),
-                SizedBox(height: 1),
+                const SizedBox(height: 1),
                 Text(
-                  'Earn 2 coins for every 100 spent',
-                  style: TextStyle(
+                  'Earn 2 coins for every 100 spent'.tr,
+                  style: const TextStyle(
                     fontSize: 10.5,
                     fontWeight: FontWeight.w500,
-                    color: Color(0xFFFFEAE2),
+                    color: Colors.black54,
                   ),
                 ),
               ],
@@ -670,7 +672,7 @@ class _ExploreRewardsBanner extends StatelessWidget {
             child: const Center(
               child: Icon(
                 Icons.arrow_forward_rounded,
-                color: Colors.white,
+                color: Color(0xFF121212),
                 size: 16,
               ),
             ),
@@ -711,15 +713,17 @@ class _TrustBadge extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          title,
+          title.tr,
+          textAlign: TextAlign.center,
           style: const TextStyle(
             fontSize: 10,
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.w600,
             color: Color(0xFF0F172A),
           ),
         ),
         Text(
-          subtitle,
+          subtitle.tr,
+          textAlign: TextAlign.center,
           style: const TextStyle(
             fontSize: 8.5,
             fontWeight: FontWeight.w500,

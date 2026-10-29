@@ -1,0 +1,190 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <!--
+        Lets the app show the one-tap "allow this app to ignore battery
+        optimisation" dialog. Play restricts this permission to apps whose core
+        function genuinely needs it; a rider app doing continuous location
+        tracking qualifies, but the Play Console listing must declare it.
+        Without the permission the dialog is skipped and the rider is sent to the
+        battery settings list instead, which still works.
+    -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT"/>
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <application
+        android:label="Jhatpat Delivery"
+        android:name="${applicationName}"
+        android:icon="@mipmap/launcher_icon">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:taskAffinity=""
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:windowSoftInputMode="adjustResize">
+            <!-- Specifies an Android theme to apply to this Activity as soon as
+                 the Android process has started. This theme is visible to the user
+                 while the Flutter UI initializes. After that, this theme continues
+                 to determine the Window background behind the Flutter UI. -->
+            <meta-data
+              android:name="io.flutter.embedding.android.NormalTheme"
+              android:resource="@style/NormalTheme"
+              />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <!-- Don't delete the meta-data below.
+             This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
+        <meta-data
+            android:name="flutterEmbedding"
+            android:value="2" />
+        
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBbOTOv3KgTY__MAvPC1A7GZSO_5Wp1N88" />
+
+        <!-- Background pushes that name no channel land here instead of the
+             low-importance "Miscellaneous" channel, so they show a banner.
+             Must match the channel created in lib/core/services/fcm_service.dart. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="high_importance_channel" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_stat_jhatpat" />
+
+        <!--
+            Keeps the process alive while the rider is online, so location keeps
+            flowing and the Flutter engine stays warm for incoming orders.
+            foregroundServiceType=location is mandatory from Android 14; the
+            matching FOREGROUND_SERVICE_LOCATION permission is declared above.
+        -->
+        <service
+            android:name=".RiderOnlineService"
+            android:exported="false"
+            android:stopWithTask="false"
+            android:foregroundServiceType="location" />
+
+        <service
+            android:name="flutter.overlay.window.flutter_overlay_window.OverlayService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Floating incoming-order bubble shown while backgrounded, like Uber/Rapido" />
+        </service>
+
+        <!--
+            The target of the incoming-order full-screen intent. Shows over the
+            lock screen and wakes the display, which is the whole point: an offer
+            that arrives on a dark, locked phone is one the rider never sees.
+
+            excludeFromRecents + noHistory so a dealt-with offer cannot be
+            resurrected from the recents list minutes later, by which time the
+            job belongs to someone else. Not exported: only our own notification
+            may launch it.
+        -->
+        <activity
+            android:name=".IncomingOrderActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:taskAffinity=""
+            android:theme="@style/IncomingOrderTheme" />
+
+        <!--
+            Receives the FCM push directly, in parallel with the
+            firebase_messaging plugin's own receiver, so the alert does not wait
+            on a Flutter engine starting. The SEND permission is what stops any
+            other app from broadcasting fake offers to us.
+        -->
+        <!--
+            The offer notification's Reject button. A broadcast so declining
+            opens nothing; not exported, reachable only through our own
+            PendingIntent.
+        -->
+        <receiver
+            android:name=".OfferActionReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".IncomingOrderReceiver"
+            android:exported="true"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            </intent-filter>
+        </receiver>
+        <!-- Sweeps away blank notifications the system draws for backend data pushes. -->
+        <receiver
+            android:name=".EmptyPushCleaner"
+            android:exported="true"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            </intent-filter>
+        </receiver>
+    </application>
+    <!-- Required to query activities that can process text, see:
+         https://developer.android.com/training/package-visibility and
+         https://developer.android.com/reference/android/content/Intent#ACTION_PROCESS_TEXT.
+
+         In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
+    <queries>
+        <!-- Android 11+ package visibility: without these the OEM autostart
+             screens (MainActivity.resolveAutoStartIntent) resolve to null, so
+             the setup screen never found or offered them. -->
+        <package android:name="com.miui.securitycenter"/>
+        <package android:name="com.letv.android.letvsafe"/>
+        <package android:name="com.huawei.systemmanager"/>
+        <package android:name="com.hihonor.systemmanager"/>
+        <package android:name="com.coloros.safecenter"/>
+        <package android:name="com.oppo.safe"/>
+        <package android:name="com.oplus.battery"/>
+        <package android:name="com.oneplus.security"/>
+        <package android:name="com.iqoo.secure"/>
+        <package android:name="com.vivo.permissionmanager"/>
+        <package android:name="com.asus.mobilemanager"/>
+        <package android:name="com.samsung.android.lool"/>
+        <intent>
+            <action android:name="android.intent.action.PROCESS_TEXT"/>
+            <data android:mimeType="text/plain"/>
+        </intent>
+        <!-- Android 11+ hides other apps from canLaunchUrl unless declared:
+             without these the Call / Navigate buttons silently do nothing. -->
+        <intent>
+            <action android:name="android.intent.action.DIAL"/>
+            <data android:scheme="tel"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="https"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="google.navigation"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="geo"/>
+        </intent>
+    </queries>
+</manifest>

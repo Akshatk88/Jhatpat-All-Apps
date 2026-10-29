@@ -10,6 +10,7 @@ import 'package:superapp_user/modules/taxi/auth/application/auth_providers.dart'
 import 'package:superapp_user/design_system/components/ride/app_text_field.dart';
 import 'package:superapp_user/design_system/components/ride/custom_app_bar.dart';
 import 'package:superapp_user/design_system/components/ride/primary_button.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 class TaxiEditProfileScreen extends ConsumerStatefulWidget {
   const TaxiEditProfileScreen({super.key});
@@ -47,7 +48,7 @@ class _EditProfileScreenState extends ConsumerState<TaxiEditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Edit profile'),
+      appBar: CustomAppBar(title: 'Edit profile'.tr),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -55,30 +56,30 @@ class _EditProfileScreenState extends ConsumerState<TaxiEditProfileScreen> {
           children: [
             Center(child: _buildAvatar()),
             const SizedBox(height: 32),
-            AppTextField(controller: _nameController, label: 'Full name', hint: 'Your name'),
+            AppTextField(controller: _nameController, label: 'Full name'.tr, hint: 'Your name'.tr),
             const SizedBox(height: 16),
             AppTextField(
               controller: _emailController,
-              label: 'Email',
+              label: 'Email'.tr,
               hint: 'you@example.com',
               keyboardType: TextInputType.emailAddress,
             ),
             const SizedBox(height: 16),
-            Text('Gender', style: Theme.of(context).textTheme.titleMedium),
+            Text('Gender'.tr, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
               children: [
                 for (final g in ['male', 'female', 'other'])
                   ChoiceChip(
-                    label: Text(g[0].toUpperCase() + g.substring(1)),
+                    label: Text((g[0].toUpperCase() + g.substring(1)).tr),
                     selected: _gender == g,
                     onSelected: (_) => setState(() => _gender = g),
                   ),
               ],
             ),
             const SizedBox(height: 32),
-            TaxiPrimaryButton(label: 'Save changes', isLoading: _saving, onPressed: _save),
+            TaxiPrimaryButton(label: 'Save changes'.tr, isLoading: _saving, onPressed: _save),
           ],
         ),
       ),
@@ -112,9 +113,9 @@ class _EditProfileScreenState extends ConsumerState<TaxiEditProfileScreen> {
               child: _uploadingImage
                   ? const Padding(
                       padding: EdgeInsets.all(8),
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF121212)),
                     )
-                  : const Icon(Icons.camera_alt_rounded, size: 18, color: Colors.white),
+                  : const Icon(Icons.camera_alt_rounded, size: 18, color: Color(0xFF121212)),
             ),
           ),
         ),
@@ -138,7 +139,7 @@ class _EditProfileScreenState extends ConsumerState<TaxiEditProfileScreen> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not upload photo. Please try again.')),
+          SnackBar(content: Text('Could not upload photo. Please try again.'.tr)),
         );
       }
     } finally {
@@ -159,14 +160,14 @@ class _EditProfileScreenState extends ConsumerState<TaxiEditProfileScreen> {
       ref.read(authControllerProvider.notifier).updateUser(updated);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile updated')),
+          SnackBar(content: Text('Profile updated'.tr)),
         );
         Navigator.of(context).pop();
       }
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not save changes. Please try again.')),
+          SnackBar(content: Text('Could not save changes. Please try again.'.tr)),
         );
       }
     } finally {

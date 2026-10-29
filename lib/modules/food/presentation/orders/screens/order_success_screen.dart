@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:superapp_user/core/speech/hindi_announcer.dart';
+import 'package:superapp_user/core/i18n/tr.dart';
 import 'package:superapp_user/core/utils/haptics.dart';
 import 'package:superapp_user/modules/food/data/models/order_model.dart';
 import 'package:superapp_user/design_system/tokens/app_colors.dart';
 import 'package:superapp_user/design_system/components/feedback/app_snackbar.dart';
+import 'package:superapp_user/design_system/components/buttons/announce_button.dart';
 import 'package:superapp_user/app/routing/route_names.dart';
 import 'package:superapp_user/modules/food/presentation/orders/utils/reorder.dart';
 import 'package:superapp_user/modules/food/presentation/orders/widgets/gst_label.dart';
@@ -27,6 +30,7 @@ class _OrderSuccessScreenState extends ConsumerState<OrderSuccessScreen> with Ti
   Timer? _pollTimer;
   Timer? _countdownTimer;
   bool _navigatedAway = false;
+  bool _announced = false;
   late AnimationController _staggerController;
 
   @override
@@ -63,7 +67,18 @@ class _OrderSuccessScreenState extends ConsumerState<OrderSuccessScreen> with Ti
     _pollTimer?.cancel();
     _countdownTimer?.cancel();
     _staggerController.dispose();
+    HindiAnnouncer.instance.stop();
     super.dispose();
+  }
+
+  /// Speaks the order once, the first time real order data is on screen.
+  void _announceOnce(OrderModel order) {
+    if (_announced || _navigatedAway || !mounted) return;
+    // Accepted/cancelled orders leave this screen immediately — nothing to say.
+    if (order.isCancelled || !order.isAwaitingAcceptance) return;
+    if (!HindiAnnouncer.appInForeground) return;
+    _announced = true;
+    HindiAnnouncer.instance.speak(_announcementText(order));
   }
 
   void _continueShopping() {
@@ -86,7 +101,7 @@ class _OrderSuccessScreenState extends ConsumerState<OrderSuccessScreen> with Ti
       Haptics.error();
       final reason = order.cancellationReason.isNotEmpty
           ? order.cancellationReason
-          : 'The restaurant was unable to accept this order.';
+          : 'The restaurant was unable to accept this order.'.tr;
       context.go(RouteNames.home);
       AppSnackbar.error(context, reason, duration: const Duration(seconds: 4));
       return;
@@ -114,7 +129,10 @@ class _OrderSuccessScreenState extends ConsumerState<OrderSuccessScreen> with Ti
     final async = ref.watch(orderDetailProvider(widget.orderId));
 
     async.whenData((order) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _handleStatus(order));
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _handleStatus(order);
+        _announceOnce(order);
+      });
     });
 
     return PopScope(
@@ -169,10 +187,10 @@ class _OrderSuccessScreenState extends ConsumerState<OrderSuccessScreen> with Ti
                             _StaggeredWidget(
                               animation: _getInterval(0.1, 0.4),
                               child: Text(
-                                order.isAwaitingAcceptance ? 'Order placed!' : 'Order confirmed!',
+                                order.isAwaitingAcceptance ? 'Order placed!'.tr : 'Order confirmed!'.tr,
                                 style: TextStyle(
                                   fontSize: 28,
-                                  fontWeight: FontWeight.w900,
+                                  fontWeight: FontWeight.w700,
                                   color: isDark ? Colors.white : AppColors.textPrimaryLight,
                                 ),
                               ),
@@ -182,12 +200,12 @@ class _OrderSuccessScreenState extends ConsumerState<OrderSuccessScreen> with Ti
                               animation: _getInterval(0.2, 0.5),
                               child: Text(
                                 order.isAwaitingAcceptance
-                                    ? 'Waiting for restaurant confirmation...'
-                                    : (order.etaLabel ?? 'Your food is being prepared'),
+                                    ? 'Waiting for restaurant confirmation...'.tr
+                                    : (order.etaLabel ?? 'Your food is being prepared'.tr),
                                 style: TextStyle(
                                   fontSize: 15,
-                                  color: AppColors.primary,
-                                  fontWeight: FontWeight.w600,
+                                  color: const Color(0xFFE5A600),
+                                  fontWeight: FontWeight.w500,
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -205,7 +223,12 @@ class _OrderSuccessScreenState extends ConsumerState<OrderSuccessScreen> with Ti
                                 ),
                               ),
                             ],
-                            const SizedBox(height: 32),
+                            const SizedBox(height: 16),
+                            _StaggeredWidget(
+                              animation: _getInterval(0.3, 0.6),
+                              child: AnnounceButton(text: _announcementText(order)),
+                            ),
+                            const SizedBox(height: 24),
                             _StaggeredWidget(
                               animation: _getInterval(0.4, 0.7),
                               child: _OrderInfoCard(order: order),
@@ -347,7 +370,7 @@ class _WaitingAnimationState extends State<_WaitingAnimation> with SingleTickerP
                     ),
                   ],
                 ),
-                child: const Icon(Icons.restaurant_rounded, color: Colors.white, size: 34),
+                child: const Icon(Icons.restaurant_rounded, color: Color(0xFF121212), size: 34),
               ),
             ],
           );
@@ -444,13 +467,13 @@ class _OrderInfoCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: TextStyle(fontSize: 12, color: secondary)),
+                Text(label.tr, style: TextStyle(fontSize: 12, color: secondary)),
                 const SizedBox(height: 4),
                 Text(
                   value,
                   style: TextStyle(
                     fontSize: 14,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                     color: textColor,
                   ),
                 ),
@@ -489,10 +512,10 @@ class _ItemsCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'YOUR ORDER',
+            'YOUR ORDER'.tr,
             style: TextStyle(
               fontSize: 13,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w600,
               letterSpacing: 0.5,
               color: secondary,
             ),
@@ -513,8 +536,8 @@ class _ItemsCard extends StatelessWidget {
                     child: Text(
                       '${item.quantity}×',
                       style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFFE5A600),
                         fontSize: 13,
                       ),
                     ),
@@ -530,7 +553,7 @@ class _ItemsCard extends StatelessWidget {
                               : '${item.name} (${item.variants.join(', ')})',
                           style: TextStyle(
                             fontSize: 14,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w500,
                             color: textColor,
                           ),
                         ),
@@ -548,7 +571,7 @@ class _ItemsCard extends StatelessWidget {
                     _fmt(item.lineTotal),
                     style: TextStyle(
                       fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w500,
                       color: textColor,
                     ),
                   ),
@@ -561,10 +584,10 @@ class _ItemsCard extends StatelessWidget {
             child: Divider(),
           ),
           Text(
-            'Bill Details',
+            'Bill Details'.tr,
             style: TextStyle(
               fontSize: 14,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w600,
               color: textColor,
             ),
           ),
@@ -591,7 +614,7 @@ class _ItemsCard extends StatelessWidget {
               ),
             if (order.deliveryFeeGst > 0)
               _billRow(
-                gstLabel('GST on Delivery Fee', order.deliveryFeeGstRate),
+                gstLabel('GST on Delivery Fee'.tr, order.deliveryFeeGstRate),
                 _fmt(order.deliveryFeeGst),
                 textColor,
                 secondary,
@@ -614,10 +637,10 @@ class _ItemsCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Total Paid',
+                'Total Paid'.tr,
                 style: TextStyle(
                   fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   color: textColor,
                 ),
               ),
@@ -625,8 +648,8 @@ class _ItemsCard extends StatelessWidget {
                 _fmt(order.total),
                 style: TextStyle(
                   fontSize: 18,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.primary,
+                  fontWeight: FontWeight.w700,
+                  color: const Color(0xFFE5A600),
                 ),
               ),
             ],
@@ -642,18 +665,21 @@ class _ItemsCard extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 13,
-              color: labelColor,
+          Flexible(
+            child: Text(
+              label.tr,
+              style: TextStyle(
+                fontSize: 13,
+                color: labelColor,
+              ),
             ),
           ),
+          const SizedBox(width: 8),
           Text(
             value,
             style: TextStyle(
               fontSize: 13,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w500,
               color: valueColor,
             ),
           ),
@@ -721,8 +747,8 @@ class _ReorderButtonState extends ConsumerState<_ReorderButton> {
                   Icon(Icons.replay_rounded, color: AppColors.primary, size: 20),
                   SizedBox(width: 8),
                   Text(
-                    'Reorder these items',
-                    style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 15),
+                    'Reorder these items'.tr,
+                    style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: 15),
                   ),
                 ],
               ),
@@ -798,10 +824,10 @@ class _BottomActions extends StatelessWidget {
               ),
               onPressed: onContinue,
               child: Text(
-                'Continue Shopping',
+                'Continue Shopping'.tr,
                 style: TextStyle(
                   color: isDark ? Colors.white : AppColors.textPrimaryLight,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   fontSize: 14,
                 ),
               ),
@@ -819,9 +845,9 @@ class _BottomActions extends StatelessWidget {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
                 onPressed: onTrack,
-                child: const Text(
-                  'Track Order',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                child: Text(
+                  'Track Order'.tr,
+                  style: const TextStyle(color: Color(0xFF121212), fontWeight: FontWeight.w600, fontSize: 15),
                 ),
               ),
             ),
@@ -851,14 +877,14 @@ class _MinimalSuccess extends StatelessWidget {
           const Spacer(),
           const _SuccessBadge(),
           const SizedBox(height: 24),
-          const Text(
-            'Order placed!',
-            style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
+          Text(
+            'Order placed!'.tr,
+            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Your order was placed successfully.',
-            style: TextStyle(fontSize: 15, color: AppColors.textSecondaryLight),
+          Text(
+            'Your order was placed successfully.'.tr,
+            style: const TextStyle(fontSize: 15, color: AppColors.textSecondaryLight),
           ),
           const Spacer(),
           _BottomActions(onContinue: onContinue, onTrack: onTrack),
@@ -898,16 +924,45 @@ Widget _card(BuildContext context, Widget child) {
   );
 }
 
+/// Hindi read-out of the order, built only from fields the order carries.
+String _announcementText(OrderModel order) {
+  final parts = <String>[
+    order.restaurantName.isNotEmpty
+        ? 'आपका ऑर्डर ${order.restaurantName} से प्लेस हो गया है।'
+        : 'आपका ऑर्डर प्लेस हो गया है।',
+    if (order.orderNumber.isNotEmpty) 'ऑर्डर नंबर ${order.orderNumber}।',
+  ];
+  if (order.items.isNotEmpty) {
+    final count = order.items.fold<int>(0, (sum, item) => sum + item.quantity);
+    final names = order.items.map((item) => '${item.quantity} ${item.name}').join(', ');
+    parts.add('$count आइटम: $names।');
+  }
+  if (order.total > 0) parts.add('कुल राशि ${HindiAnnouncer.rupees(order.total)}।');
+  final payment = switch (order.paymentMethod) {
+    'cash' => 'डिलीवरी पर कैश',
+    'razorpay_qr' => 'डिलीवरी पर QR से',
+    'wallet' => 'वॉलेट से हो चुका है',
+    'razorpay' => 'ऑनलाइन हो चुका है',
+    _ => '',
+  };
+  if (payment.isNotEmpty) parts.add('भुगतान: $payment।');
+  if (order.deliveryAddress.isNotEmpty) {
+    parts.add('डिलीवरी पता: ${HindiAnnouncer.address(order.deliveryAddress)}।');
+  }
+  if (order.isAwaitingAcceptance) parts.add('रेस्टोरेंट की पुष्टि का इंतज़ार है।');
+  return parts.join(' ');
+}
+
 String _paymentLabel(String method) {
   switch (method) {
     case 'cash':
-      return 'Cash on Delivery';
+      return 'Cash on Delivery'.tr;
     case 'razorpay':
-      return 'UPI / Card';
+      return 'Online (Card/NetBanking)'.tr;
     case 'razorpay_qr':
-      return 'Pay on delivery (QR)';
+      return 'Pay on delivery (QR)'.tr;
     case 'wallet':
-      return 'Suvio Wallet';
+      return 'JhatPat Wallet'.tr;
     default:
       return method;
   }

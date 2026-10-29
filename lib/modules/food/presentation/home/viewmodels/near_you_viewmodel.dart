@@ -35,6 +35,15 @@ class NearYouViewModel extends Notifier<NearYouState> {
   @override
   NearYouState build() {
     _catalogDataSource = ref.watch(catalogRemoteDataSourceProvider);
+    // Reload when the app-wide location moves (address picked or fetched).
+    ref.listen(currentLocationProvider, (previous, next) {
+      final a = previous?.value;
+      final b = next.value;
+      if (b == null || (a?.latitude == b.latitude && a?.longitude == b.longitude)) {
+        return;
+      }
+      loadNearbyRestaurants(isRefresh: true);
+    });
     Future.microtask(() => loadNearbyRestaurants());
     return const NearYouState(restaurants: AsyncValue.loading());
   }

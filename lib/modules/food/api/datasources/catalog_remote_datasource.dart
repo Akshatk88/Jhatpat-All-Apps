@@ -22,6 +22,23 @@ class CatalogRemoteDataSource {
   /// copy instead of hitting the network on every screen visit.
   static const _cacheTtl = Duration(minutes: 3);
 
+  /// Pulls a list out of an unwrapped payload, tolerating envelope drift:
+  /// the named key first, then the common `results` / `data` / `items` /
+  /// `docs` fallbacks, or the payload itself when it is already a list.
+  static List<dynamic> _listOf(Object? data, String key) {
+    if (data is List) return data;
+    if (data is! Map) return const [];
+    for (final k in [key, 'results', 'data', 'items', 'docs']) {
+      final v = data[k];
+      if (v is List) return v;
+      if (v is Map) {
+        final inner = v[key];
+        if (inner is List) return inner;
+      }
+    }
+    return const [];
+  }
+
   // ------------------------------------------------------------------ zones
 
   Future<ZoneModel> detectZone({required double lat, required double lng}) async {
@@ -40,7 +57,7 @@ class CatalogRemoteDataSource {
   /// which is exactly what the existing carousels consume.
   Future<List<String>> getHeroBannerImages() async {
     final data = await _client.get<Map<String, dynamic>>(ApiPaths.heroBanners, auth: false, cacheTtl: _cacheTtl);
-    return ((data['banners'] as List?) ?? const [])
+    return _listOf(data, 'banners')
         .whereType<Map>()
         .map((b) => ApiConfig.resolveMedia(b['imageUrl'] as String?))
         .where((url) => url.isNotEmpty)
@@ -59,7 +76,7 @@ class CatalogRemoteDataSource {
       auth: false,
       cacheTtl: _cacheTtl,
     );
-    return ((data['banners'] as List?) ?? const [])
+    return _listOf(data, 'banners')
         .whereType<Map>()
         .map((b) => PromoBannerModel.fromApi(b.cast<String, dynamic>()))
         .where((b) => b.imageUrl.isNotEmpty)
@@ -84,7 +101,7 @@ class CatalogRemoteDataSource {
 
   Future<List<CategoryModel>> getExploreIcons() async {
     final data = await _client.get<Map<String, dynamic>>(ApiPaths.exploreIcons, auth: false, cacheTtl: _cacheTtl);
-    final raw = ((data['items'] as List?) ?? const [])
+    final raw = _listOf(data, 'items')
         .whereType<Map>()
         .map((e) => CategoryModel.fromApi(e.cast<String, dynamic>()))
         .toList();
@@ -96,7 +113,7 @@ class CatalogRemoteDataSource {
     void Function(List<CategoryModel>)? onCache,
   }) async {
     List<CategoryModel> parse(Map<String, dynamic> data) {
-      final raw = ((data['categories'] as List?) ?? const [])
+      final raw = _listOf(data, 'categories')
           .whereType<Map>()
           .map((e) => CategoryModel.fromApi(e.cast<String, dynamic>()))
           .toList();
@@ -126,7 +143,7 @@ class CatalogRemoteDataSource {
     int limit = 50,
     void Function(List<RestaurantModel>)? onCache,
   }) async {
-    List<RestaurantModel> parse(Map<String, dynamic> data) => ((data['restaurants'] as List?) ?? const [])
+    List<RestaurantModel> parse(Map<String, dynamic> data) => _listOf(data, 'restaurants')
         .whereType<Map>()
         .map((e) => RestaurantModel.fromApi(e.cast<String, dynamic>()))
         .toList();
@@ -152,7 +169,7 @@ class CatalogRemoteDataSource {
 
   Future<RestaurantModel?> getRestaurantById(String id) async {
     final data = await _client.get<Map<String, dynamic>>(ApiPaths.restaurantById(id), auth: false, cacheTtl: _cacheTtl);
-    final r = data['restaurant'];
+    final r = data['restaurant'] ?? ((data.containsKey('_id') || data.containsKey('id')) ? data : null);
     return r is Map ? RestaurantModel.fromApi(r.cast<String, dynamic>()) : null;
   }
 
@@ -188,7 +205,7 @@ class CatalogRemoteDataSource {
     int limit = 200,
     void Function(List<FoodModel>)? onCache,
   }) async {
-    List<FoodModel> parse(Map<String, dynamic> data) => ((data['foods'] as List?) ?? const [])
+    List<FoodModel> parse(Map<String, dynamic> data) => _listOf(data, 'foods')
         .whereType<Map>()
         .map((e) => FoodModel.fromApi(e.cast<String, dynamic>()))
         .toList();
@@ -212,7 +229,7 @@ class CatalogRemoteDataSource {
       ApiPaths.restaurantAddons(restaurantId),
       auth: false,
     );
-    return ((data['addons'] as List?) ?? const [])
+    return _listOf(data, 'addons')
         .whereType<Map>()
         .map((e) => FoodAddon.fromApi(e.cast<String, dynamic>()))
         .where((a) => a.name.isNotEmpty)
@@ -241,7 +258,7 @@ class CatalogRemoteDataSource {
       },
       auth: false,
     );
-    return ((data['restaurants'] as List?) ?? const [])
+    return _listOf(data, 'restaurants')
         .whereType<Map>()
         .map((e) => RestaurantModel.fromApi(e.cast<String, dynamic>()))
         .toList();
@@ -257,7 +274,7 @@ class CatalogRemoteDataSource {
       ApiPaths.offers,
       query: {'restaurantId': restaurantId, 'subtotal': subtotal},
     );
-    return ((data['allOffers'] as List?) ?? const [])
+    return _listOf(data, 'allOffers')
         .whereType<Map>()
         .map((e) => e.cast<String, dynamic>())
         .toList();

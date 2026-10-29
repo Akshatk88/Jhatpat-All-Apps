@@ -45,7 +45,7 @@ ThemeData buildLightTheme() => ThemeData(
     secondary: AppColors.primaryButton,
     surface: AppColors.surfaceLight,
     error: AppColors.error,
-    onPrimary: Colors.white,
+    onPrimary: Colors.black,
     onSurface: AppColors.textPrimaryLight,
   ),
 
@@ -63,14 +63,14 @@ ThemeData buildLightTheme() => ThemeData(
     titleTextStyle: TextStyle(
       color: AppColors.textPrimaryLight,
       fontSize: 18,
-      fontWeight: FontWeight.w600,
+      fontWeight: FontWeight.w500,
     ),
   ),
 
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
       backgroundColor: AppColors.primaryButton,
-      foregroundColor: Colors.white,
+      foregroundColor: Colors.black,
       minimumSize: const Size(double.infinity, _buttonHeight),
       textStyle: AppTextStyles.button,
       shape: RoundedRectangleBorder(
@@ -136,7 +136,7 @@ ThemeData buildDarkTheme() => ThemeData(
     secondary: AppColors.primaryButton,
     surface: AppColors.surfaceDark,
     error: AppColors.error,
-    onPrimary: Colors.white,
+    onPrimary: Colors.black,
     onSurface: AppColors.textPrimaryDark,
   ),
   
@@ -154,14 +154,14 @@ ThemeData buildDarkTheme() => ThemeData(
     titleTextStyle: TextStyle(
       color: Colors.white,
       fontSize: 18,
-      fontWeight: FontWeight.w600,
+      fontWeight: FontWeight.w500,
     ),
   ),
 
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
       backgroundColor: AppColors.primaryButton,
-      foregroundColor: Colors.white,
+      foregroundColor: Colors.black,
       minimumSize: const Size(double.infinity, _buttonHeight),
       textStyle: AppTextStyles.button,
       shape: RoundedRectangleBorder(

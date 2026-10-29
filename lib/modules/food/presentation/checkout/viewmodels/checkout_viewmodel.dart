@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:superapp_user/core/i18n/tr.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -138,7 +139,7 @@ class CheckoutViewModel extends Notifier<CheckoutState> {
     if (restaurantId.isEmpty) {
       state = state.copyWith(
         isCalculating: false,
-        error: 'This item is missing its restaurant. Please re-add it to the cart.',
+        error: 'This item is missing its restaurant. Please re-add it to the cart.'.tr,
       );
       return;
     }
@@ -162,7 +163,7 @@ class CheckoutViewModel extends Notifier<CheckoutState> {
     } on Failure catch (f) {
       state = state.copyWith(isCalculating: false, error: f.message);
     } catch (_) {
-      state = state.copyWith(isCalculating: false, error: 'Could not calculate your bill.');
+      state = state.copyWith(isCalculating: false, error: 'Could not calculate your bill.'.tr);
     }
   }
 
@@ -187,10 +188,10 @@ class CheckoutViewModel extends Notifier<CheckoutState> {
     final cart = ref.read(cartViewModelProvider);
     final pricing = state.pricing;
 
-    if (cart.items.isEmpty) return (result: null, error: 'Your cart is empty.');
-    if (pricing == null) return (result: null, error: 'Bill not ready. Please try again.');
+    if (cart.items.isEmpty) return (result: null, error: 'Your cart is empty.'.tr);
+    if (pricing == null) return (result: null, error: 'Bill not ready. Please try again.'.tr);
     if (state.needsPriceConfirmation) {
-      return (result: null, error: 'Item prices changed. Please review before ordering.');
+      return (result: null, error: 'Item prices changed. Please review before ordering.'.tr);
     }
 
     try {
@@ -214,7 +215,7 @@ class CheckoutViewModel extends Notifier<CheckoutState> {
     } on Failure catch (f) {
       return (result: null, error: f.message);
     } catch (_) {
-      return (result: null, error: 'Could not place your order. Please try again.');
+      return (result: null, error: 'Could not place your order. Please try again.'.tr);
     }
   }
 
@@ -257,7 +258,7 @@ class CheckoutViewModel extends Notifier<CheckoutState> {
     final order = placed.result?['order'] as Map<String, dynamic>?;
     final orderId = (order?['_id'] ?? order?['orderMongoId'] ?? '').toString();
 
-    // For non-gateway payment methods (Cash on Delivery & Suvio Wallet)
+    // For non-gateway payment methods (Cash on Delivery & Jhatpat Wallet)
     if (paymentMethod == 'cash' || paymentMethod == 'wallet') {
       ref.read(cartViewModelProvider.notifier).clearCart();
       unawaited(
@@ -266,8 +267,8 @@ class CheckoutViewModel extends Notifier<CheckoutState> {
       return PaymentFlowResult(
         outcome: PaymentOutcome.success,
         message: paymentMethod == 'cash'
-            ? 'Order placed with Cash on Delivery 🎉'
-            : 'Order paid successfully using Suvio Wallet 🎉',
+            ? 'Order placed with Cash on Delivery 🎉'.tr
+            : 'Order paid successfully using JhatPat Wallet 🎉'.tr,
         orderId: orderId,
       );
     }
